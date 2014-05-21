@@ -7,7 +7,7 @@ define(['skate', 'slash', 'windex'], function (skate, Slash, Windex) {
   });
 
   var http = new Windex();
-  http.prefix = '/skate/views/';
+  http.prefix = '/views/';
   http.suffix = '.html';
 
   skate('skate-router', {
