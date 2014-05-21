@@ -1,0 +1,14 @@
+{
+  "name": "witness",
+  "homepage": "https://github.com/treshugart/witness",
+  "version": "0.1.1",
+  "_release": "0.1.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.1",
+    "commit": "602dbe5a4029ae9fbd0899867f8fd0bbf02d6fe8"
+  },
+  "_source": "git://github.com/treshugart/witness.git",
+  "_target": "~0.1.1",
+  "_originalSource": "witness"
+}

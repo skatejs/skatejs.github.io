@@ -1,0 +1,13 @@
+{
+  "name": "slash",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "0.4",
+    "grunt-contrib": "0.4",
+    "grunt-ghoul": "0.3"
+  },
+  "scripts": {
+    "test": "grunt test"
+  }
+}

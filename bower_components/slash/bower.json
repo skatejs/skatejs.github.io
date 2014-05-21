@@ -1,0 +1,9 @@
+{
+  "name": "slash",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "1.8",
+    "mocha": "1.13"
+  }
+}

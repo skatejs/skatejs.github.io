@@ -1,0 +1,16 @@
+{
+  "name": "skate-heading-link",
+  "version": "0.0.0",
+  "dependencies": {
+    "skate": "*"
+  },
+  "_cacheHeaders": {
+    "ETag": "\"a89d06fcddd7e7a30be58dfcb42670e79bc9dc15\"",
+    "Content-Type": "application/zip",
+    "Content-Disposition": "attachment; filename=skate-heading-link-a89d06fcddd7e7a30be58dfcb42670e79bc9dc15.zip"
+  },
+  "_release": "e-tag:a89d06fcd",
+  "_source": "https://github.com/treshugart/skate-heading-link/archive/a89d06fcddd7e7a30be58dfcb42670e79bc9dc15.zip",
+  "_target": "*",
+  "_originalSource": "https://github.com/treshugart/skate-heading-link/archive/a89d06fcddd7e7a30be58dfcb42670e79bc9dc15.zip"
+}

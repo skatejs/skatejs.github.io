@@ -1,0 +1,16 @@
+{
+  "name": "skate-external-link",
+  "version": "0.0.0",
+  "dependencies": {
+    "skate": "*"
+  },
+  "_cacheHeaders": {
+    "ETag": "\"049f47d23244e917b4908ebc61b6324674da28cc\"",
+    "Content-Type": "application/zip",
+    "Content-Disposition": "attachment; filename=skate-external-link-049f47d23244e917b4908ebc61b6324674da28cc.zip"
+  },
+  "_release": "e-tag:049f47d23",
+  "_source": "https://github.com/treshugart/skate-external-link/archive/049f47d23244e917b4908ebc61b6324674da28cc.zip",
+  "_target": "*",
+  "_originalSource": "https://github.com/treshugart/skate-external-link/archive/049f47d23244e917b4908ebc61b6324674da28cc.zip"
+}

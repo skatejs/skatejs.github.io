@@ -1,0 +1,17 @@
+{
+  "name": "skate",
+  "main": [
+    "dist/skate.js",
+    "dist/skate.min.js"
+  ],
+  "homepage": "https://github.com/treshugart/skate",
+  "_release": "9fb3d41462",
+  "_resolution": {
+    "type": "commit",
+    "commit": "9fb3d4146293e203c4cf06f311657d5b0957012f"
+  },
+  "_source": "git://github.com/treshugart/skate.git",
+  "_target": "9fb3d4146293e203c4cf06f311657d5b0957012f",
+  "_originalSource": "skate",
+  "_direct": true
+}

@@ -1,0 +1,17 @@
+{
+  "name": "skate-code",
+  "version": "0.0.0",
+  "dependencies": {
+    "highlightjs": "~8.0.0",
+    "skate": "*"
+  },
+  "_cacheHeaders": {
+    "ETag": "\"ff476c0cf9e5e9e13bb733bc4f56d18aabe9dc21\"",
+    "Content-Type": "application/zip",
+    "Content-Disposition": "attachment; filename=skate-code-ff476c0cf9e5e9e13bb733bc4f56d18aabe9dc21.zip"
+  },
+  "_release": "e-tag:ff476c0cf",
+  "_source": "https://github.com/treshugart/skate-code/archive/ff476c0cf9e5e9e13bb733bc4f56d18aabe9dc21.zip",
+  "_target": "*",
+  "_originalSource": "https://github.com/treshugart/skate-code/archive/ff476c0cf9e5e9e13bb733bc4f56d18aabe9dc21.zip"
+}

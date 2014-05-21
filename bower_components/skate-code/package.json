@@ -1,0 +1,19 @@
+{
+  "name": "skate-code",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "bower": "latest",
+    "grunt": "latest",
+    "grunt-available-tasks": "latest",
+    "grunt-contrib": "latest",
+    "grunt-jscs-checker": "latest",
+    "grunt-karma": "latest",
+    "karma-chai": "latest",
+    "karma-mocha": "latest"
+  },
+  "scripts": {
+    "postinstall": "./build/bin/npm-postinstall.sh",
+    "test": "grunt test"
+  }
+}

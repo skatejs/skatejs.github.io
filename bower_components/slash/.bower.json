@@ -1,0 +1,20 @@
+{
+  "name": "slash",
+  "version": "0.1.2",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "1.8",
+    "mocha": "1.13"
+  },
+  "homepage": "https://github.com/treshugart/slash",
+  "_release": "0.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.2",
+    "commit": "663d95adbc7188dd1013d6fad77777122ba1c79d"
+  },
+  "_source": "git://github.com/treshugart/slash.git",
+  "_target": "~0.1.2",
+  "_originalSource": "slash",
+  "_direct": true
+}
