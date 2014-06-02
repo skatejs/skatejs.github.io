@@ -7,7 +7,7 @@
     "highlightjs": "~8.0.0",
     "less": "~1.6.2",
     "requirejs": "~2.1.10",
-    "skate": "9fb3d4146293e203c4cf06f311657d5b0957012f",
+    "skate": "e9c06cc97663c03c2c58e24336c192b2b9a337d9",
     "skate-code": "https://github.com/treshugart/skate-code/archive/ff476c0cf9e5e9e13bb733bc4f56d18aabe9dc21.zip",
     "skate-external-link": "https://github.com/treshugart/skate-external-link/archive/049f47d23244e917b4908ebc61b6324674da28cc.zip",
     "skate-heading-link": "https://github.com/treshugart/skate-heading-link/archive/a89d06fcddd7e7a30be58dfcb42670e79bc9dc15.zip",

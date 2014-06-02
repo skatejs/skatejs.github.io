@@ -1,0 +1,24 @@
+<h2>Installing</h2>
+
+<p>You can install Skate using <a is="skate-external-link" href="http://bower.io/">Bower</a> or by downloading the source from the <a skate-external-link href="https://github.com/treshugart/skate">repository</a>.</p>
+<skate-code lang="bash">
+  bower install skate
+</skate-code>
+
+
+
+<h3 id="heading-installing-amd">AMD</h3>
+
+<p>Skate supports AMD if detected and is registered as <code>skate</code>. You must ensure that when you <code>require(['skate'])</code> that you have pointed that module to the correct path. In RequireJS you would use the <code>paths</code> configuration option:</p>
+<skate-code lang="javascript">
+  require.config({
+    paths: {
+      skate: 'bower_components/skate/dist/skate'
+    }
+  });
+</skate-code>
+
+
+
+<h3 id="heading-installing-global">Global</h3>
+<p>If you're still skating old school, we've got you covered. Just make sure skate is included on the page and you can access it via <code>window.skate</code>.</p>

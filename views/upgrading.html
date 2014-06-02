@@ -2,7 +2,7 @@
 <p>Notes on upgrading breaking changes.</p>
 
 
-<h3 skate-heading-link skate-toc-item>0.4 to Latest</h3>
+<h3>0.4 to Latest</h3>
 <p>Renamed the <code>extend</code> property from the component definition to <code>prototype</code> to fall more in line with the Web Component spec. It also removes any conflicting similarities with the spec'd <code>extends</code> property and is a better name for what it does.</p>
 <skate-code lang="javascript">
   // 0.4
@@ -17,7 +17,7 @@
 </skate-code>
 
 
-<h3 skate-heading-link skate-toc-item>0.3 to 0.4</h3>
+<h3>0.3 to 0.4</h3>
 <p>Usage of component names rather than selectors. This greatly increases performance since there's no need to match selectors and removes any ambiguity that selectors can introduce.</p>
 <skate-code lang="javascript">
   // 0.3
@@ -67,7 +67,7 @@
 </skate-code>
 
 
-<h3 skate-heading-link skate-toc-item>0.2 to 0.3</h3>
+<h3>0.2 to 0.3</h3>
 <p>Removed element parameter from lifecycle callbacks. Use <code>this</code> instead.</p>
 <skate-code lang="javascript">
   // 0.2
@@ -86,7 +86,7 @@
 </skate-code>
 
 
-<h3 skate-heading-link skate-toc-item>0.1 to 0.2</h3>
+<h3>0.1 to 0.2</h3>
 <p>Rename <code>inserted</code> to <code>insert</code> to normalise tense.</p>
 <skate-code lang="javascript">
   // 0.1
@@ -101,7 +101,7 @@
 </skate-code>
 
 
-<h3 skate-heading-link skate-toc-item>Initial to 0.1</h3>
+<h3>Initial to 0.1</h3>
 <p>Removed <code>each()</code> from the instance so that it doesn't get treated as a way to access elements.</p>
 <skate-code lang="javascript">
   var component = skate('something', lifecycle);

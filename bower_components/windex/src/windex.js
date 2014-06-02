@@ -1,4 +1,4 @@
-!function(factory) {
+(function(factory) {
   if (typeof exports === 'object') {
     module.exports = factory(require('q'));
   } else if (typeof define === 'function' && define.amd) {
@@ -47,7 +47,7 @@
       return this.request('PUT ' + url, data);
     },
 
-    delete: function(url, data) {
+    'delete': function(url, data) {
       return this.request('DELETE ' + url, data);
     },
 
@@ -78,9 +78,10 @@
       var type = (parts[1] || 'GET').toUpperCase();
       var uri = this.prefix + parts[2] + this.suffix;
       var stubUri = type + ' ' + parts[2];
-      var data = this.serialize(data || {});
       var request = this.xhr();
       var deferred = Q.defer();
+
+      data = this.serialize(data || {});
 
       if (data && type === 'GET') {
         uri += '?' + data;
@@ -102,7 +103,7 @@
         }
       }
 
-      request.open(type, encodeURI(uri), true);
+      request.open(type, uri, true);
 
       if (data && type !== 'GET') {
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -151,10 +152,10 @@
       var str = [];
 
       for (var a in obj) {
-        var k = prefix ? prefix + '[' + a + ']' : a
-          , v = obj[a];
+        var k = prefix ? prefix + '[' + a + ']' : a;
+        var v = obj[a];
 
-        str.push(typeof v === 'object' ? this.serialize(v, k) : k + '=' + v);
+        str.push(typeof v === 'object' ? this.serialize(v, k) : k + '=' + encodeURIComponent(v));
       }
 
       return str.join('&');
@@ -165,8 +166,8 @@
     },
 
     gen: function() {
-      var obj
-        , args = [].slice.call(arguments);
+      var obj;
+      var args = [].slice.call(arguments);
 
       if (typeof arguments[0] === 'function') {
         obj = arguments[0];
@@ -187,8 +188,8 @@
     },
 
     xhr: function() {
-      var request = false
-        , factories = [
+      var request = false;
+      var factories = [
             function () { return new XMLHttpRequest(); },
             function () { return new ActiveXObject('Msxml2.XMLHTTP'); },
             function () { return new ActiveXObject('Msxml3.XMLHTTP'); },
@@ -226,6 +227,7 @@
 
   function Url(windex, uri, defaults) {
     var parts = (uri || '').split(' ');
+
     this.windex = windex;
     this.type = parts.length === 2 ? parts[0].toUpperCase() : 'GET';
     this.uri = parts.length === 2 ? parts[1] : parts[0];
@@ -237,8 +239,8 @@
       add: 'POST',
       update: 'PATCH',
       replace: 'PUT',
-      delete: 'DELETE'
-    }
+      'delete': 'DELETE'
+    };
 
     // Either applies a getter or a method depending
     // on the environment capabilities.
@@ -265,7 +267,7 @@
           get: function() {
             return this;
           }
-        })
+        });
       }
     }
   }
@@ -303,10 +305,11 @@
     },
 
     now: function(data) {
-      var remove = []
-        , url = this.toString()
-        , repl = {}
-        , data = data || {};
+      var remove = [];
+      var url = this.toString();
+      var repl = {};
+
+      data = data || {};
 
       for (var a in this.defaults) {
         if (typeof data[a] === 'undefined') {
@@ -329,10 +332,10 @@
     },
 
     later: function() {
-      var that = this
-        , func = function(data) {
-            return that.now(data);
-          };
+      var that = this;
+      var func = function(data) {
+          return that.now(data);
+        };
 
       func.url = this;
       return func;
@@ -342,8 +345,9 @@
       var url = this.type + ' ' + this.uri;
 
       if (data) {
-        var remove = []
-          , data = typeof data === 'object' ? data : {};
+        var remove = [];
+
+        data = typeof data === 'object' ? data : {};
 
         for (var a in this.defaults) {
           if (typeof data[a] === 'undefined') {
@@ -353,7 +357,7 @@
 
         for (var b in data) {
           if (url.match(':' + b)) {
-            url = url.replace(':' + b, data[b]);
+            url = url.replace(':' + b, encodeURIComponent(data[b]));
           }
         }
       }
@@ -371,4 +375,4 @@
   };
 
   return Windex;
-});
+}));

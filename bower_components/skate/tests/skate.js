@@ -23,6 +23,21 @@
   // Specs
   // -----
 
+  describe('Registration', function () {
+    it('Should not allow you to register the same component more than once.', function () {
+      var multiple = false;
+
+      skate('div');
+
+      try {
+        skate('div');
+        multiple = true;
+      } catch (e) {}
+
+      assert(!multiple, 'Multiple "div" components were registered.');
+    });
+  });
+
   describe('Lifecycle Callbacks', function () {
     it('Should trigger ready before the element is shown.', function (done) {
       skate('div', {
@@ -63,9 +78,9 @@
 
   describe('DOM node interaction.', function () {
     it('Modules should pick up nodes already in the DOM.', function (done) {
-      add('existing-element');
+      add('div');
 
-      skate('existing-element', {
+      skate('div', {
         insert: function (element) {
           assert(true);
           done();
@@ -74,14 +89,14 @@
     });
 
     it('Modules should pick up nodes inserted into the DOM after they are defined.', function (done) {
-      skate('new-element', {
+      skate('div', {
         insert: function (element) {
           assert(true);
           done();
         }
       });
 
-      add('new-element');
+      add('div');
     });
 
     it('Should pick up descendants that are inserted as part of an HTML block.', function (done) {
@@ -113,7 +128,7 @@
     it('Ready event should be async and provide a done callback.', function (done) {
       var ok = false;
 
-      skate('asdf', {
+      skate('div', {
         ready: function (element, next) {
           setTimeout(function () {
             ok = true;
@@ -127,7 +142,7 @@
         }
       });
 
-      add('asdf');
+      add('div');
     });
   });
 
@@ -194,17 +209,17 @@
       skate('div', {
         attributes: {
           open: {
-            insert: function (element, value) {
-              value.should.equal('insert');
+            insert: function (element, data) {
+              data.newValue.should.equal('insert');
               element.setAttribute('open', 'update');
             },
-            update: function (element, newValue, oldValue) {
-              oldValue.should.equal('insert');
-              newValue.should.equal('update');
+            update: function (element, data) {
+              data.oldValue.should.equal('insert');
+              data.newValue.should.equal('update');
               element.removeAttribute('open');
             },
-            remove: function (element, value) {
-              value.should.equal('update');
+            remove: function (element, data) {
+              data.oldValue.should.equal('update');
               done();
             }
           }
@@ -214,43 +229,47 @@
       add('div').setAttribute('open', 'insert');
     });
 
-    it('Should use the update callback as the insert callback if no insert callback is specified.', function (done) {
+    it('Should accept a function insead of an object for a particular attribute definition.', function (done) {
+      var init = false;
+
       skate('div', {
         attributes: {
-          open: {
-            update: function (element, value) {
-              if (value === 'update') {
-                assert(true);
-                done();
-              }
-
-              // Mutation events fire synchronously.
+          open: function (element, data) {
+            if (data.type === 'insert') {
               setTimeout(function () {
                 element.setAttribute('open', 'update');
-              }, 100);
+              });
+            } else if (data.type === 'update') {
+              setTimeout(function () {
+                element.removeAttribute('open');
+              });
+            } else if (data.type === 'remove') {
+              assert(true);
+              done();
             }
           }
         }
       });
 
-      document.body.innerHTML = '<div id="attrtest" open="insert"></div>';
+      document.body.innerHTML = '<div id="attrtest" open="init"></div>';
     });
 
-    it('Should accept a function insead of an object for the lifecycle definition which triggers both init and update.', function (done) {
+    it('Should accept a function insead of an object for the entire attribute definition.', function (done) {
       var init = false;
 
       skate('div', {
-        attributes: {
-          open: function (element, value) {
-            if (value === 'update') {
-              assert(true);
-              done();
-            }
-
-            // Mutation events fire synchronously.
+        attributes: function (element, data) {
+          if (data.type === 'insert') {
             setTimeout(function () {
               element.setAttribute('open', 'update');
             });
+          } else if (data.type === 'update') {
+            setTimeout(function () {
+              element.removeAttribute('open');
+            });
+          } else if (data.type === 'remove') {
+            assert(true);
+            done();
           }
         }
       });
@@ -278,7 +297,7 @@
 
   describe('Instantiation', function () {
     it('Should return a constructor', function () {
-      skate('div').should.be.a.function;
+      skate('div').should.be.a('function');
     });
 
     it('Should return a new element when constructed.', function () {
@@ -287,14 +306,9 @@
       div.nodeName.should.equal('DIV');
     });
 
-    it('Should return a new element when called without "new".', function () {
-      var div = skate('div');
-      div().nodeName.should.equal('DIV');
-    });
-
     it('Should synchronously initialise the new element.', function () {
       var called = false;
-      var div = skate('div', {
+      var Div = skate('div', {
         prototype: {
           someMethod: function () {
             called = true;
@@ -302,7 +316,7 @@
         }
       });
 
-      div().someMethod();
+      new Div().someMethod();
       called.should.equal(true);
     });
 
@@ -345,7 +359,7 @@
       var numReady = 0;
       var numInsert = 0;
       var numRemove = 0;
-      var div = skate('div', {
+      var Div = skate('div', {
         ready: function () {
           ++numReady;
         },
@@ -357,8 +371,8 @@
         }
       });
 
-      var div1 = div();
-      var div2 = div();
+      var div1 = new Div();
+      var div2 = new Div();
 
       document.body.appendChild(div1);
       document.body.appendChild(div2);
@@ -376,6 +390,148 @@
         assert(numRemove === 2, 'Remove not called');
         done();
       });
+    });
+  });
+
+  describe('Returning a constructor', function () {
+    it('Should return a constructor that extends a native element.', function () {
+      var Div = skate('div', {
+        prototype: {
+          func1: function () {}
+        }
+      });
+
+      Div.prototype.func2 = function () {};
+
+      expect(Div.prototype.func1).to.be.a('function');
+      expect(Div.prototype.func2).to.be.a('function');
+
+      var div = new Div();
+
+      expect(div.func1).to.be.a('function');
+      expect(div.func2).to.be.a('function');
+
+      div.func1.should.equal(Div.prototype.func1);
+      div.func2.should.equal(Div.prototype.func2);
+    });
+
+    it('Should not allow the constructor property to be enumerated.', function () {
+      var Div = skate('div');
+
+      for (var prop in Div.prototype) {
+        if (prop === 'constructor') {
+          throw new Error('The constructor property should not be enumerable.');
+        }
+      }
+    });
+
+    it('Should affect the element prototype even if it was not constructed using the constructor.', function () {
+      var Div = skate('div', {
+        prototype: {
+          func1: function () {}
+        }
+      });
+
+      Div.prototype.func2 = function () {};
+
+      var div = add('div');
+
+      div.func1.should.be.a('function');
+      div.func2.should.be.a('function');
+    });
+  });
+
+  describe('Doing something when an element is augmented by a particular component.', function () {
+    it('Should execute a callback if an element is already augmented.', function (done) {
+      var Div = skate('div', {
+        prototype: {
+          test: function () {}
+        }
+      });
+
+      var div = new Div();
+      document.body.appendChild(div);
+      skate.init(div);
+
+      skate.when(div).is('div').then(function (element) {
+        expect(element.test).to.be.a('function');
+        done();
+      });
+    });
+
+    it('Should execute a callback when an element will be augmented.', function (done) {
+      var Div = skate('div', {
+        prototype: {
+          test: function () {}
+        }
+      });
+
+      var div = new Div();
+
+      skate.when(div).is('div').then(function (element) {
+        expect(element.test).to.be.a('function');
+        done();
+      });
+
+      document.body.appendChild(div);
+    });
+
+    // Safety net to ensure this never happens.
+    it('Should not execute when callbacks that were previously executed.', function () {
+      var Div = skate('div');
+      var div = new Div();
+      var executions = 0;
+      var callbacks = skate.when(div).is('div').then(incrementExecutions);
+
+      document.body.appendChild(div);
+      callbacks.then(incrementExecutions);
+      executions.should.equal(2);
+
+      function incrementExecutions () {
+        ++executions;
+      }
+    });
+  });
+
+  describe('Events', function () {
+    it('Should bind events', function (done) {
+      skate('div', {
+        events: {
+          test: function (element, e) {
+            element.should.equal(div);
+            e.should.be.an('object');
+            done();
+          }
+        }
+      });
+
+      var div = add('div');
+      var evt = document.createEvent('CustomEvent');
+
+      evt.initEvent('test');
+      div.dispatchEvent(evt);
+    });
+
+    it('Should unbind events', function (done) {
+      skate('div', {
+        events: {
+          test: function () {
+            assert(false);
+            done();
+          }
+        }
+      });
+
+      var div = add('div');
+      remove(div);
+
+      setTimeout(function () {
+        var evt = document.createEvent('CustomEvent');
+        evt.initEvent('test');
+        div.dispatchEvent(evt);
+        assert(true);
+        done();
+      }, 100);
     });
   });
 })();

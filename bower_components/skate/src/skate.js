@@ -13,6 +13,7 @@
   // Normalise the mutaiton observer constructor.
   var MutationObserver = window.MutationObserver || window.WebkitMutationObserver || window.MozMutationObserver;
 
+  // Polyfill only the parts of Mutation Observer that we need.
   if (!MutationObserver) {
     MutationObserver = function (callback) {
       this.callback = callback;
@@ -112,6 +113,10 @@
           item.target.removeEventListener('DOMNodeRemoved', item.removeHandler);
           item.target.removeEventListener('DOMAttrModified', item.attributeHandler);
         }
+
+        this.elements = [];
+
+        return this;
       }
     };
   }
@@ -129,9 +134,13 @@
    * @param {String} id The ID of the component.
    * @param {Object | Function} component The component definition.
    *
-   * @return {Function} Function or constructor that creates a custom-element for the component.
+   * @returns {Function} Function or constructor that creates a custom-element for the component.
    */
   function skate (id, component) {
+    if (skateComponents[id]) {
+      throw new Error('A component with the ID of "' + id + '" already exists.');
+    }
+
     if (!documentObserver) {
       documentObserver = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
@@ -210,33 +219,9 @@
   };
 
   /**
-   * Ensures the passed element or elements aren't initialised.
+   * Stops listening for new elements. Generally this will only be used in testing.
    *
-   * @param {Element | Traversable} elements The element or elements to blacklist.
-   * @param {Boolean} andDescendants Whether or not to blacklist element descendants.
-   *
-   * @return {skate}
-   */
-  skate.blacklist = function (elements, andDescendants) {
-    if (andDescendants === undefined) {
-      andDescendants = true;
-    }
-
-    eachElement(elements, function (element) {
-      data(element, 'blacklisted', true);
-
-      if (andDescendants) {
-        skate.blacklist(element.children, true);
-      }
-    });
-
-    return skate;
-  };
-
-  /**
-   * Stops listening.
-   *
-   * @return {skate}
+   * @returns {skate}
    */
   skate.destroy = function () {
     documentObserver.disconnect();
@@ -250,7 +235,7 @@
    *
    * @param {Element | Traversable} elements The element or elements to init.
    *
-   * @return {skate}
+   * @returns {skate}
    */
   skate.init = function (elements) {
     eachElement(elements, function (element) {
@@ -271,34 +256,56 @@
    *
    * @param {Function} callback The callback to execute for the observer.
    *
-   * @return {MutationObserver}
+   * @returns {MutationObserver}
    */
   skate.watch = function (callback) {
     return new MutationObserver(callback);
   };
 
   /**
-   * Ensures the passed element or elements aren't blacklisted.
+   * Executes a callback when an element is initialised as a particular component.
    *
-   * @param {Element | Traversable} elements The element or elements to blacklist.
-   * @param {Boolean} andDescendants Whether or not to whitelist element descendants.
+   * @param {HTMLElement} element The element to listen to.
    *
-   * @return {skate}
+   * @returns {Object}
    */
-  skate.whitelist = function (elements, andDescendants) {
-    if (andDescendants === undefined) {
-      andDescendants = true;
-    }
+  skate.when = function (element) {
+    return {
+      /**
+       * Sets the id of the component to listen for on the element.
+       *
+       * @param {String} id The id of the component to listen for.
+       *
+       * @returns {Object}
+       */
+      is: function (id) {
+        return {
+          /**
+           * Executes the specified callback when an element is initialised with a particular component.
+           *
+           * @param {Function} callback The callback to execute.
+           *
+           * @returns {Object}
+           */
+          then: function (callback) {
+            if (data(element, id + '.ready-called')) {
+              callback(element);
+            } else {
+              var callbacks = data(element, id + '.when-callbacks');
 
-    eachElement(elements, function (element) {
-      data(element, 'blacklisted', undefined);
+              if (!callbacks) {
+                callbacks = [];
+              }
 
-      if (andDescendants) {
-        skate.whitelist(element.children, true);
+              callbacks.push(callback);
+              data(element, id + '.when-callbacks', callbacks);
+            }
+
+            return this;
+          }
+        };
       }
-    });
-
-    return skate;
+    };
   };
 
 
@@ -307,10 +314,6 @@
 
   // Triggers the entire lifecycle.
   function triggerLifecycle (id, component, target) {
-    if (data(target, 'blacklisted')) {
-      return;
-    }
-
     triggerReady(id, component, target, function (replaceWith) {
       if (!replaceWith) {
         return triggerInsert(id, component, target);
@@ -356,6 +359,8 @@
 
     data(target, id + '.ready-called', true);
     inherit(target, component.prototype);
+    addEventListeners(id, target, component.events);
+    triggerWhenCallbacks(target, id);
 
     if (readyFn && definedMultipleArgs.test(readyFn)) {
       readyFn(target, done);
@@ -389,8 +394,14 @@
 
   // Triggers remove on the target.
   function triggerRemove (id, component, target) {
-    if (component.remove && !data(target, 'blacklisted') && !data(target, id + '.remove-called')) {
-      data(target, id + '.remove-called', true);
+    if (data(target, id + '.remove-called')) {
+      return;
+    }
+
+    data(target, id + '.remove-called', true);
+    removeEventListeners(id, target, component.events);
+
+    if (component.remove) {
       component.remove(target);
     }
   }
@@ -417,21 +428,19 @@
 
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
+        var type;
         var name = mutation.attributeName;
         var attr = target.attributes[name];
-        var lifecycle = component.attributes[name];
 
-        if (!lifecycle) {
-          return;
+        if (attr && mutation.oldValue === null) {
+          type = 'insert';
+        } else if (attr && mutation.oldValue !== null) {
+          type = 'update';
+        } else if (!attr) {
+          type = 'remove';
         }
 
-        if (attr && mutation.oldValue === null && (lifecycle.insert || lifecycle.update || lifecycle)) {
-          insert(lifecycle, target, attr.nodeValue);
-        } else if (attr && mutation.oldValue !== null && (lifecycle.update || lifecycle)) {
-          update(lifecycle, target, attr.nodeValue, mutation.oldValue);
-        } else if (!attr && lifecycle.remove) {
-          remove(lifecycle, target, mutation.oldValue);
-        }
+        triggerCallback(type, name, attr ? attr.nodeValue : undefined, mutation.oldValue);
       });
     });
 
@@ -440,27 +449,82 @@
       attributeOldValue: true
     });
 
-    // Now trigger init on each attribute.
+    // We must initialise each attribute.
     for (var a = 0; a < target.attributes.length; a++) {
-      var attribute = target.attributes[a];
-      var lifecycle = component.attributes[attribute.nodeName];
+      var attr = target.attributes[a];
+      triggerCallback('insert', attr.nodeName, attr.nodeValue);
+    }
 
-      if (lifecycle) {
-        insert(lifecycle, target, attribute.nodeValue);
+    function triggerCallback (type, name, newValue, oldValue) {
+      var callback;
+
+      if (component.attributes && component.attributes[name] && typeof component.attributes[name][type] === 'function') {
+        callback = component.attributes[name][type];
+      } else if (component.attributes && typeof component.attributes[name] === 'function') {
+        callback = component.attributes[name];
+      } else if (typeof component.attributes === 'function') {
+        callback = component.attributes;
+      }
+
+      // There may still not be a callback.
+      if (callback) {
+        callback(target, {
+          type: type,
+          name: name,
+          newValue: newValue,
+          oldValue: oldValue
+        });
       }
     }
+  }
 
-    function insert (lifecycle, element, newValue) {
-      (lifecycle.insert || lifecycle.update || lifecycle)(element, newValue);
+  function addEventListeners (id, target, events) {
+    if (typeof events !== 'object') {
+      return;
     }
 
-    function update (lifecycle, element, newValue, oldValue) {
-      (lifecycle.update || lifecycle)(element, newValue, oldValue);
+    function makeHandler (handler) {
+      return function (e) {
+        handler(target, e);
+      };
     }
 
-    function remove (lifecycle, element, oldValue) {
-      lifecycle.remove(element, oldValue);
+    for (var a in events) {
+      if (events.hasOwnProperty(a)) {
+        var handler = makeHandler(events[a]);
+        data(target, id + '.event.' + a, handler);
+        target.addEventListener(a, handler);
+      }
     }
+  }
+
+  function removeEventListeners (id, target, events) {
+    if (typeof events !== 'object') {
+      return;
+    }
+
+    for (var a in events) {
+      if (events.hasOwnProperty(a)) {
+        target.removeEventListener(a, data(target, id + '.event.' + a));
+        removeData(target, id + '.event.' + a);
+      }
+    }
+  }
+
+  function triggerWhenCallbacks (target, id) {
+    var callbacks = data(target, id + '.when-callbacks');
+
+    if (!callbacks) {
+      return;
+    }
+
+    callbacks.forEach(function (callback) {
+      callback(target);
+    });
+
+    // Cleaning up extra callbacks will help
+    // prevent possible memory leaks.
+    removeData(target, id + '.when-callbacks');
   }
 
 
@@ -479,6 +543,12 @@
     element.__SKATE_DATA[name] = value;
 
     return element;
+  }
+
+  function removeData (element, name) {
+    if (element.__SKATE_DATA && element.__SKATE_DATA[name]) {
+      delete element.__SKATE_DATA[name];
+    }
   }
 
   // Adds the specified class to the element.
@@ -533,7 +603,15 @@
       ids[name] = name;
     }
 
-    element.className.split(' ').forEach(function (id) {
+    var classname = '';
+
+    if (typeof element.className === 'string') {
+      classname = element.className;
+    } else {
+      classname = element.getAttribute('class') || '';
+    }
+
+    classname.split(' ').forEach(function (id) {
       if (id) {
         ids[id] = id;
       }
@@ -577,25 +655,30 @@
 
         return selectors.join(', ');
       }());
-    var ctor = function () {
-        if (!isTag) {
-          throw new Error('Cannot construct "' + id + '" as a custom element.');
-        }
 
-        var element = document.createElement(id);
-        triggerReady(id, component, element);
-        return element;
-      };
+    function CustomElement () {
+      if (!isTag) {
+        throw new Error('Cannot construct "' + id + '" as a custom element.');
+      }
 
-    ctor.existing = function (within) {
-      return (within || document).querySelectorAll(ctor.selector());
+      var element = document.createElement(id);
+
+      triggerReady(id, component, element);
+
+      return element;
+    }
+
+    CustomElement.existing = function (within) {
+      return (within || document).querySelectorAll(selector);
     };
 
-    ctor.selector = function () {
+    CustomElement.selector = function () {
       return selector;
     };
 
-    return ctor;
+    CustomElement.prototype = component.prototype;
+
+    return CustomElement;
   }
 
 

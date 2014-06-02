@@ -24,7 +24,11 @@ define([
   skateHeadingLink
 ) {
   router.on('route', function () {
-    toc.existing()[0].clearAllItems();
+    var tocs = toc.existing();
+
+    if (tocs.length) {
+      toc.existing()[0].clearAllItems();
+    }
   });
 
   return function() {
