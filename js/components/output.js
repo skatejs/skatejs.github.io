@@ -9,9 +9,9 @@ define(['skate'], function(skate) {
     },
 
     attributes: {
-      title: function(element, value) {
+      title: function(element, change) {
         var title = document.createElement('div');
-        title.textContent = value;
+        title.textContent = change.newValue;
         element.parentNode.insertBefore(title, element);
       }
     }
