@@ -14,7 +14,7 @@
 
 
 
-<h4>Binding Restrictions</h4>
+<h4>Restrictions</h4>
 
 <p>Components are opt-in, meaning the consumer of a component must use a custom-element name, attribute name or class name in their HTML. The developer of the component must decide which binding method they want to restrict the component to using, if any. If the consumer tries to bind a component using a class name and the developer only allows it to be bound using an attribute, the component is not bound and no errors are raised.</p>
 <p>For example, a component developer can restrict a component to be bound using a custom element and if that element is bound otherwise, an exception will be raised. Binding restrictions are passed as an option using the second argument to the <skate-snippet lang="javascript">skate()</skate-snippet> function. The following component would be restricted to be bound via a tag name:</p>
