@@ -1,7 +1,0 @@
-{
-  "name": "skate-heading-link",
-  "version": "0.0.0",
-  "dependencies": {
-    "skate": "*"
-  }
-}

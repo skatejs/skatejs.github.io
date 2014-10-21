@@ -1,8 +1,0 @@
-{
-  "name": "skate-code",
-  "version": "0.0.0",
-  "dependencies": {
-    "highlightjs": "~8.0.0",
-    "skate": "*"
-  }
-}
