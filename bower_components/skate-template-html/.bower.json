@@ -1,0 +1,21 @@
+{
+  "name": "template-html",
+  "description": "template-html",
+  "version": "0.0.0",
+  "repository": "https://github.com/yourname/template-html",
+  "dependencies": {},
+  "devDependencies": {
+    "require-cs": "latest",
+    "require-less": "latest",
+    "requirejs-text": "latest"
+  },
+  "_cacheHeaders": {
+    "ETag": "\"1086d08a478b5d9cb7858fa2833b700aa506bf97\"",
+    "Content-Type": "application/zip",
+    "Content-Disposition": "attachment; filename=template-html-1086d08a478b5d9cb7858fa2833b700aa506bf97.zip"
+  },
+  "_release": "e-tag:1086d08a4",
+  "_source": "https://github.com/skatejs/template-html/archive/1086d08a478b5d9cb7858fa2833b700aa506bf97.zip",
+  "_target": "*",
+  "_originalSource": "https://github.com/skatejs/template-html/archive/1086d08a478b5d9cb7858fa2833b700aa506bf97.zip"
+}
