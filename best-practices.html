@@ -47,7 +47,7 @@ var myComponent = new MyComponent();
 });
 </code></pre>
 <p><em>BEWARE that when using native custom elements and polyfilled custom elements that the <code>created</code> callback behaves differently. In native, your element will not have a parent or any children even if the HTML you&#39;ve written begs to differ. This is because the element is created the instant the HTML parser encounters it. In polyfill land, we can&#39;t only detect changes to the DOM once it&#39;s already added, so it would already be in the DOM along with its children by the time you get into this callback.</em></p>
-<p><em>Because of this, it is <strong>never</strong> recommended to assume structure in your <code>created</code> callback. Use the <code>attached</code> callback instead.</em></p>
+<p><em>Because of this, <strong>never</strong> ever assume structure in your <code>created</code> callback. Use the <code>attached</code> callback instead.</em></p>
 <p>If you need to do something when the element is inserted into the DOM, then use the <code>attached</code> callback.</p>
 <pre><code class="lang-js">skate(&#39;my-component&#39;, {
   attached: function (element) {
@@ -69,7 +69,7 @@ var myComponent = new MyComponent();
 <h2 id="unidirectional-data-flow">Unidirectional data-flow</h2>
 <p>Parents should control and know about their children and the children should not know about their parents or their siblings. Maintaining this philosophy will help to ensure that you do not couple any behavoiur with how you&#39;ve structured your component.</p>
 <p>If a parent needs to respond to a change within a child, respond to an event.</p>
-<pre><code class="lang-js">skate(&#39;my-parent&#39;, {
+<pre><code class="lang-js">var MyParent = skate(&#39;my-parent&#39;, {
   events: {
     &#39;update my-child&#39;: function (element, e, target) {
       console.log(&#39;my-child got updated&#39;);
@@ -77,13 +77,21 @@ var myComponent = new MyComponent();
   }
 });
 
-skate(&#39;my-child&#39;, {
+var MyChild = skate(&#39;my-child&#39;, {
   prototype: {
     update: function () {
       this.dispatchEvent(new CustomEvent(&#39;updated&#39;, { bubbles: true }));
     }
   }
 });
+
+var myParent = new MyParent();
+var myChild = new MyChild();
+
+myParent.appendChild(myChild);
+
+// Logs: &quot;my-child got updated&quot;.
+myChild.update();
 </code></pre>
 
   </body>
