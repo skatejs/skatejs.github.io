@@ -6540,7 +6540,6 @@ skate {
   box-sizing: border-box;
   border-radius: 100%;
   color: transparent;
-  cursor: pointer;
   display: block;
   font-family: sans-serif;
   font-size: 4rem;
@@ -6630,4 +6629,17 @@ pre {
 }
 skate {
   margin: 20px auto;
+}
+skate-nav {
+  display: block;
+  margin: 20px;
+  text-align: center;
+}
+skate-item a {
+  background-color: #eee;
+  display: inline-block;
+  padding: 10px 20px;
+}
+skate-notice {
+  background-color: #f6c342;
 }
