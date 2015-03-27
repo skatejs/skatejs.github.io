@@ -93,6 +93,63 @@ myParent.appendChild(myChild);
 // Logs: &quot;my-child got updated&quot;.
 myChild.update();
 </code></pre>
+<h2 id="keep-things-concise">Keep things concise</h2>
+<p>When you define attributes on your component:</p>
+<pre><code class="lang-js">var MyComponent = skate(&#39;my-component&#39;, {
+  attributes: {
+    &#39;my-attribute-1&#39;: ...,
+    &#39;my-attribute-2&#39;: ...
+  }
+});
+</code></pre>
+<p>Skate will create property links for those attributes:</p>
+<pre><code class="lang-js">var myComponent = new MyComponent();
+myComponent.myAttribute1 = &#39;testing&#39;;
+
+// &quot;testing&quot;
+myComponent.myAttribute1;
+myComponent.getAttribute(&#39;my-attribute-1&#39;);
+</code></pre>
+<p>This makes the behaviour consistent with properties / attributes like <code>id</code> and <code>name</code> that are linked by default.</p>
+<h2 id="data-binding-sort-of-">Data-binding. Sort of.</h2>
+<p>Being able to use attribute listeners is kinda like having an abstract way to use data-binding. As seen above we can use property links to manipulate attributes which, visually, looks more like a view model - and for all intents and purposes, it <em>is</em> a view model. This means you can do some really cool stuff with a very small amount of code.</p>
+<p>For example, you can write a helper to take an attiribute change and apply it to an element.</p>
+<pre><code class="lang-js">// File: helper/text.js
+
+export default function text (selector) {
+  return function (element, data) {
+    [].slice.call(element.querySelectorAll(selector)).forEach(function (descendant) {
+      descendant.textContent = data.newValue;
+    });
+  };
+}
+</code></pre>
+<p>And then use it in your component:</p>
+<pre><code class="lang-js">// File: my-component.js
+import text from &#39;./helper/text&#39;;
+
+export default skate(&#39;my-component&#39;, {
+  attributes: {
+    name: text(&#39;.name&#39;)
+  },
+
+  template: function (element) {
+    element.innerHTML = &#39;&lt;div class=&quot;name&quot;&gt;&lt;/div&gt;&#39;;
+  }
+});
+</code></pre>
+<p>When you set the <code>name</code> attribute of the element, it will update the descendants:</p>
+<pre><code class="lang-js">// File main.js
+import MyComponent from &#39;my-component&#39;;
+
+var myComponent = new MyComponent();
+
+myComponent.name = &#39;Trey&#39;;
+
+// Logs: &lt;my-component name=&quot;Trey&quot;&gt;&lt;div class=&quot;name&quot;&gt;Trey&lt;/div&gt;&lt;/my-component&gt;
+console.log(myComponent);
+</code></pre>
+<p>You&#39;re not limited to text either. You can use that functional pattern to set attributes, form field values and manipulate structure.</p>
 
   </body>
 </html>
