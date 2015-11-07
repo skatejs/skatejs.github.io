@@ -1,0 +1,27 @@
+{
+  "name": "skatejs-website",
+  "version": "0.0.0",
+  "description": "SkateJS website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skatejs/website.git"
+  },
+  "author": "Trey Shugart <treshugart@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skatejs/website/issues"
+  },
+  "homepage": "https://github.com/skatejs/website#readme",
+  "dependencies": {
+    "bootstrap": "3.3.5",
+    "font-awesome": "4.4.0",
+    "highlight.js": "8.9.1",
+    "shadejs": "skatejs/shade#2a69707",
+    "webcomponents.js": "0.7.2",
+    "whatwg-fetch": "0.10.1"
+  }
+}
