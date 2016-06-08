@@ -1,4 +1,4 @@
 SkateJS Website
 ===============
 
-This is the future SkateJS website.
+Currently this is being updated for the new docs. Stay tuned!
