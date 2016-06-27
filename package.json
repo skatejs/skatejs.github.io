@@ -19,11 +19,16 @@
   "homepage": "https://github.com/skatejs/skatejs.github.io#readme",
   "devDependencies": {
     "cz-conventional-changelog": "^1.1.6",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
     "skatejs-build": "^4.3.0"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "skatejs": "^1.0.0-beta.3"
   }
 }
