@@ -1,0 +1,28 @@
+{
+  "name": "skatejs.github.io",
+  "version": "1.0.0",
+  "description": "SkateJS website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skatejs/skatejs.github.io.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/skatejs/skatejs.github.io/issues"
+  },
+  "homepage": "https://github.com/skatejs/skatejs.github.io#readme",
+  "devDependencies": {
+    "cz-conventional-changelog": "^1.1.6",
+    "skatejs-build": "^4.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
