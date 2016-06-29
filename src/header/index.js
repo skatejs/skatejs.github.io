@@ -18,7 +18,7 @@ export default define('sk-header', {
       h1({ class: 'header-title' }, elem.title);
       ul({ class: 'header-list-item' }, () => {
         item('Docs');
-        item('Github');
+        item('Github', 'https://github.com/skatejs/skatejs');
         item('Community');
       });
     });
