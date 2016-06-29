@@ -5,7 +5,7 @@ import elements from '../_/elements';
 const { a, div, h1, li, style, ul } = elements;
 
 function item(text, href = '#') {
-  li({ class: 'header-list-item' }, () => a({ class: 'header-link', href }, text));
+  li({ class: css.locals.item }, () => a({ class: css.locals.link, href }, text));
 }
 
 export default define('sk-header', {
@@ -14,9 +14,9 @@ export default define('sk-header', {
   },
   render(elem) {
     style(css.toString());
-    div({ class: 'header' }, () => {
-      h1({ class: 'header-title' }, elem.title);
-      ul({ class: 'header-list-item' }, () => {
+    div({ class: css.locals.header }, () => {
+      h1({ class: css.locals.title }, elem.title);
+      ul({ class: css.locals.list }, () => {
         item('Docs');
         item('Github', 'https://github.com/skatejs/skatejs');
         item('Community');

@@ -2632,8 +2632,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function item(text) {
 	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
 	
-	  li({ class: 'header-list-item' }, function () {
-	    return a({ class: 'header-link', href: href }, text);
+	  li({ class: _index2.default.locals.item }, function () {
+	    return a({ class: _index2.default.locals.link, href: href }, text);
 	  });
 	}
 	
@@ -2643,11 +2643,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  render: function render(elem) {
 	    style(_index2.default.toString());
-	    div({ class: 'header' }, function () {
-	      h1({ class: 'header-title' }, elem.title);
-	      ul({ class: 'header-list-item' }, function () {
+	    div({ class: _index2.default.locals.header }, function () {
+	      h1({ class: _index2.default.locals.title }, elem.title);
+	      ul({ class: _index2.default.locals.list }, function () {
 	        item('Docs');
-	        item('Github');
+	        item('Github', 'https://github.com/skatejs/skatejs');
 	        item('Community');
 	      });
 	    });
@@ -2663,10 +2663,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".header{background-color:#333;color:#eee;height:60px}.header-list{list-style:none}.header-list,.header-list-item{display:inline-block;margin:0;padding:0}.header-title{display:inline-block;font-size:24px;line-height:24px;margin:-2px 0 0;padding:18px}.header-link{color:#eee;font-size:18px;margin:0;padding:20px;text-decoration:none}.header-link:hover{background-color:#444}", ""]);
+	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#333;color:#eee;height:60px}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;font-size:24px;line-height:24px;margin:-2px 0 0;padding:18px}._3gAAJyILxgLXLUDHVCLw1K{color:#eee;font-size:18px;margin:0;padding:20px;text-decoration:none}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#444}", ""]);
 	
 	// exports
-
+	exports.locals = {
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K"
+	};
 
 /***/ },
 /* 6 */
