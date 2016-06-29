@@ -1,0 +1,38 @@
+.header {
+  background-color: #333;
+  color: #eee;
+  height: 60px;
+}
+
+.header-list {
+  display: inline-block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-list-item {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+.header-title {
+  display: inline-block;
+  font-size: 24px;
+  line-height: 24px;
+  margin: -2px 0 0 0;
+  padding: 18px;
+}
+
+.header-link {
+  color: #eee;
+  font-size: 18px;
+  margin: 0;
+  padding: 20px;
+  text-decoration: none;
+}
+
+.header-link:hover {
+  background-color: #444;
+}
