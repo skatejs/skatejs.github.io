@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/skatejs/skatejs.github.io#readme",
   "devDependencies": {
+    "babel-plugin-incremental-dom": "^3.4.0",
     "cz-conventional-changelog": "^1.1.6",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
