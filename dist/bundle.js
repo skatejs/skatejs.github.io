@@ -2294,7 +2294,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
+	var _style = __webpack_require__(9);
+	
+	var _style2 = _interopRequireDefault(_style);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function item(text) {
+	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
+	
+	  _skatejs.vdom.IncrementalDOM.elementOpen('li', null, null, 'class', _index2.default.locals.item);
+	
+	  _skatejs.vdom.IncrementalDOM.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
+	
+	  _renderArbitrary(text);
+	
+	  _skatejs.vdom.IncrementalDOM.elementClose('a');
+	
+	  return _skatejs.vdom.IncrementalDOM.elementClose('li');
+	}
 	
 	exports.default = (0, _skatejs.define)('sk-header', {
 	  props: {
@@ -2303,11 +2321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render(elem) {
 	    _skatejs.vdom.IncrementalDOM.elementOpen('div');
 	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('style');
-	
-	    _renderArbitrary(_index2.default.toString());
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('style');
+	    _renderArbitrary((0, _style2.default)(_index2.default));
 	
 	    _skatejs.vdom.IncrementalDOM.elementOpen('div', null, null, 'class', _index2.default.locals.header);
 	
@@ -2319,35 +2333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _skatejs.vdom.IncrementalDOM.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
 	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('li', null, null, 'class', _index2.default.locals.item);
-	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', '#');
-	
-	    _skatejs.vdom.IncrementalDOM.text('Docs');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('a');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('li');
-	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('li', null, null, 'class', _index2.default.locals.item);
-	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', 'https://github.com/skatejs/skatejs');
-	
-	    _skatejs.vdom.IncrementalDOM.text('Github');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('a');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('li');
-	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('li', null, null, 'class', _index2.default.locals.item);
-	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', '#');
-	
-	    _skatejs.vdom.IncrementalDOM.text('Community');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('a');
-	
-	    _skatejs.vdom.IncrementalDOM.elementClose('li');
+	    _renderArbitrary([item('Docs'), item('Github', 'https://github.com/skatejs/skatejs'), item('Community')]);
 	
 	    _skatejs.vdom.IncrementalDOM.elementClose('ul');
 	
@@ -2464,6 +2450,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// exports
 
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.IncrementalDOM.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	exports.default = function (css) {
+	  _skatejs.vdom.IncrementalDOM.elementOpen('style');
+	
+	  _renderArbitrary(css.toString());
+	
+	  return _skatejs.vdom.IncrementalDOM.elementClose('style');
+	};
+	
+	var _skatejs = __webpack_require__(2);
 
 /***/ }
 /******/ ])
