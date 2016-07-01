@@ -13,18 +13,20 @@ export default define('sk-header', {
     title: prop.string(),
   },
   render(elem) {
-    return <div>
-      {style(css)}
-      <div class={css.locals.header}>
-        <h1 class={css.locals.title}>{elem.title}</h1>
-        <ul class={css.locals.list}>
-          {[
-            item('Docs'),
-            item('Github', 'https://github.com/skatejs/skatejs'),
-            item('Community'),
-          ]}
-        </ul>
+    return (
+      <div>
+        {style(css)}
+        <div class={css.locals.header}>
+          <h1 class={css.locals.title}>{elem.title}</h1>
+          <ul class={css.locals.list}>
+            {[
+              item('Docs'),
+              item('Github', 'https://github.com/skatejs/skatejs'),
+              item('Community'),
+            ]}
+          </ul>
+        </div>
       </div>
-    </div>;
+    );
   },
 });

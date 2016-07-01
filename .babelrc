@@ -2,7 +2,7 @@
   "plugins": [[
     "incremental-dom", {
       "components": true,
-      "prefix": "vdom.IncrementalDOM"
+      "prefix": "vdom"
     }
   ]],
   "presets": ["es2015"]

@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _index3 = __webpack_require__(8);
+	var _index3 = __webpack_require__(9);
 	
 	var _index4 = _interopRequireDefault(_index3);
 	
@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _header2 = _interopRequireDefault(_header);
 	
-	var _title = __webpack_require__(7);
+	var _title = __webpack_require__(8);
 	
 	var _title2 = _interopRequireDefault(_title);
 	
@@ -99,7 +99,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = (0, _skatejs.define)('sk-app', {
 	  render: function render() {
 	    (0, _title2.default)('SkateJS - functional web components');
-	    return _skatejs.vdom.IncrementalDOM.elementVoid(_header2.default, null, null, 'title', 'SkateJS');
+	
+	    _skatejs.vdom.elementOpen('div');
+	
+	    _skatejs.vdom.elementVoid(_header2.default, null, null, 'title', 'SkateJS');
+	
+	    return _skatejs.vdom.elementClose('div');
 	  }
 	});
 
@@ -112,8 +117,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	(function (global, factory) {
-	  ( false ? 'undefined' : _typeof2(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(3)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skate = global.skate || {}, global.IncrementalDOM);
-	})(undefined, function (exports, IncrementalDOM) {
+	  ( false ? 'undefined' : _typeof2(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(3)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skate = global.skate || {}, global.incrementalDom);
+	})(undefined, function (exports, incrementalDom) {
 	
 	  var assign = Object.assign;
 	  var assign$1 = assign ? assign.bind(Object) : function (obj) {
@@ -204,7 +209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var rendererDebounced = '____rendererDebounced';
 	  var shadowRoot = '____shadowRoot';
 	
-	  var symbols = Object.freeze({
+	  var symbols$1 = Object.freeze({
 	    created: created,
 	    events: events,
 	    name: name,
@@ -289,29 +294,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return call && ((typeof call === 'undefined' ? 'undefined' : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
 	  };
 	
-	  var attr = IncrementalDOM.attr;
-	  var applyProp = IncrementalDOM.applyProp;
-	  var attributes = IncrementalDOM.attributes;
-	  var elementClose = IncrementalDOM.elementClose;
-	  var elementOpen = IncrementalDOM.elementOpen;
-	  var elementOpenEnd = IncrementalDOM.elementOpenEnd;
-	  var elementOpenStart = IncrementalDOM.elementOpenStart;
-	  var elementVoid = IncrementalDOM.elementVoid;
-	  var skip = IncrementalDOM.skip;
-	  var symbols$1 = IncrementalDOM.symbols;
-	  var text = IncrementalDOM.text;
-	
 	  var fallbackToV0 = !shadowDomV1 && shadowDomV0;
-	  var applyDefault = attributes[symbols$1.default];
+	  var applyDefault = incrementalDom.attributes[incrementalDom.symbols.default];
 	
 	  // Attributes that are not handled by Incremental DOM.
-	  attributes.key = attributes.skip = attributes.statics = function () {};
+	  incrementalDom.attributes.key = incrementalDom.attributes.skip = incrementalDom.attributes.statics = function () {};
 	
 	  // Attributes that *must* be set via a property on all elements.
-	  attributes.checked = attributes.className = attributes.disabled = attributes.value = applyProp;
+	  incrementalDom.attributes.checked = incrementalDom.attributes.className = incrementalDom.attributes.disabled = incrementalDom.attributes.value = incrementalDom.applyProp;
 	
 	  // Default attribute applicator.
-	  attributes[symbols$1.default] = function (elem, name, value) {
+	  incrementalDom.attributes[incrementalDom.symbols.default] = function (elem, name, value) {
 	    // Boolean false values should not set attributes at all.
 	    if (value === false) {
 	      return;
@@ -319,18 +312,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // If the skip attribute was specified, skip
 	    if (name === 'skip' && value) {
-	      return skip();
+	      return incrementalDom.skip();
 	    }
 	
 	    // Custom element properties should be set as properties.
 	    var props = elem.constructor.props;
 	    if (props && name in props) {
-	      return applyProp(elem, name, value);
+	      return incrementalDom.applyProp(elem, name, value);
 	    }
 	
 	    // Handle built-in and custom events.
 	    if (name.indexOf('on') === 0) {
-	      return name in elem ? applyProp(elem, name, value) : applyEvent(elem, name.substring(2), name, value);
+	      return name in elem ? incrementalDom.applyProp(elem, name, value) : applyEvent(elem, name.substring(2), name, value);
 	    }
 	
 	    // Set the select attribute instead of name if it was a <slot> translated to
@@ -385,7 +378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return elementOpen.apply(null, args);
+	    return incrementalDom.elementOpen.apply(null, args);
 	  }
 	
 	  // Patch elementOpenStart() for the same reason we patched elementOpen().
@@ -395,7 +388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return elementOpenStart.apply(null, args);
+	    return incrementalDom.elementOpenStart.apply(null, args);
 	  }
 	
 	  // Patch elementVoid() for the same reason we patched elementOpen().
@@ -405,17 +398,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return elementVoid.apply(null, args);
+	    return incrementalDom.elementVoid.apply(null, args);
 	  }
-	
-	  // Override Incremental DOM exports.
-	  var IncrementalDOM$1 = assign$1({}, IncrementalDOM);
-	  Object.defineProperties(IncrementalDOM$1, {
-	    attributes: attributes,
-	    elementOpen: { value: newElementOpen },
-	    elementOpenStart: { value: newElementOpenStart },
-	    elementVoid: { value: newElementVoid }
-	  });
 	
 	  // Convenience function for declaring an Incremental DOM element using
 	  // hyperscript-style syntax.
@@ -439,26 +423,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Set attributes.
 	    Object.keys(attrs).forEach(function (name) {
-	      return attr(name, attrs[name]);
+	      return incrementalDom.attr(name, attrs[name]);
 	    });
 	
 	    // Close before we render the descendant tree.
-	    elementOpenEnd();
+	    incrementalDom.elementOpenEnd();
 	
 	    var ctype = typeof chren === 'undefined' ? 'undefined' : _typeof(chren);
 	    if (ctype === 'function') {
 	      chren();
 	    } else if (ctype === 'string' || ctype === 'number') {
-	      text(chren);
+	      incrementalDom.text(chren);
 	    }
 	
-	    return elementClose(tname);
+	    return incrementalDom.elementClose(tname);
 	  }
 	
 	  var vdom = Object.freeze({
 	    element: element,
-	    text: text,
-	    IncrementalDOM: IncrementalDOM$1
+	    attr: incrementalDom.attr,
+	    elementClose: incrementalDom.elementClose,
+	    elementOpenEnd: incrementalDom.elementOpenEnd,
+	    elementOpen: newElementOpen,
+	    elementOpenStart: newElementOpenStart,
+	    elementVoid: newElementVoid,
+	    text: incrementalDom.text
 	  });
 	
 	  function data(element) {
@@ -751,8 +740,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 	
-	  var patchInner = IncrementalDOM$1.patchInner;
-	
 	  function createRenderer(Ctor) {
 	    var render = Ctor.render;
 	
@@ -775,7 +762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        elem[shadowRoot] = sr;
 	      }
 	
-	      patchInner(elem[shadowRoot], render, elem);
+	      incrementalDom.patchInner(elem[shadowRoot], render, elem);
 	    };
 	  }
 	
@@ -1174,7 +1161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  exports.prop = prop;
 	  exports.ready = ready;
 	  exports.state = state;
-	  exports.symbols = symbols;
+	  exports.symbols = symbols$1;
 	  exports.vdom = vdom;
 	
 	  Object.defineProperty(exports, '__esModule', { value: true });
@@ -2278,7 +2265,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var type = typeof child;
 	
 	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.IncrementalDOM.text(child);
+	    _skatejs.vdom.text(child);
 	  } else if (type === 'function' && child.__jsxDOMWrapper) {
 	    child();
 	  } else if (Array.isArray(child)) {
@@ -2294,7 +2281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _style = __webpack_require__(9);
+	var _style = __webpack_require__(7);
 	
 	var _style2 = _interopRequireDefault(_style);
 	
@@ -2303,15 +2290,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function item(text) {
 	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
 	
-	  _skatejs.vdom.IncrementalDOM.elementOpen('li', null, null, 'class', _index2.default.locals.item);
+	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
 	
-	  _skatejs.vdom.IncrementalDOM.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
+	  _skatejs.vdom.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
 	
 	  _renderArbitrary(text);
 	
-	  _skatejs.vdom.IncrementalDOM.elementClose('a');
+	  _skatejs.vdom.elementClose('a');
 	
-	  return _skatejs.vdom.IncrementalDOM.elementClose('li');
+	  return _skatejs.vdom.elementClose('li');
 	}
 	
 	exports.default = (0, _skatejs.define)('sk-header', {
@@ -2319,27 +2306,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    title: _skatejs.prop.string()
 	  },
 	  render: function render(elem) {
-	    _skatejs.vdom.IncrementalDOM.elementOpen('div');
+	    _skatejs.vdom.elementOpen('div');
 	
 	    _renderArbitrary((0, _style2.default)(_index2.default));
 	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('div', null, null, 'class', _index2.default.locals.header);
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header);
 	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
+	    _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
 	
 	    _renderArbitrary(elem.title);
 	
-	    _skatejs.vdom.IncrementalDOM.elementClose('h1');
+	    _skatejs.vdom.elementClose('h1');
 	
-	    _skatejs.vdom.IncrementalDOM.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	    _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
 	
 	    _renderArbitrary([item('Docs'), item('Github', 'https://github.com/skatejs/skatejs'), item('Community')]);
 	
-	    _skatejs.vdom.IncrementalDOM.elementClose('ul');
+	    _skatejs.vdom.elementClose('ul');
 	
-	    _skatejs.vdom.IncrementalDOM.elementClose('div');
+	    _skatejs.vdom.elementClose('div');
 	
-	    return _skatejs.vdom.IncrementalDOM.elementClose('div');
+	    return _skatejs.vdom.elementClose('div');
 	  }
 	});
 
@@ -2425,34 +2412,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	exports.default = function (title) {
-	  document.title = title;
-	};
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(6)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2472,7 +2431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var type = typeof child;
 	
 	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.IncrementalDOM.text(child);
+	    _skatejs.vdom.text(child);
 	  } else if (type === 'function' && child.__jsxDOMWrapper) {
 	    child();
 	  } else if (Array.isArray(child)) {
@@ -2483,14 +2442,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.default = function (css) {
-	  _skatejs.vdom.IncrementalDOM.elementOpen('style');
+	  _skatejs.vdom.elementOpen('style');
 	
 	  _renderArbitrary(css.toString());
 	
-	  return _skatejs.vdom.IncrementalDOM.elementClose('style');
+	  return _skatejs.vdom.elementClose('style');
 	};
 	
 	var _skatejs = __webpack_require__(2);
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (title) {
+	  document.title = title;
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(6)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
+	
+	// exports
+
 
 /***/ }
 /******/ ])

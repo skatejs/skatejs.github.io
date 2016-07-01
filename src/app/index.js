@@ -5,6 +5,8 @@ import title from '../_/title';
 export default define('sk-app', {
   render() {
     title('SkateJS - functional web components');
-    return <Header title="SkateJS" />;
+    return (
+      <Header title="SkateJS" />
+    );
   },
 });
