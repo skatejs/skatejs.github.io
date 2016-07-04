@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _index3 = __webpack_require__(9);
+	var _index3 = __webpack_require__(13);
 	
 	var _index4 = _interopRequireDefault(_index3);
 	
@@ -83,26 +83,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _header = __webpack_require__(4);
+	var _body = __webpack_require__(4);
+	
+	var _body2 = _interopRequireDefault(_body);
+	
+	var _footer = __webpack_require__(7);
+	
+	var _footer2 = _interopRequireDefault(_footer);
+	
+	var _header = __webpack_require__(9);
 	
 	var _header2 = _interopRequireDefault(_header);
 	
-	var _title = __webpack_require__(8);
+	var _title = __webpack_require__(12);
 	
 	var _title2 = _interopRequireDefault(_title);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = (0, _skatejs.define)('sk-app', {
-	  render: function render() {
+	  props: {
+	    page: _skatejs.prop.string()
+	  },
+	  render: function render(elem) {
 	    (0, _title2.default)('SkateJS - functional web components');
 	
 	    _skatejs.vdom.elementOpen('div');
 	
 	    _skatejs.vdom.elementVoid(_header2.default, null, null, 'title', 'SkateJS');
+	
+	    _skatejs.vdom.elementOpen(_body2.default);
+	
+	    _renderArbitrary(elem.page);
+	
+	    _skatejs.vdom.elementClose(_body2.default);
+	
+	    _skatejs.vdom.elementVoid(_footer2.default);
 	
 	    return _skatejs.vdom.elementClose('div');
 	  }
@@ -2281,50 +2321,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _style = __webpack_require__(7);
-	
-	var _style2 = _interopRequireDefault(_style);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function item(text) {
-	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
+	exports.default = (0, _skatejs.define)('sk-body', {
+	  render: function render() {
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
 	
-	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
+	    _skatejs.vdom.elementOpen('style');
 	
-	  _skatejs.vdom.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
+	    _renderArbitrary(_index2.default.toString());
 	
-	  _renderArbitrary(text);
+	    _skatejs.vdom.elementClose('style');
 	
-	  _skatejs.vdom.elementClose('a');
-	
-	  return _skatejs.vdom.elementClose('li');
-	}
-	
-	exports.default = (0, _skatejs.define)('sk-header', {
-	  props: {
-	    title: _skatejs.prop.string()
-	  },
-	  render: function render(elem) {
-	    _skatejs.vdom.elementOpen('div');
-	
-	    _renderArbitrary((0, _style2.default)(_index2.default));
-	
-	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header);
-	
-	    _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
-	
-	    _renderArbitrary(elem.title);
-	
-	    _skatejs.vdom.elementClose('h1');
-	
-	    _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
-	
-	    _renderArbitrary([item('Docs'), item('Github', 'https://github.com/skatejs/skatejs'), item('Community')]);
-	
-	    _skatejs.vdom.elementClose('ul');
-	
-	    _skatejs.vdom.elementClose('div');
+	    _skatejs.vdom.elementVoid('slot');
 	
 	    return _skatejs.vdom.elementClose('div');
 	  }
@@ -2339,20 +2348,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#333;color:#eee;height:60px}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;font-size:24px;line-height:24px;margin:-2px 0 0;padding:18px}._3gAAJyILxgLXLUDHVCLw1K{color:#eee;font-size:18px;margin:0;padding:20px;text-decoration:none}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#444}", ""]);
+	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 20px 10px}", ""]);
 	
 	// exports
 	exports.locals = {
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K"
+		"body": "JotV9DC7cFGUX61mmETT1",
+		"body": "JotV9DC7cFGUX61mmETT1"
 	};
 
 /***/ },
@@ -2419,6 +2420,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _jsxWrapper = function _jsxWrapper(func, args) {
+	  var wrapper = args ? function wrapper() {
+	    return func.apply(this, args);
+	  } : func;
+	  wrapper.__jsxDOMWrapper = true;
+	  return wrapper;
+	};
+	
 	var _hasOwn = Object.prototype.hasOwnProperty;
 	
 	var _forOwn = function _forOwn(object, iterator) {
@@ -2441,18 +2451,211 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	exports.default = function (css) {
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(css.toString());
-	
-	  return _skatejs.vdom.elementClose('style');
-	};
-	
 	var _skatejs = __webpack_require__(2);
+	
+	var _index = __webpack_require__(8);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function list() {
+	  var items = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	
+	  _renderArbitrary(Object.keys(items).map(function (item) {
+	    return _jsxWrapper(function (_css$locals$item, _css$locals$link, _items$item, _item) {
+	      _skatejs.vdom.elementOpen('li', null, null, 'class', _css$locals$item);
+	
+	      _skatejs.vdom.elementOpen('a', null, null, 'class', _css$locals$link, 'href', _items$item);
+	
+	      _renderArbitrary(_item);
+	
+	      _skatejs.vdom.elementClose('a');
+	
+	      return _skatejs.vdom.elementClose('li');
+	    }, [_index2.default.locals.item, _index2.default.locals.link, items[item], item]);
+	  }));
+	
+	  return _skatejs.vdom.elementClose('ul');
+	}
+	
+	exports.default = (0, _skatejs.define)('sk-footer', {
+	  render: function render() {
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.footer);
+	
+	    _skatejs.vdom.elementOpen('style');
+	
+	    _renderArbitrary(_index2.default.toString());
+	
+	    _skatejs.vdom.elementClose('style');
+	
+	    _renderArbitrary(list({ docs: 'docs/' }));
+	
+	    return _skatejs.vdom.elementClose('div');
+	  }
+	});
 
 /***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(6)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2pOZ9JVRdOcst-M-V8CIG-{background-color:#333;color:#eee;font-size:12px;padding:10px 20px}.HAjb6JuBA0hiG3VMO17sO{padding:0}.ZXtuSy6oo7L79SnJvwsHt{color:#eee;text-decoration:none}._3k8ml8FyWDLKqwlHkSBmab{padding:0 0 0 20px}", ""]);
+	
+	// exports
+	exports.locals = {
+		"footer": "_2pOZ9JVRdOcst-M-V8CIG-",
+		"footer": "_2pOZ9JVRdOcst-M-V8CIG-",
+		"item": "HAjb6JuBA0hiG3VMO17sO",
+		"item": "HAjb6JuBA0hiG3VMO17sO",
+		"link": "ZXtuSy6oo7L79SnJvwsHt",
+		"link": "ZXtuSy6oo7L79SnJvwsHt",
+		"list": "_3k8ml8FyWDLKqwlHkSBmab",
+		"list": "_3k8ml8FyWDLKqwlHkSBmab"
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(2);
+	
+	var _index = __webpack_require__(10);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	var _logo = __webpack_require__(11);
+	
+	var _logo2 = _interopRequireDefault(_logo);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function item(text) {
+	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
+	
+	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
+	
+	  _skatejs.vdom.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
+	
+	  _renderArbitrary(text);
+	
+	  _skatejs.vdom.elementClose('a');
+	
+	  return _skatejs.vdom.elementClose('li');
+	}
+	
+	exports.default = (0, _skatejs.define)('sk-header', {
+	  props: {
+	    scrolled: _skatejs.prop.boolean(),
+	    title: _skatejs.prop.string()
+	  },
+	  attached: function attached(elem) {
+	    window.addEventListener('scroll', elem._scrollHandler = function () {
+	      return elem.scrolled = !!window.scrollY;
+	    });
+	  },
+	  detached: function detached(elem) {
+	    window.removeEventListener('scroll', elem._scrollHandler);
+	  },
+	  render: function render(elem) {
+	    var scrolled = elem.scrolled ? _index2.default.locals.headerScrolled : '';
+	
+	    _skatejs.vdom.elementOpen('div');
+	
+	    _skatejs.vdom.elementOpen('style');
+	
+	    _renderArbitrary(_index2.default.toString());
+	
+	    _skatejs.vdom.elementClose('style');
+	
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + scrolled);
+	
+	    _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
+	
+	    _skatejs.vdom.elementVoid('img', null, null, 'alt', elem.title, 'src', _logo2.default, 'width', '30');
+	
+	    _skatejs.vdom.elementClose('h1');
+	
+	    _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	
+	    _renderArbitrary([item('Docs'), item('Github', 'https://github.com/skatejs/skatejs'), item('Community')]);
+	
+	    _skatejs.vdom.elementClose('ul');
+	
+	    _skatejs.vdom.elementClose('div');
+	
+	    return _skatejs.vdom.elementClose('div');
+	  }
+	});
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(6)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._10mxIH_-5Sk7Kz5KsJMq0H{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
+	
+	// exports
+	exports.locals = {
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"header-scrolled": "_10mxIH_-5Sk7Kz5KsJMq0H",
+		"headerScrolled": "_10mxIH_-5Sk7Kz5KsJMq0H",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K"
+	};
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2466,7 +2669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(6)();

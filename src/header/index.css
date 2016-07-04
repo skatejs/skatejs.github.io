@@ -1,7 +1,13 @@
 .header {
-  background-color: #333;
-  color: #eee;
-  height: 60px;
+  background-color: #fefefe;
+  color: #333;
+  position: fixed;
+  transition: box-shadow .3s ease;
+  width: 100%;
+}
+
+.header-scrolled {
+  box-shadow: 0 0 15px 0 #333;
 }
 
 .list {
@@ -19,20 +25,23 @@
 
 .title {
   display: inline-block;
-  font-size: 24px;
-  line-height: 24px;
-  margin: -2px 0 0 0;
-  padding: 18px;
+  margin: 0 20px 0 10px;
+  padding: 0;
+  position: relative;
+  left: 14px;
+  top: 8px;
 }
 
 .link {
-  color: #eee;
+  color: #333;
+  display: inline-block;
   font-size: 18px;
   margin: 0;
   padding: 20px;
   text-decoration: none;
+  transition: background-color .3s ease;
 }
 
 .link:hover {
-  background-color: #444;
+  background-color: #eee;
 }

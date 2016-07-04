@@ -1,12 +1,21 @@
-import { define, vdom } from 'skatejs';
+import { define, prop, vdom } from 'skatejs';
+import Body from '../body';
+import Footer from '../footer';
 import Header from '../header';
 import title from '../_/title';
 
 export default define('sk-app', {
-  render() {
+  props: {
+    page: prop.string(),
+  },
+  render(elem) {
     title('SkateJS - functional web components');
     return (
-      <Header title="SkateJS" />
+      <div>
+        <Header title="SkateJS" />
+        <Body>{elem.page}</Body>
+        <Footer />
+      </div>
     );
   },
 });
