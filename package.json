@@ -31,6 +31,7 @@
     }
   },
   "dependencies": {
-    "skatejs": "^1.0.0-beta.3"
+    "page": "^1.7.1",
+    "skatejs": "^1.0.0-beta.7"
   }
 }
