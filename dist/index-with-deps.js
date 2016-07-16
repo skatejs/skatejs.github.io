@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _index3 = __webpack_require__(13);
+	var _index3 = __webpack_require__(14);
 	
 	var _index4 = _interopRequireDefault(_index3);
 	
@@ -83,62 +83,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _body = __webpack_require__(4);
+	var _body = __webpack_require__(5);
 	
 	var _body2 = _interopRequireDefault(_body);
 	
-	var _footer = __webpack_require__(7);
+	var _footer = __webpack_require__(8);
 	
 	var _footer2 = _interopRequireDefault(_footer);
 	
-	var _header = __webpack_require__(9);
+	var _header = __webpack_require__(10);
 	
 	var _header2 = _interopRequireDefault(_header);
 	
-	var _title = __webpack_require__(12);
+	var _title = __webpack_require__(13);
 	
 	var _title2 = _interopRequireDefault(_title);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	// export default define('sk-app', {
-	//   props: {
-	//     page: prop.string(),
-	//   },
-	//   render(elem) {
-	//     title('SkateJS - functional web components');
-	//     return (
-	//       <div>
-	//         <Header title="SkateJS" />
-	//         <Body>{elem.page}</Body>
-	//         <Footer />
-	//       </div>
-	//     );
-	//   },
-	// });
-	
-	var Button = (0, _skatejs.define)('editorkit-button', {
-	  render: function render() {
-	    _skatejs.vdom.elementOpen('button');
-	
-	    _skatejs.vdom.elementVoid('slot');
-	
-	    return _skatejs.vdom.elementClose('button');
-	  }
-	});
-	
 	exports.default = (0, _skatejs.define)('sk-app', {
-	  render: function render() {
-	    _skatejs.vdom.elementOpen(Button);
+	  props: {
+	    page: _skatejs.prop.string(),
+	    scrolled: _skatejs.prop.boolean()
+	  },
+	  attached: function attached(elem) {
+	    window.addEventListener('scroll', elem._scrollHandler = function () {
+	      return elem.scrolled = !!window.scrollY;
+	    });
+	    elem.page = 'testing...';
+	  },
+	  detached: function detached(elem) {
+	    window.removeEventListener('scroll', elem._scrollHandler);
+	  },
+	  render: function render(elem) {
+	    (0, _title2.default)('SkateJS - functional web components');
 	
-	    _skatejs.vdom.elementOpen('svg', null, null, 'width', '20', 'height', '20');
+	    _skatejs.vdom.elementOpen('div');
 	
-	    _skatejs.vdom.elementClose('svg');
+	    _skatejs.vdom.elementOpen(_header2.default, null, null, 'scrolled', elem.scrolled, 'title', 'SkateJS');
 	
-	    return _skatejs.vdom.elementClose(Button);
+	    _skatejs.vdom.elementClose(_header2.default);
+	
+	    _skatejs.vdom.elementOpen(_body2.default);
+	
+	    _renderArbitrary(elem.page);
+	
+	    _skatejs.vdom.elementClose(_body2.default);
+	
+	    _skatejs.vdom.elementOpen(_footer2.default);
+	
+	    _skatejs.vdom.elementClose(_footer2.default);
+	
+	    return _skatejs.vdom.elementClose('div');
 	  }
 	});
 
@@ -146,13 +166,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
-	
-	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	(function (global, factory) {
-	  ( false ? 'undefined' : _typeof2(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(3)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skate = global.skate || {}, global.incrementalDom);
-	})(undefined, function (exports, incrementalDom) {
+	   true ? factory(exports, __webpack_require__(3), __webpack_require__(4)) : typeof define === 'function' && define.amd ? define(['exports', 'incremental-dom', 'regex-native-function'], factory) : factory(global.skate = global.skate || {}, global.IncrementalDOM, global.isNativeRegex);
+	})(this, function (exports, incrementalDom, isNativeRegex) {
+	
+	  isNativeRegex = 'default' in isNativeRegex ? isNativeRegex['default'] : isNativeRegex;
 	
 	  var assign = Object.assign;
 	  var assign$1 = assign ? assign.bind(Object) : function (obj) {
@@ -235,37 +253,74 @@ return /******/ (function(modules) { // webpackBootstrap
 	    string: string
 	  });
 	
-	  var created = '____created';
-	  var events = '____events';
-	  var name = '____name';
-	  var props = '____props';
-	  var renderer = '____renderer';
-	  var rendererDebounced = '____rendererDebounced';
-	  var shadowRoot = '____shadowRoot';
+	  var $created = '____skate_created';
+	  var $ctor = '____skate_constructor';
+	  var $events = '____skate_events';
+	  var $name = '____skate_name';
+	  var $props = '____skate_props';
+	  var $renderer = '____skate_renderer';
+	  var $rendererDebounced = '____skate_rendererDebounced';
+	  var $shadowRoot = '____skate_shadowRoot';
 	
 	  var symbols$1 = Object.freeze({
-	    created: created,
-	    events: events,
-	    name: name,
-	    props: props,
-	    renderer: renderer,
-	    rendererDebounced: rendererDebounced,
-	    shadowRoot: shadowRoot
+	    name: $name,
+	    shadowRoot: $shadowRoot
 	  });
 	
-	  var div = document.createElement('div');
-	  var customElementsV0 = !!document.registerElement;
-	  var customElementsV1 = !!window.customElements;
-	  var shadowDomV0 = !!div.createShadowRoot;
-	  var shadowDomV1 = !!div.attachShadow;
+	  // checks if a function is native using regex
 	
-	  var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-	    return typeof obj === 'undefined' ? 'undefined' : _typeof2(obj);
-	  } : function (obj) {
-	    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === 'undefined' ? 'undefined' : _typeof2(obj);
+	  var div = document.createElement('div');
+	  var isNative = function isNative(elem, prop) {
+	    return isNativeRegex.test(elem[prop]);
+	  };
+	  var isPolyfill = function isPolyfill(elem, prop) {
+	    return !!elem[prop] && !isNative(elem, prop);
 	  };
 	
-	  var classCallCheck = function classCallCheck(instance, Constructor) {
+	  // property used to check for shadowDOMv0 support
+	  var v0ShadowDOMProperty = 'createShadowRoot';
+	
+	  // property used to check for shadowDOMv1 support
+	  var v1ShadowDOMProperty = 'attachShadow';
+	
+	  function shouldUseShadowDomV0(elem) {
+	    if (isNative(elem, v1ShadowDOMProperty)) {
+	      return false;
+	    } else if (isPolyfill(elem, v1ShadowDOMProperty) && isNative(elem, v0ShadowDOMProperty)) {
+	      return true;
+	    } else if (!isPolyfill(elem, v1ShadowDOMProperty) && isNative(elem, v0ShadowDOMProperty)) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  }
+	
+	  function shouldUseShadowDomV1(elem) {
+	    if (isNative(elem, v1ShadowDOMProperty)) {
+	      return true;
+	    } else if (isPolyfill(elem, v1ShadowDOMProperty) && isNative(elem, v0ShadowDOMProperty)) {
+	      return false;
+	    } else if (isPolyfill(elem, v1ShadowDOMProperty)) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	  }
+	
+	  var customElementsV0 = !!document.registerElement;
+	  var customElementsV0Polyfill = customElementsV0 && !Document.prototype.registerElement;
+	  var customElementsV1 = !!window.customElements;
+	
+	  var shadowDomV0 = shouldUseShadowDomV0(div);
+	  var shadowDomV1 = shouldUseShadowDomV1(div);
+	
+	  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+	    return typeof obj;
+	  } : function (obj) {
+	    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+	  };
+	
+	  var classCallCheck = function (instance, Constructor) {
 	    if (!(instance instanceof Constructor)) {
 	      throw new TypeError("Cannot call a class as a function");
 	    }
@@ -289,7 +344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }();
 	
-	  var defineProperty = function defineProperty(obj, key, value) {
+	  var defineProperty = function (obj, key, value) {
 	    if (key in obj) {
 	      Object.defineProperty(obj, key, {
 	        value: value,
@@ -304,9 +359,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return obj;
 	  };
 	
-	  var inherits = function inherits(subClass, superClass) {
+	  var inherits = function (subClass, superClass) {
 	    if (typeof superClass !== "function" && superClass !== null) {
-	      throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === 'undefined' ? 'undefined' : _typeof2(superClass)));
+	      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
 	    }
 	
 	    subClass.prototype = Object.create(superClass && superClass.prototype, {
@@ -320,16 +375,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 	  };
 	
-	  var possibleConstructorReturn = function possibleConstructorReturn(self, call) {
+	  var possibleConstructorReturn = function (self, call) {
 	    if (!self) {
 	      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
 	    }
 	
-	    return call && ((typeof call === 'undefined' ? 'undefined' : _typeof2(call)) === "object" || typeof call === "function") ? call : self;
+	    return call && (typeof call === "object" || typeof call === "function") ? call : self;
 	  };
 	
-	  var fallbackToV0 = !shadowDomV1 && shadowDomV0;
+	  var toConsumableArray = function (arr) {
+	    if (Array.isArray(arr)) {
+	      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+	
+	      return arr2;
+	    } else {
+	      return Array.from(arr);
+	    }
+	  };
+	
 	  var applyDefault = incrementalDom.attributes[incrementalDom.symbols.default];
+	  var fallbackToV0 = !shadowDomV1 && shadowDomV0;
+	  var stackChren = [];
+	  var stackProps = [];
 	
 	  // Attributes that are not handled by Incremental DOM.
 	  incrementalDom.attributes.key = incrementalDom.attributes.skip = incrementalDom.attributes.statics = function () {};
@@ -339,11 +406,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Default attribute applicator.
 	  incrementalDom.attributes[incrementalDom.symbols.default] = function (elem, name, value) {
-	    // Boolean false values should not set attributes at all.
-	    if (value === false) {
-	      return;
-	    }
-	
 	    // If the skip attribute was specified, skip
 	    if (name === 'skip' && value) {
 	      return incrementalDom.skip();
@@ -353,6 +415,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var props = elem.constructor.props;
 	    if (props && name in props) {
 	      return incrementalDom.applyProp(elem, name, value);
+	    }
+	
+	    // Boolean false values should not set attributes at all.
+	    if (value === false) {
+	      return;
 	    }
 	
 	    // Handle built-in and custom events.
@@ -392,47 +459,71 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  // Returns the tag name of the element if a custom element constructor was
-	  // provided instead of a string.
-	  function decideIfConstructorOrNot(tname) {
-	    return typeof tname === 'function' ? tname[name] : tname;
-	  }
-	
-	  // Returns the correct tag name so we can use <content> instead of <slot> if we
-	  // need to use Shadow DOM V0.
-	  function decideIfContentTagOrNot(tname) {
-	    return tname === 'slot' && fallbackToV0 ? 'content' : tname;
-	  }
-	
-	  // Patch elementOpen() so that anything that compiles down to Incremental DOM
-	  // gets the special behaviour.
-	  function newElementOpen() {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
+	  function resolveTagName(tname) {
+	    // If the tag name is a function, a Skate constructor or a standard function
+	    // is supported.
+	    //
+	    // - If a Skate constructor, the tag name is extracted from that.
+	    // - If a standard function, it is used as a helper.
+	    if (typeof tname === 'function') {
+	      return tname[$name] || tname;
 	    }
 	
-	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return incrementalDom.elementOpen.apply(null, args);
-	  }
-	
-	  // Patch elementOpenStart() for the same reason we patched elementOpen().
-	  function newElementOpenStart() {
-	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	      args[_key2] = arguments[_key2];
+	    // Skate allows the consumer to use <slot /> and it will translate it to
+	    // <content /> if Shadow DOM V0 is preferred.
+	    if (tname === 'slot' && fallbackToV0) {
+	      return 'content';
 	    }
 	
-	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return incrementalDom.elementOpenStart.apply(null, args);
+	    // All other tag names are just passed through.
+	    return tname;
 	  }
 	
-	  // Patch elementVoid() for the same reason we patched elementOpen().
-	  function newElementVoid() {
-	    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	      args[_key3] = arguments[_key3];
-	    }
+	  function wrapIdomFunc(func) {
+	    var tnameFuncHandler = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 	
-	    args[0] = decideIfConstructorOrNot(decideIfContentTagOrNot(args[0]));
-	    return incrementalDom.elementVoid.apply(null, args);
+	    return function wrap() {
+	      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	        args[_key] = arguments[_key];
+	      }
+	
+	      var tname = args[0] = resolveTagName(args[0]);
+	      if (typeof tname === 'function') {
+	        // If we've encountered a function, handle it according to the type of
+	        // function that is being wrapped.
+	        tnameFuncHandler(tname);
+	      } else if (stackChren.length) {
+	        // We pass the wrap() function in here so that when it's called as
+	        // children, it will queue up for the next stack, if there is one.
+	        stackChren[stackChren.length - 1].push([wrap, args]);
+	      } else {
+	        // If there is no stack left, we call Incremental DOM directly.
+	        return func.apply(undefined, args);
+	      }
+	    };
+	  }
+	
+	  function newAttr(key, val) {
+	    if (stackProps.length) {
+	      stackProps[stackProps.length - 1][key] = val;
+	    } else {
+	      return incrementalDom.attr(key, val);
+	    }
+	  }
+	
+	  function stackOpen() {
+	    stackChren.push([]);
+	    stackProps.push({});
+	  }
+	
+	  function stackClose(tname) {
+	    var chren = stackChren.pop();
+	    var props = stackProps.pop();
+	    tname(props, function () {
+	      return chren.forEach(function (args) {
+	        return args[0].apply(args, toConsumableArray(args[1]));
+	      });
+	    });
 	  }
 	
 	  // Convenience function for declaring an Incremental DOM element using
@@ -440,10 +531,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function element(tname, attrs, chren) {
 	    var atype = typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs);
 	
-	    if (atype === 'function') {
+	    // If attributes are a function, then they should be treated as children.
+	    if (atype === 'function' || atype === 'string') {
 	      chren = attrs;
 	    }
 	
+	    // Ensure the attributes are an object.
 	    if (atype !== 'object') {
 	      attrs = {};
 	    }
@@ -457,31 +550,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Set attributes.
 	    Object.keys(attrs).forEach(function (name) {
-	      return incrementalDom.attr(name, attrs[name]);
+	      return newAttr(name, attrs[name]);
 	    });
 	
 	    // Close before we render the descendant tree.
-	    incrementalDom.elementOpenEnd();
+	    newElementOpenEnd(tname);
 	
 	    var ctype = typeof chren === 'undefined' ? 'undefined' : _typeof(chren);
 	    if (ctype === 'function') {
 	      chren();
 	    } else if (ctype === 'string' || ctype === 'number') {
-	      incrementalDom.text(chren);
+	      newText(chren);
 	    }
 	
-	    return incrementalDom.elementClose(tname);
+	    return newElementClose(tname);
 	  }
+	
+	  // Patch element factories.
+	  var newElementClose = wrapIdomFunc(incrementalDom.elementClose, stackClose);
+	  var newElementOpen = wrapIdomFunc(incrementalDom.elementOpen, stackOpen);
+	  var newElementOpenEnd = wrapIdomFunc(incrementalDom.elementOpenEnd);
+	  var newElementOpenStart = wrapIdomFunc(incrementalDom.elementOpenStart, stackOpen);
+	  var newElementVoid = wrapIdomFunc(incrementalDom.elementVoid);
+	  var newText = wrapIdomFunc(incrementalDom.text);
 	
 	  var vdom = Object.freeze({
 	    element: element,
-	    attr: incrementalDom.attr,
-	    elementClose: incrementalDom.elementClose,
-	    elementOpenEnd: incrementalDom.elementOpenEnd,
+	    attr: newAttr,
+	    elementClose: newElementClose,
 	    elementOpen: newElementOpen,
+	    elementOpenEnd: newElementOpenEnd,
 	    elementOpenStart: newElementOpenStart,
 	    elementVoid: newElementVoid,
-	    text: incrementalDom.text
+	    text: newText
 	  });
 	
 	  function data(element) {
@@ -491,11 +592,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return namespace && (data[namespace] || (data[namespace] = {})) || data;
 	  }
 	
+	  var definePropertyConstructor = function (obj, value) {
+	    return Object.defineProperty(obj, 'constructor', { enumerable: false, value: value });
+	  };
+	
 	  function getOwnPropertyDescriptors(obj) {
 	    return Object.getOwnPropertyNames(obj || {}).reduce(function (prev, curr) {
 	      prev[curr] = Object.getOwnPropertyDescriptor(obj, curr);
 	      return prev;
 	    }, {});
+	  }
+	
+	  // In native Custom Elements v0, you can extend HTMLElement. In the polyfill
+	  // you cannot, so we ensure the polyfill has a patched HTMLElement constructor.
+	  if (customElementsV0Polyfill) {
+	    var proto = HTMLElement.prototype;
+	    window.HTMLElement = function () {
+	      var ctor = this[$ctor];
+	      var name = this[$name];
+	      var type = ctor.extends;
+	      return document.createElement(type || name, type ? name : null);
+	    };
+	    HTMLElement.prototype = Object.create(proto);
+	    definePropertyConstructor(HTMLElement.prototype, HTMLElement);
 	  }
 	
 	  var Component = function (_HTMLElement) {
@@ -563,40 +682,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value: function createdCallback() {
 	        var _this2 = this;
 	
+	        // In the polyfill, if you define a custom element after it has been
+	        // created the polyfill will call the constructor it has on record thus
+	        // ignoring the one the user has defined for the element. We ensure the
+	        // constructor is actually the one that was specified in the definition
+	        // rather than the one the polyfill gives it.
+	        //
+	        // In native v0 this behaves normally, so we only need to worry about the
+	        // polyfill here.
+	        if (customElementsV0Polyfill) {
+	          definePropertyConstructor(this, this[$ctor]);
+	        }
+	
 	        var elemData = data(this);
 	        var readyCallbacks = elemData.readyCallbacks;
 	        var Ctor = this.constructor;
 	        var definedAttribute = Ctor.definedAttribute;
-	        var events$$ = Ctor.events;
-	        var created$$ = Ctor.created;
+	        var events = Ctor.events;
+	        var created = Ctor.created;
 	        var observedAttributes = Ctor.observedAttributes;
-	        var props$$ = Ctor.props;
+	        var props = Ctor.props;
 	        var ready = Ctor.ready;
 	        var renderedAttribute = Ctor.renderedAttribute;
 	
-	        var renderer$$ = Ctor[renderer];
+	        var renderer = Ctor[$renderer];
 	
 	        // TODO: This prevents an element from being initialised multiple times. For
 	        // some reason this is happening in the event tests. It's possibly creating
 	        // elements in a way that the causes the custom element v1 polyfill to call
 	        // the constructor twice.
-	        if (this[created]) return;
-	        this[created] = true;
+	        if (this[$created]) return;
+	        this[$created] = true;
 	
-	        if (props$$) {
-	          Ctor[props](this);
+	        if (props) {
+	          Ctor[$props](this);
 	        }
 	
-	        if (events$$) {
-	          Ctor[events](this);
+	        if (events) {
+	          Ctor[$events](this);
 	        }
 	
-	        if (created$$) {
-	          created$$(this);
+	        if (created) {
+	          created(this);
 	        }
 	
-	        if (renderer$$ && !this.hasAttribute(renderedAttribute)) {
-	          renderer$$(this);
+	        if (renderer && !this.hasAttribute(renderedAttribute)) {
+	          renderer(this);
 	        }
 	
 	        if (ready) {
@@ -738,6 +869,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var current = e.path ? e.path[0] : e.target;
 	      var selector = parsed.selector;
 	      while (current && current !== elem.parentNode) {
+	        if (current.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+	          break;
+	        }
 	        if (matches(current, selector)) {
 	          readonly(e, 'currentTarget', current);
 	          readonly(e, 'delegateTarget', elem);
@@ -765,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    elem.addEventListener(name, handler, capture);
 	  }
 	
-	  function events$1(opts) {
+	  function events(opts) {
 	    var events = opts.events || {};
 	    return function (elem) {
 	      for (var name in events) {
@@ -782,7 +916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	
-	      if (!elem[shadowRoot]) {
+	      if (!elem[$shadowRoot]) {
 	        var sr = void 0;
 	
 	        if (shadowDomV1) {
@@ -793,10 +927,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          sr = elem;
 	        }
 	
-	        elem[shadowRoot] = sr;
+	        elem[$shadowRoot] = sr;
 	      }
 	
-	      incrementalDom.patchInner(elem[shadowRoot], render, elem);
+	      incrementalDom.patchInner(elem[$shadowRoot], render, elem);
 	    };
 	  }
 	
@@ -807,10 +941,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	
-	  var raf = window.requestAnimationFrame || setTimeout;
 	  function debounce(fn) {
 	    var called = false;
-	
 	    return function () {
 	      var _this = this;
 	
@@ -820,7 +952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (!called) {
 	        called = true;
-	        raf(function () {
+	        setTimeout(function () {
 	          called = false;
 	          fn.apply(_this, args);
 	        });
@@ -968,7 +1100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // Re-render on property updates if the should-update check passes.
 	      if (prop.render(this, changeData)) {
-	        var deb = this[rendererDebounced] || (this[rendererDebounced] = debounce(this.constructor[renderer]));
+	        var deb = this[$rendererDebounced] || (this[$rendererDebounced] = debounce(this.constructor[$renderer]));
 	        deb(this);
 	      }
 	
@@ -1013,6 +1145,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 	
+	  var registry = {};
+	
 	  // Ensures that definitions passed as part of the constructor are functions
 	  // that return property definitions used on the element.
 	  function ensurePropertyFunctions(Ctor) {
@@ -1035,20 +1169,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      descriptors[descriptorName] = props[descriptorName](descriptorName);
 	      return descriptors;
 	    }, {});
-	  }
-	
-	  // Makes a function / constructor for the custom element that automates the
-	  // boilerplate of ensuring the parent constructor is called first and ensures
-	  // that the element is returned at the end.
-	  function createConstructor(name$$, Ctor) {
-	    if ((typeof Ctor === 'undefined' ? 'undefined' : _typeof(Ctor)) === 'object') {
-	      Ctor = Component.extend(Ctor);
-	    }
-	
-	    // Internal data.
-	    Ctor[name] = name$$;
-	
-	    return Ctor;
 	  }
 	
 	  // Ensures linked properties that have linked attributes are pre-formatted to
@@ -1078,6 +1198,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Merge observed attributes.
 	    Object.defineProperty(Ctor, 'observedAttributes', {
+	      configurable: true,
+	      enumerable: true,
 	      get: function get() {
 	        return observedAttributes;
 	      }
@@ -1107,22 +1229,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 	
-	  function define(name, Ctor) {
-	    Ctor = createConstructor(name, Ctor);
+	  function generateUniqueName(name) {
+	    var registered = registry[name];
+	    return registered ? name + '-' + registered : name;
+	  }
+	
+	  function registerUniqueName(name) {
+	    registry[name] = registry[name] ? registry[name] + 1 : 1;
+	  }
+	
+	  function define(name, opts) {
+	    var uniqueName = generateUniqueName(name);
+	    var Ctor = (typeof opts === 'undefined' ? 'undefined' : _typeof(opts)) === 'object' ? Component.extend(opts) : opts;
+	
+	    registerUniqueName(name);
 	    formatLinkedAttributes(Ctor);
 	
-	    Ctor[events] = events$1(Ctor);
-	    Ctor[props] = createInitProps(Ctor);
-	    Ctor[renderer] = createRenderer(Ctor);
+	    Ctor[$events] = events(Ctor);
+	    Ctor[$name] = uniqueName;
+	    Ctor[$props] = createInitProps(Ctor);
+	    Ctor[$renderer] = createRenderer(Ctor);
 	
 	    if (customElementsV0) {
-	      return document.registerElement(name, Ctor);
+	      // These properties are necessary for the Custom Element v0 polyfill so
+	      // that we can fix it not working with extending the built-in HTMLElement.
+	      Ctor.prototype[$ctor] = Ctor;
+	      Ctor.prototype[$name] = uniqueName;
+	      var NewCtor = document.registerElement(uniqueName, Ctor);
+	      definePropertyConstructor(NewCtor.prototype, Ctor);
+	      return customElementsV0Polyfill ? Ctor : NewCtor;
 	    } else if (customElementsV1) {
-	      window.customElements.define(name, Ctor, { extends: Ctor.extends });
-	      return Ctor;
+	      window.customElements.define(uniqueName, Ctor, { extends: Ctor.extends });
 	    } else {
 	      throw new Error('Skate requires native custom element support or a polyfill.');
 	    }
+	
+	    return Ctor;
 	  }
 	
 	  function get$1(elem) {
@@ -1140,7 +1282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function set$1(elem, newState) {
 	    assign$1(elem, newState);
 	    if (elem.constructor.render) {
-	      elem.constructor[renderer](elem);
+	      elem.constructor[$renderer](elem);
 	    }
 	  }
 	
@@ -1246,8 +1388,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A cached reference to the hasOwnProperty function.
 	 */
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	
 	/**
@@ -1261,7 +1401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} property The property to check.
 	 * @return {boolean} Whether map has property.
 	 */
-	var has = function has(map, property) {
+	var has = function (map, property) {
 	  return hasOwnProperty.call(map, property);
 	};
 	
@@ -1269,7 +1409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Creates an map object without a prototype.
 	 * @return {!Object}
 	 */
-	var createMap = function createMap() {
+	var createMap = function () {
 	  return create(null);
 	};
 	
@@ -1339,7 +1479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?string=} key The key that identifies the node.
 	 * @return {!NodeData} The newly initialized data object
 	 */
-	var initData = function initData(node, nodeName, key) {
+	var initData = function (node, nodeName, key) {
 	  var data = new NodeData(nodeName, key);
 	  node['__incrementalDOMData'] = data;
 	  return data;
@@ -1351,7 +1491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Node} node The node to retrieve the data for.
 	 * @return {!NodeData} The NodeData for this Node.
 	 */
-	var getData = function getData(node) {
+	var getData = function (node) {
 	  var data = node['__incrementalDOMData'];
 	
 	  if (!data) {
@@ -1395,7 +1535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} name
 	 * @return {string|undefined} The namespace to use for the attribute.
 	 */
-	var getNamespace = function getNamespace(name) {
+	var getNamespace = function (name) {
 	  if (name.lastIndexOf('xml:', 0) === 0) {
 	    return 'http://www.w3.org/XML/1998/namespace';
 	  }
@@ -1413,7 +1553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} name The attribute's name.
 	 * @param {?(boolean|number|string)=} value The attribute's value.
 	 */
-	var applyAttr = function applyAttr(el, name, value) {
+	var applyAttr = function (el, name, value) {
 	  if (value == null) {
 	    el.removeAttribute(name);
 	  } else {
@@ -1432,7 +1572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} name The property's name.
 	 * @param {*} value The property's value.
 	 */
-	var applyProp = function applyProp(el, name, value) {
+	var applyProp = function (el, name, value) {
 	  el[name] = value;
 	};
 	
@@ -1444,7 +1584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {*} style The style to set. Either a string of css or an object
 	 *     containing property-value pairs.
 	 */
-	var applyStyle = function applyStyle(el, name, style) {
+	var applyStyle = function (el, name, style) {
 	  if (typeof style === 'string') {
 	    el.style.cssText = style;
 	  } else {
@@ -1468,8 +1608,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     function it is set on the Element, otherwise, it is set as an HTML
 	 *     attribute.
 	 */
-	var applyAttributeTyped = function applyAttributeTyped(el, name, value) {
-	  var type = typeof value === 'undefined' ? 'undefined' : _typeof(value);
+	var applyAttributeTyped = function (el, name, value) {
+	  var type = typeof value;
 	
 	  if (type === 'object' || type === 'function') {
 	    applyProp(el, name, value);
@@ -1484,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} name The attribute's name.
 	 * @param {*} value The attribute's value.
 	 */
-	var updateAttribute = function updateAttribute(el, name, value) {
+	var updateAttribute = function (el, name, value) {
 	  var data = getData(el);
 	  var attrs = data.attrs;
 	
@@ -1518,7 +1658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?Node} parent
 	 * @return {?string} The namespace to create the tag in.
 	 */
-	var getNamespaceForTag = function getNamespaceForTag(tag, parent) {
+	var getNamespaceForTag = function (tag, parent) {
 	  if (tag === 'svg') {
 	    return 'http://www.w3.org/2000/svg';
 	  }
@@ -1540,7 +1680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     static attributes for the Element.
 	 * @return {!Element}
 	 */
-	var createElement = function createElement(doc, parent, tag, key, statics) {
+	var createElement = function (doc, parent, tag, key, statics) {
 	  var namespace = getNamespaceForTag(tag, parent);
 	  var el = undefined;
 	
@@ -1566,7 +1706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Document} doc The document with which to create the Element.
 	 * @return {!Text}
 	 */
-	var createText = function createText(doc) {
+	var createText = function (doc) {
 	  var node = doc.createTextNode('');
 	  initData(node, '#text', null);
 	  return node;
@@ -1578,7 +1718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {!Object<string, !Element>} A mapping of keys to the children of the
 	 *     Element.
 	 */
-	var createKeyMap = function createKeyMap(el) {
+	var createKeyMap = function (el) {
 	  var map = createMap();
 	  var child = el.firstElementChild;
 	
@@ -1601,7 +1741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?Node} el
 	 * @return {!Object<string, !Node>} A mapping of keys to child Elements
 	 */
-	var getKeyMap = function getKeyMap(el) {
+	var getKeyMap = function (el) {
 	  var data = getData(el);
 	
 	  if (!data.keyMap) {
@@ -1617,7 +1757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?string=} key
 	 * @return {?Node} The child corresponding to the key.
 	 */
-	var getChild = function getChild(parent, key) {
+	var getChild = function (parent, key) {
 	  return key ? getKeyMap(parent)[key] : null;
 	};
 	
@@ -1629,7 +1769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} key A key to identify the child with.
 	 * @param {!Node} child The child to register.
 	 */
-	var registerChild = function registerChild(parent, key, child) {
+	var registerChild = function (parent, key, child) {
 	  getKeyMap(parent)[key] = child;
 	};
 	
@@ -1720,7 +1860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	* @param {string=} tag The tag name of the Element.
 	* @param {?string=} key The key of the Element.
 	*/
-	var assertKeyedTagMatches = function assertKeyedTagMatches(nodeName, tag, key) {
+	var assertKeyedTagMatches = function (nodeName, tag, key) {
 	  if (nodeName !== tag) {
 	    throw new Error('Was expecting node with key "' + key + '" to be a ' + tag + ', not a ' + nodeName + '.');
 	  }
@@ -1748,7 +1888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return {function((!Element|!DocumentFragment),!function(T),T=)}
 	 * @template T
 	 */
-	var patchFactory = function patchFactory(run) {
+	var patchFactory = function (run) {
 	  /**
 	   * TODO(moz): These annotations won't be necessary once we switch to Closure
 	   * Compiler's new type inference. Remove these once the switch is done.
@@ -1758,7 +1898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {T=} data
 	   * @template T
 	   */
-	  var f = function f(node, fn, data) {
+	  var f = function (node, fn, data) {
 	    var prevContext = context;
 	    var prevRoot = root;
 	    var prevDoc = doc;
@@ -1835,7 +1975,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?string=} key An optional key that identifies a node.
 	 * @return {boolean} True if the node matches, false otherwise.
 	 */
-	var matches = function matches(nodeName, key) {
+	var matches = function (nodeName, key) {
 	  var data = getData(currentNode);
 	
 	  // Key check is done using double equals as we want to treat a null key the
@@ -1853,7 +1993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {?Array<*>=} statics For an Element, this should be an array of
 	 *     name-value pairs.
 	 */
-	var alignWithDOM = function alignWithDOM(nodeName, key, statics) {
+	var alignWithDOM = function (nodeName, key, statics) {
 	  if (currentNode && matches(nodeName, key)) {
 	    return;
 	  }
@@ -1901,7 +2041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Clears out any unvisited Nodes, as the corresponding virtual element
 	 * functions were never called for them.
 	 */
-	var clearUnvisitedDOM = function clearUnvisitedDOM() {
+	var clearUnvisitedDOM = function () {
 	  var node = currentParent;
 	  var data = getData(node);
 	  var keyMap = data.keyMap;
@@ -1946,7 +2086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Changes to the first child of the current node.
 	 */
-	var enterNode = function enterNode() {
+	var enterNode = function () {
 	  currentParent = currentNode;
 	  currentNode = null;
 	};
@@ -1954,7 +2094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Changes to the next sibling of the current node.
 	 */
-	var nextNode = function nextNode() {
+	var nextNode = function () {
 	  if (currentNode) {
 	    currentNode = currentNode.nextSibling;
 	  } else {
@@ -1965,7 +2105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Changes to the parent of the current node, removing any unvisited children.
 	 */
-	var exitNode = function exitNode() {
+	var exitNode = function () {
 	  clearUnvisitedDOM();
 	
 	  currentNode = currentParent;
@@ -1985,7 +2125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     Element is created.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var coreElementOpen = function coreElementOpen(tag, key, statics) {
+	var coreElementOpen = function (tag, key, statics) {
 	  nextNode();
 	  alignWithDOM(tag, key, statics);
 	  enterNode();
@@ -1999,7 +2139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @return {!Element} The corresponding Element.
 	 */
-	var coreElementClose = function coreElementClose() {
+	var coreElementClose = function () {
 	  if (false) {}
 	
 	  exitNode();
@@ -2013,7 +2153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @return {!Text} The corresponding Text Node.
 	 */
-	var coreText = function coreText() {
+	var coreText = function () {
 	  nextNode();
 	  alignWithDOM('#text', null, null);
 	  return (/** @type {!Text} */currentNode
@@ -2024,7 +2164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Gets the current Element being patched.
 	 * @return {!Element}
 	 */
-	var currentElement = function currentElement() {
+	var currentElement = function () {
 	  if (false) {}
 	  return (/** @type {!Element} */currentParent
 	  );
@@ -2034,7 +2174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Skips the children in a subtree, allowing an Element to be closed without
 	 * clearing out the children.
 	 */
-	var skip = function skip() {
+	var skip = function () {
 	  if (false) {}
 	  currentNode = currentParent.lastChild;
 	};
@@ -2065,7 +2205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     for the Element.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var elementOpen = function elementOpen(tag, key, statics, const_args) {
+	var elementOpen = function (tag, key, statics, const_args) {
 	  if (false) {}
 	
 	  var node = coreElementOpen(tag, key, statics);
@@ -2130,7 +2270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     static attributes for the Element. These will only be set once when the
 	 *     Element is created.
 	 */
-	var elementOpenStart = function elementOpenStart(tag, key, statics) {
+	var elementOpenStart = function (tag, key, statics) {
 	  if (false) {}
 	
 	  argsBuilder[0] = tag;
@@ -2145,7 +2285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} name
 	 * @param {*} value
 	 */
-	var attr = function attr(name, value) {
+	var attr = function (name, value) {
 	  if (false) {}
 	
 	  argsBuilder.push(name, value);
@@ -2155,7 +2295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Closes an open tag started with elementOpenStart.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var elementOpenEnd = function elementOpenEnd() {
+	var elementOpenEnd = function () {
 	  if (false) {}
 	
 	  var node = elementOpen.apply(null, argsBuilder);
@@ -2169,7 +2309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {string} tag The element's tag.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var elementClose = function elementClose(tag) {
+	var elementClose = function (tag) {
 	  if (false) {}
 	
 	  var node = coreElementClose();
@@ -2193,7 +2333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     for the Element.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var elementVoid = function elementVoid(tag, key, statics, const_args) {
+	var elementVoid = function (tag, key, statics, const_args) {
 	  elementOpen.apply(null, arguments);
 	  return elementClose(tag);
 	};
@@ -2215,7 +2355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     for the Element.
 	 * @return {!Element} The corresponding Element.
 	 */
-	var elementPlaceholder = function elementPlaceholder(tag, key, statics, const_args) {
+	var elementPlaceholder = function (tag, key, statics, const_args) {
 	  if (false) {}
 	
 	  elementOpen.apply(null, arguments);
@@ -2232,7 +2372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     changed.
 	 * @return {!Text} The corresponding text node.
 	 */
-	var text = function text(value, const_args) {
+	var text = function (value, const_args) {
 	  if (false) {}
 	
 	  var node = coreText();
@@ -2280,6 +2420,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	// REGEX //
+	
+	var re = '';
+	
+	// Use a native function as a template...
+	re += Function.prototype.toString.call(Function);
+	
+	// Escape special RegExp characters...
+	re = re.replace(/([.*+?^=!:$(){}|[\]\/\\])/g, '\\$1');
+	
+	// Replace any mentions of `Function` to make template generic.
+	// Replace `for ...` and additional info provided in other environments, such as Rhino (see lodash).
+	re = re.replace(/Function|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?');
+	
+	// Bracket the regex:
+	re = '^' + re + '$';
+	
+	// EXPORTS //
+	
+	module.exports = new RegExp(re);
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2311,33 +2478,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _index = __webpack_require__(5);
+	var _index = __webpack_require__(6);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = (0, _skatejs.define)('sk-body', {
-	  render: function render() {
-	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
+	exports.default = function (props, chren) {
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
 	
-	    _skatejs.vdom.elementOpen('style');
+	  _skatejs.vdom.elementOpen('style');
 	
-	    _renderArbitrary(_index2.default.toString());
+	  _renderArbitrary(_index2.default.toString());
 	
-	    _skatejs.vdom.elementClose('style');
+	  _skatejs.vdom.elementClose('style');
 	
-	    _skatejs.vdom.elementVoid('slot');
+	  _renderArbitrary(chren());
 	
-	    return _skatejs.vdom.elementClose('div');
-	  }
-	});
+	  return _skatejs.vdom.elementClose('div');
+	};
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(6)();
+	exports = module.exports = __webpack_require__(7)();
 	// imports
 	
 	
@@ -2351,7 +2516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2406,7 +2571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2447,55 +2612,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _index = __webpack_require__(8);
+	var _index = __webpack_require__(9);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function list() {
-	  var items = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
+	var List = function List(props) {
 	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
 	
-	  _renderArbitrary(Object.keys(items).map(function (item) {
-	    return _jsxWrapper(function (_css$locals$item, _css$locals$link, _items$item, _item) {
+	  _renderArbitrary(Object.keys(props.items).map(function (item) {
+	    return _jsxWrapper(function (_css$locals$item, _css$locals$link, _props$items$item, _item) {
 	      _skatejs.vdom.elementOpen('li', null, null, 'class', _css$locals$item);
 	
-	      _skatejs.vdom.elementOpen('a', null, null, 'class', _css$locals$link, 'href', _items$item);
+	      _skatejs.vdom.elementOpen('a', null, null, 'class', _css$locals$link, 'href', _props$items$item);
 	
 	      _renderArbitrary(_item);
 	
 	      _skatejs.vdom.elementClose('a');
 	
 	      return _skatejs.vdom.elementClose('li');
-	    }, [_index2.default.locals.item, _index2.default.locals.link, items[item], item]);
+	    }, [_index2.default.locals.item, _index2.default.locals.link, props.items[item], item]);
 	  }));
 	
 	  return _skatejs.vdom.elementClose('ul');
-	}
+	};
 	
-	exports.default = (0, _skatejs.define)('sk-footer', {
-	  render: function render() {
-	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.footer);
+	exports.default = function () {
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.footer);
 	
-	    _skatejs.vdom.elementOpen('style');
+	  _skatejs.vdom.elementOpen('style');
 	
-	    _renderArbitrary(_index2.default.toString());
+	  _renderArbitrary(_index2.default.toString());
 	
-	    _skatejs.vdom.elementClose('style');
+	  _skatejs.vdom.elementClose('style');
 	
-	    _renderArbitrary(list({ docs: 'docs/' }));
+	  _skatejs.vdom.elementOpen(List, null, null, 'items', { Docs: 'docs/' });
 	
-	    return _skatejs.vdom.elementClose('div');
-	  }
-	});
+	  _skatejs.vdom.elementClose(List);
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(6)();
+	exports = module.exports = __webpack_require__(7)();
 	// imports
 	
 	
@@ -2515,7 +2678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2547,79 +2710,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _index = __webpack_require__(10);
+	var _index = __webpack_require__(11);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _logo = __webpack_require__(11);
+	var _logo = __webpack_require__(12);
 	
 	var _logo2 = _interopRequireDefault(_logo);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function item(text) {
-	  var href = arguments.length <= 1 || arguments[1] === undefined ? '#' : arguments[1];
-	
+	var Item = function Item(props, chren) {
 	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
 	
-	  _skatejs.vdom.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', href);
+	  _skatejs.vdom.elementOpen('a', null, null, 'class', _index2.default.locals.link, 'href', props.href);
 	
-	  _renderArbitrary(text);
+	  _renderArbitrary(chren());
 	
 	  _skatejs.vdom.elementClose('a');
 	
 	  return _skatejs.vdom.elementClose('li');
-	}
+	};
 	
-	exports.default = (0, _skatejs.define)('sk-header', {
-	  props: {
-	    scrolled: _skatejs.prop.boolean(),
-	    title: _skatejs.prop.string()
-	  },
-	  attached: function attached(elem) {
-	    window.addEventListener('scroll', elem._scrollHandler = function () {
-	      return elem.scrolled = !!window.scrollY;
-	    });
-	  },
-	  detached: function detached(elem) {
-	    window.removeEventListener('scroll', elem._scrollHandler);
-	  },
-	  render: function render(elem) {
-	    var scrolled = elem.scrolled ? _index2.default.locals.headerScrolled : '';
+	exports.default = function (props) {
+	  _skatejs.vdom.elementOpen('div');
 	
-	    _skatejs.vdom.elementOpen('div');
+	  _skatejs.vdom.elementOpen('style');
 	
-	    _skatejs.vdom.elementOpen('style');
+	  _renderArbitrary(_index2.default.toString());
 	
-	    _renderArbitrary(_index2.default.toString());
+	  _skatejs.vdom.elementClose('style');
 	
-	    _skatejs.vdom.elementClose('style');
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + props.scrolled);
 	
-	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + scrolled);
+	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
 	
-	    _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
+	  _skatejs.vdom.elementVoid('img', null, null, 'alt', props.title, 'src', _logo2.default, 'width', '30');
 	
-	    _skatejs.vdom.elementVoid('img', null, null, 'alt', elem.title, 'src', _logo2.default, 'width', '30');
+	  _skatejs.vdom.elementClose('h1');
 	
-	    _skatejs.vdom.elementClose('h1');
+	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
 	
-	    _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '');
 	
-	    _renderArbitrary([item('Docs'), item('Github', 'https://github.com/skatejs/skatejs'), item('Community')]);
+	  _skatejs.vdom.text('Docs');
 	
-	    _skatejs.vdom.elementClose('ul');
+	  _skatejs.vdom.elementClose(Item);
 	
-	    _skatejs.vdom.elementClose('div');
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs');
 	
-	    return _skatejs.vdom.elementClose('div');
-	  }
-	});
+	  _skatejs.vdom.text('Github');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '');
+	
+	  _skatejs.vdom.text('Community');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementClose('ul');
+	
+	  _skatejs.vdom.elementClose('div');
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(6)();
+	exports = module.exports = __webpack_require__(7)();
 	// imports
 	
 	
@@ -2643,13 +2804,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2663,10 +2824,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(6)();
+	exports = module.exports = __webpack_require__(7)();
 	// imports
 	
 	
@@ -2680,4 +2841,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=index-with-deps.js.map

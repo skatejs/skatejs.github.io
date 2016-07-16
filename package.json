@@ -23,7 +23,7 @@
     "file-loader": "^0.9.0",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
-    "skatejs-build": "^4.3.0"
+    "skatejs-build": "^6.0.0"
   },
   "config": {
     "commitizen": {
@@ -32,6 +32,6 @@
   },
   "dependencies": {
     "page": "^1.7.1",
-    "skatejs": "^1.0.0-beta.7"
+    "skatejs": "^1.0.0-beta.10"
   }
 }
