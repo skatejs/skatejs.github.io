@@ -11,8 +11,11 @@ function onRouteUpdate(elem) {
   return e => {
     const { component, path } = e.target;
     if (component && path) {
+      const curr = window.location.pathname;
       page(path, createRouteHandler(elem, component));
-      page(window.location.pathname);
+      if (curr === path) {
+        page(curr);
+      }
     }
   };
 }

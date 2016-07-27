@@ -4170,8 +4170,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var path = _e$target.path;
 	
 	    if (component && path) {
+	      var curr = window.location.pathname;
 	      (0, _page2.default)(path, createRouteHandler(elem, component));
-	      (0, _page2.default)(window.location.pathname);
+	      if (curr === path) {
+	        (0, _page2.default)(curr);
+	      }
 	    }
 	  };
 	}
