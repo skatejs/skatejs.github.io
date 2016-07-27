@@ -71,7 +71,7 @@ export default define('sk-page-index', {
         </div>
         <div class={css.locals.featurePanes}>
           <FeaturePane title="Forward-thinking">
-            Skate leverages the web platform and is built on top of the <a href="">W3C Web Component specs</a>. From this it gets native performance, longevity and cross-framework compatibility.
+            Skate leverages the web platform and is built on top of the <a href="https://github.com/w3c/webcomponents">W3C Web Component specs</a>. From this it gets native performance, longevity and cross-framework compatibility.
           </FeaturePane>
           <FeaturePane title="Functional">
             <a href="https://github.com/google/incremental-dom">Incremental DOM</a> backs Skate's functional rendering pipeline, offering performance, memory-efficiency and simplicity.

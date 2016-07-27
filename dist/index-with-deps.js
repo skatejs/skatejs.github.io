@@ -3831,7 +3831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    vdom.elementOpen('div', null, null, 'class', _index2.default.locals.featurePanes);
 	    vdom.elementOpen(FeaturePane, null, null, 'title', 'Forward-thinking');
 	    vdom.text(' Skate leverages the web platform and is built on top of the ');
-	    vdom.elementOpen('a', null, null, 'href', '');
+	    vdom.elementOpen('a', null, null, 'href', 'https://github.com/w3c/webcomponents');
 	    vdom.text('W3C Web Component specs');
 	    vdom.elementClose('a');
 	    vdom.text('. From this it gets native performance, longevity and cross-framework compatibility. ');
