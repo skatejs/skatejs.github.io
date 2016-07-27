@@ -7,7 +7,7 @@ import title from '../_/title';
 
 export default define('sk-app', {
   props: {
-    page: { default: () => Index },
+    page: {},
     scrolled: prop.boolean(),
   },
   attached(elem) {

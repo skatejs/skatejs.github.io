@@ -108,9 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.default = (0, _skatejs.define)('sk-app', {
 	  props: {
-	    page: { default: function _default() {
-	        return _pages.Index;
-	      } },
+	    page: {},
 	    scrolled: _skatejs.prop.boolean()
 	  },
 	  attached: function attached(elem) {
