@@ -5,7 +5,10 @@ import logo from './logo.png';
 
 const Item = (props, chren) => (
   <li class={css.locals.item}>
-    <Link {...props} class={css.locals.link}>{chren()}</Link>
+    {props.external ?
+      <a {...props} class={css.locals.link}>{chren()}</a> :
+      <Link {...props} class={css.locals.link}>{chren()}</Link>
+    }
   </li>
 );
 
@@ -18,7 +21,7 @@ export default props => (
       </h1>
       <ul class={css.locals.list}>
         <Item href="/docs">Docs</Item>
-        <Item href="https://github.com/skatejs/skatejs">Github</Item>
+        <Item href="https://github.com/skatejs/skatejs" external>Github</Item>
       </ul>
     </div>
   </div>

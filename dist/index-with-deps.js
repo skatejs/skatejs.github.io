@@ -2563,17 +2563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Item = function Item(props, chren) {
 	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
 	
-	  _skatejs.vdom.elementOpenStart(_helpers.Link);
-	
-	  _forOwn(props, _attr);
-	
-	  _skatejs.vdom.attr('class', _index2.default.locals.link);
-	
-	  _skatejs.vdom.elementOpenEnd(_helpers.Link);
-	
-	  _renderArbitrary(chren());
-	
-	  _skatejs.vdom.elementClose(_helpers.Link);
+	  _renderArbitrary(props.external ? ((_skatejs.vdom.elementOpenStart('a'), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd('a')), _renderArbitrary(chren()), _skatejs.vdom.elementClose('a')) : ((_skatejs.vdom.elementOpenStart(_helpers.Link), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd(_helpers.Link)), _renderArbitrary(chren()), _skatejs.vdom.elementClose(_helpers.Link)));
 	
 	  return _skatejs.vdom.elementClose('li');
 	};
@@ -2607,7 +2597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  _skatejs.vdom.elementClose(Item);
 	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs');
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs', 'external', true);
 	
 	  _skatejs.vdom.text('Github');
 	
