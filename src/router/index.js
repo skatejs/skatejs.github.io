@@ -11,7 +11,6 @@ function onRouteUpdate(elem) {
   return e => {
     const { component, path } = e.target;
     if (component && path) {
-      console.log(path, component);
       page(path, createRouteHandler(elem, component));
     }
   };
