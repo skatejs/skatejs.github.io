@@ -92,10 +92,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _body2 = _interopRequireDefault(_body);
 	
-	var _footer = __webpack_require__(8);
-	
-	var _footer2 = _interopRequireDefault(_footer);
-	
 	var _header = __webpack_require__(10);
 	
 	var _header2 = _interopRequireDefault(_header);
@@ -148,8 +144,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _skatejs.vdom.elementVoid(Page);
 	
 	    _skatejs.vdom.elementClose(_body2.default);
-	
-	    _skatejs.vdom.elementVoid(_footer2.default);
 	
 	    return _skatejs.vdom.elementClose('div');
 	  }
@@ -2515,113 +2509,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _jsxWrapper = function _jsxWrapper(func, args) {
-	  var wrapper = args ? function wrapper() {
-	    return func.apply(this, args);
-	  } : func;
-	  wrapper.__jsxDOMWrapper = true;
-	  return wrapper;
-	};
-	
-	var _hasOwn = Object.prototype.hasOwnProperty;
-	
-	var _forOwn = function _forOwn(object, iterator) {
-	  for (var prop in object) {
-	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
-	  }
-	};
-	
-	var _renderArbitrary = function _renderArbitrary(child) {
-	  var type = typeof child;
-	
-	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.text(child);
-	  } else if (type === 'function' && child.__jsxDOMWrapper) {
-	    child();
-	  } else if (Array.isArray(child)) {
-	    child.forEach(_renderArbitrary);
-	  } else if (type === 'object' && String(child) === '[object Object]') {
-	    _forOwn(child, _renderArbitrary);
-	  }
-	};
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _index = __webpack_require__(9);
-	
-	var _index2 = _interopRequireDefault(_index);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var List = function List(props) {
-	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
-	
-	  _renderArbitrary(Object.keys(props.items).map(function (item) {
-	    return _jsxWrapper(function (_css$locals$item, _css$locals$link, _props$items$item, _item) {
-	      _skatejs.vdom.elementOpen('li', null, null, 'class', _css$locals$item);
-	
-	      _skatejs.vdom.elementOpen('a', null, null, 'class', _css$locals$link, 'href', _props$items$item);
-	
-	      _renderArbitrary(_item);
-	
-	      _skatejs.vdom.elementClose('a');
-	
-	      return _skatejs.vdom.elementClose('li');
-	    }, [_index2.default.locals.item, _index2.default.locals.link, props.items[item], item]);
-	  }));
-	
-	  return _skatejs.vdom.elementClose('ul');
-	};
-	
-	exports.default = function () {
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.footer);
-	
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(_index2.default.toString());
-	
-	  _skatejs.vdom.elementClose('style');
-	
-	  _skatejs.vdom.elementOpen(List, null, null, 'items', { Docs: 'docs/' });
-	
-	  _skatejs.vdom.elementClose(List);
-	
-	  return _skatejs.vdom.elementClose('div');
-	};
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "._2pOZ9JVRdOcst-M-V8CIG-{background-color:#222;color:#eee;font-size:12px;padding:10px 20px}.HAjb6JuBA0hiG3VMO17sO{padding:0}.ZXtuSy6oo7L79SnJvwsHt{color:#eee;text-decoration:none}._3k8ml8FyWDLKqwlHkSBmab{padding:0 0 0 20px}", ""]);
-	
-	// exports
-	exports.locals = {
-		"footer": "_2pOZ9JVRdOcst-M-V8CIG-",
-		"footer": "_2pOZ9JVRdOcst-M-V8CIG-",
-		"item": "HAjb6JuBA0hiG3VMO17sO",
-		"item": "HAjb6JuBA0hiG3VMO17sO",
-		"link": "ZXtuSy6oo7L79SnJvwsHt",
-		"link": "ZXtuSy6oo7L79SnJvwsHt",
-		"list": "_3k8ml8FyWDLKqwlHkSBmab",
-		"list": "_3k8ml8FyWDLKqwlHkSBmab"
-	};
-
-/***/ },
+/* 8 */,
+/* 9 */,
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2721,12 +2610,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs');
 	
 	  _skatejs.vdom.text('Github');
-	
-	  _skatejs.vdom.elementClose(Item);
-	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '');
-	
-	  _skatejs.vdom.text('Community');
 	
 	  _skatejs.vdom.elementClose(Item);
 	
@@ -4239,7 +4122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Link = undefined;
+	exports.Layout = exports.Link = undefined;
 	
 	var _renderArbitrary = function _renderArbitrary(child) {
 	  var type = typeof child;
@@ -4293,6 +4176,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  return _skatejs.vdom.elementClose('a');
 	};
+	var Layout = exports.Layout = function Layout(props, chren) {
+	  _skatejs.vdom.elementOpen('div', null, null, 'style', 'padding: 20px');
+	
+	  _renderArbitrary(chren());
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
 
 /***/ },
 /* 23 */
@@ -4306,13 +4196,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
+	var _helpers = __webpack_require__(22);
+	
 	exports.default = (0, _skatejs.define)('sk-page-docs', {
 	  render: function render() {
-	    _skatejs.vdom.elementOpen('div');
+	    _skatejs.vdom.elementOpen(_helpers.Layout);
 	
-	    _skatejs.vdom.text('docs...');
+	    _skatejs.vdom.elementOpen('p');
 	
-	    return _skatejs.vdom.elementClose('div');
+	    _skatejs.vdom.text('The docs are currently being ported over from the ');
+	
+	    _skatejs.vdom.elementOpen('a', null, null, 'href', 'https://github.com/skatejs/skatejs');
+	
+	    _skatejs.vdom.text('README');
+	
+	    _skatejs.vdom.elementClose('a');
+	
+	    _skatejs.vdom.text('.');
+	
+	    _skatejs.vdom.elementClose('p');
+	
+	    return _skatejs.vdom.elementClose(_helpers.Layout);
 	  }
 	});
 

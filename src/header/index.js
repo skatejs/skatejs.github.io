@@ -19,7 +19,6 @@ export default props => (
       <ul class={css.locals.list}>
         <Item href="/docs">Docs</Item>
         <Item href="https://github.com/skatejs/skatejs">Github</Item>
-        <Item href="">Community</Item>
       </ul>
     </div>
   </div>

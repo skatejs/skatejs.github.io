@@ -7,3 +7,4 @@ function followHref(e) {
 }
 
 export const Link = (props, chren) => <a {...props} onclick={followHref}>{chren()}</a>;
+export const Layout = (props, chren) => <div style="padding: 20px">{chren()}</div>;
