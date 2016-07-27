@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _index3 = __webpack_require__(14);
+	var _index3 = __webpack_require__(22);
 	
 	var _index4 = _interopRequireDefault(_index3);
 	
@@ -86,21 +86,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _pages = __webpack_require__(20);
+	var _pages = __webpack_require__(5);
 	
-	var _body = __webpack_require__(5);
+	var _body = __webpack_require__(15);
 	
 	var _body2 = _interopRequireDefault(_body);
 	
-	var _header = __webpack_require__(10);
+	var _header = __webpack_require__(17);
 	
 	var _header2 = _interopRequireDefault(_header);
 	
-	var _router = __webpack_require__(15);
+	var _router = __webpack_require__(20);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _title = __webpack_require__(13);
+	var _title = __webpack_require__(21);
 	
 	var _title2 = _interopRequireDefault(_title);
 	
@@ -2392,126 +2392,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var _hasOwn = Object.prototype.hasOwnProperty;
+	exports.Index = exports.Docs = undefined;
 	
-	var _forOwn = function _forOwn(object, iterator) {
-	  for (var prop in object) {
-	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
-	  }
-	};
+	var _docs = __webpack_require__(6);
 	
-	var _renderArbitrary = function _renderArbitrary(child) {
-	  var type = typeof child;
+	var _docs2 = _interopRequireDefault(_docs);
 	
-	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.text(child);
-	  } else if (type === 'function' && child.__jsxDOMWrapper) {
-	    child();
-	  } else if (Array.isArray(child)) {
-	    child.forEach(_renderArbitrary);
-	  } else if (type === 'object' && String(child) === '[object Object]') {
-	    _forOwn(child, _renderArbitrary);
-	  }
-	};
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _index = __webpack_require__(6);
+	var _index = __webpack_require__(12);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = function (props, chren) {
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
-	
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(_index2.default.toString());
-	
-	  _skatejs.vdom.elementClose('style');
-	
-	  _renderArbitrary(chren());
-	
-	  return _skatejs.vdom.elementClose('div');
-	};
+	exports.Docs = _docs2.default;
+	exports.Index = _index2.default;
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 0 0}", ""]);
-	
-	// exports
-	exports.locals = {
-		"body": "JotV9DC7cFGUX61mmETT1",
-		"body": "JotV9DC7cFGUX61mmETT1"
-	};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function () {
-		var list = [];
-	
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for (var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if (item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-	
-		// import a list of modules into the list
-		list.i = function (modules, mediaQuery) {
-			if (typeof modules === "string") modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for (var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if (typeof id === "number") alreadyImportedModules[id] = true;
-			}
-			for (i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if (mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if (mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-/***/ },
-/* 8 */,
-/* 9 */,
-/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2519,6 +2416,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _skatejs = __webpack_require__(2);
+	
+	var _helpers = __webpack_require__(7);
+	
+	exports.default = (0, _skatejs.define)('sk-page-docs', {
+	  render: function render() {
+	    _skatejs.vdom.elementOpen(_helpers.Layout);
+	
+	    _skatejs.vdom.elementOpen('p');
+	
+	    _skatejs.vdom.text('The docs are currently being ported over from the ');
+	
+	    _skatejs.vdom.elementOpen('a', null, null, 'href', 'https://github.com/skatejs/skatejs');
+	
+	    _skatejs.vdom.text('README');
+	
+	    _skatejs.vdom.elementClose('a');
+	
+	    _skatejs.vdom.text('.');
+	
+	    _skatejs.vdom.elementClose('p');
+	
+	    return _skatejs.vdom.elementClose(_helpers.Layout);
+	  }
+	});
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Layout = exports.Link = undefined;
 	
 	var _renderArbitrary = function _renderArbitrary(child) {
 	  var type = typeof child;
@@ -2548,194 +2482,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _helpers = __webpack_require__(22);
-	
-	var _index = __webpack_require__(11);
-	
-	var _index2 = _interopRequireDefault(_index);
-	
-	var _logo = __webpack_require__(12);
-	
-	var _logo2 = _interopRequireDefault(_logo);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var Item = function Item(props, chren) {
-	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
-	
-	  _renderArbitrary(props.external ? ((_skatejs.vdom.elementOpenStart('a'), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd('a')), _renderArbitrary(chren()), _skatejs.vdom.elementClose('a')) : ((_skatejs.vdom.elementOpenStart(_helpers.Link), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd(_helpers.Link)), _renderArbitrary(chren()), _skatejs.vdom.elementClose(_helpers.Link)));
-	
-	  return _skatejs.vdom.elementClose('li');
-	};
-	
-	exports.default = function (props) {
-	  _skatejs.vdom.elementOpen('div');
-	
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(_index2.default.toString());
-	
-	  _skatejs.vdom.elementClose('style');
-	
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + (props.scrolled ? _index2.default.locals.scrolled : ''));
-	
-	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
-	
-	  _skatejs.vdom.elementOpen(_helpers.Link, null, null, 'href', '/');
-	
-	  _skatejs.vdom.elementVoid('img', null, null, 'alt', props.title, 'src', _logo2.default, 'width', '30');
-	
-	  _skatejs.vdom.elementClose(_helpers.Link);
-	
-	  _skatejs.vdom.elementClose('h1');
-	
-	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
-	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '/docs');
-	
-	  _skatejs.vdom.text('Docs');
-	
-	  _skatejs.vdom.elementClose(Item);
-	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs', 'external', true);
-	
-	  _skatejs.vdom.text('Github');
-	
-	  _skatejs.vdom.elementClose(Item);
-	
-	  _skatejs.vdom.elementClose('ul');
-	
-	  _skatejs.vdom.elementClose('div');
-	
-	  return _skatejs.vdom.elementClose('div');
-	};
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._1P6DOElNwq3GvvXJFHGg0J{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
-	
-	// exports
-	exports.locals = {
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
-		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K"
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	exports.default = function (title) {
-	  document.title = title;
-	};
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.Route = undefined;
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _page = __webpack_require__(16);
+	var _page = __webpack_require__(8);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function createRouteHandler(elem, detail) {
-	  return function () {
-	    (0, _skatejs.emit)(elem, 'RouteChange', { detail: detail });
-	  };
+	function followHref(e) {
+	  (0, _page2.default)(e.target.pathname || '/');
+	  e.preventDefault();
 	}
 	
-	function onRouteUpdate(elem) {
-	  return function (e) {
-	    var _e$target = e.target;
-	    var component = _e$target.component;
-	    var path = _e$target.path;
+	var Link = exports.Link = function Link(props, chren) {
+	  _skatejs.vdom.elementOpenStart('a');
 	
-	    if (component && path) {
-	      (0, _page2.default)(path, createRouteHandler(elem, component));
-	    }
-	  };
-	}
+	  _forOwn(props, _attr);
 	
-	exports.default = (0, _skatejs.define)('sk-router', {
-	  render: function render(elem) {
-	    return _skatejs.vdom.elementVoid('slot', null, null, 'onRouteUpdate', onRouteUpdate(elem));
-	  }
-	});
-	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
-	  props: {
-	    component: {},
-	    path: {}
-	  },
-	  render: function render(elem) {
-	    // We have to use render() to emit an event because there's no lifecycle
-	    // callbacks for:
-	    // - before receiving properties
-	    // - after receiving properties
-	    var component = elem.component;
-	    var path = elem.path;
+	  _skatejs.vdom.attr('onclick', followHref);
 	
-	    if (component && path) {
-	      (0, _skatejs.emit)(elem, 'RouteUpdate', {
-	        detail: { component: component, path: path }
-	      });
-	    }
-	  }
-	});
+	  _skatejs.vdom.elementOpenEnd('a');
+	
+	  _renderArbitrary(chren());
+	
+	  return _skatejs.vdom.elementClose('a');
+	};
+	var Layout = exports.Layout = function Layout(props, chren) {
+	  _skatejs.vdom.elementOpen('div', null, null, 'style', 'padding: 20px');
+	
+	  _renderArbitrary(chren());
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
 
 /***/ },
-/* 16 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/* globals require, module */
@@ -2746,7 +2526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Module dependencies.
 	 */
 	
-	var pathtoRegexp = __webpack_require__(18);
+	var pathtoRegexp = __webpack_require__(10);
 	
 	/**
 	 * Module exports.
@@ -3349,10 +3129,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	page.sameOrigin = sameOrigin;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ },
-/* 17 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3482,14 +3262,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
-	var isarray = __webpack_require__(19);
+	var isarray = __webpack_require__(11);
 	
 	/**
 	 * Expose `pathToRegexp`.
@@ -3880,7 +3660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 19 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3890,31 +3670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.Index = exports.Docs = undefined;
-	
-	var _docs = __webpack_require__(23);
-	
-	var _docs2 = _interopRequireDefault(_docs);
-	
-	var _index = __webpack_require__(21);
-	
-	var _index2 = _interopRequireDefault(_index);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.Docs = _docs2.default;
-	exports.Index = _index2.default;
-
-/***/ },
-/* 21 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3948,7 +3704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var skate = _interopRequireWildcard(_skatejs);
 	
-	var _index = __webpack_require__(24);
+	var _index = __webpack_require__(13);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
@@ -4104,7 +3860,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 22 */
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(14)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2kWNDIfW4mqEKHe3oTRqk3{background-color:#f8f5ec;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3,._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{margin:0;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3{background-color:#dad6ce;font-weight:200}._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{background-color:#f1ede4;font-weight:100}.iYB-ylcS-0bRr059nTAvY{background-color:#111;color:#eee;font-size:14px;margin:10px;width:33%}.iYB-ylcS-0bRr059nTAvY a{color:#fff}.iYB-ylcS-0bRr059nTAvY h3{background-color:#222;font-weight:200}.iYB-ylcS-0bRr059nTAvY p{font-weight:100}.iYB-ylcS-0bRr059nTAvY h3,.iYB-ylcS-0bRr059nTAvY p{margin:0;padding:20px}._2eA-gGgtu95U0T2LIjbefD{background-color:#333;display:flex;padding:10px}._34LLXGQWwpFC-AGNgRE-Zi{background-color:#f4547b;color:#fff;padding:40px}._34LLXGQWwpFC-AGNgRE-Zi h1{font-size:48px;font-weight:200;margin-top:0}._34LLXGQWwpFC-AGNgRE-Zi p{font-size:24px;font-weight:100;margin-bottom:0}", ""]);
+	
+	// exports
+	exports.locals = {
+		"code-example": "_2kWNDIfW4mqEKHe3oTRqk3",
+		"codeExample": "_2kWNDIfW4mqEKHe3oTRqk3",
+		"feature-pane": "iYB-ylcS-0bRr059nTAvY",
+		"featurePane": "iYB-ylcS-0bRr059nTAvY",
+		"feature-panes": "_2eA-gGgtu95U0T2LIjbefD",
+		"featurePanes": "_2eA-gGgtu95U0T2LIjbefD",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi"
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function () {
+		var list = [];
+	
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for (var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if (item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+	
+		// import a list of modules into the list
+		list.i = function (modules, mediaQuery) {
+			if (typeof modules === "string") modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for (var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if (typeof id === "number") alreadyImportedModules[id] = true;
+			}
+			for (i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if (typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if (mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if (mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+/***/ },
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4112,7 +3946,76 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Layout = exports.Link = undefined;
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(2);
+	
+	var _index = __webpack_require__(16);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = function (props, chren) {
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
+	
+	  _skatejs.vdom.elementOpen('style');
+	
+	  _renderArbitrary(_index2.default.toString());
+	
+	  _skatejs.vdom.elementClose('style');
+	
+	  _renderArbitrary(chren());
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(14)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 0 0}", ""]);
+	
+	// exports
+	exports.locals = {
+		"body": "JotV9DC7cFGUX61mmETT1",
+		"body": "JotV9DC7cFGUX61mmETT1"
+	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	
 	var _renderArbitrary = function _renderArbitrary(child) {
 	  var type = typeof child;
@@ -4142,40 +4045,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _page = __webpack_require__(16);
+	var _helpers = __webpack_require__(7);
 	
-	var _page2 = _interopRequireDefault(_page);
+	var _index = __webpack_require__(18);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	var _logo = __webpack_require__(19);
+	
+	var _logo2 = _interopRequireDefault(_logo);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function followHref(e) {
-	  (0, _page2.default)(e.target.pathname || '/');
-	  e.preventDefault();
-	}
+	var Item = function Item(props, chren) {
+	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
 	
-	var Link = exports.Link = function Link(props, chren) {
-	  _skatejs.vdom.elementOpenStart('a');
+	  _renderArbitrary(props.external ? ((_skatejs.vdom.elementOpenStart('a'), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd('a')), _renderArbitrary(chren()), _skatejs.vdom.elementClose('a')) : ((_skatejs.vdom.elementOpenStart(_helpers.Link), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd(_helpers.Link)), _renderArbitrary(chren()), _skatejs.vdom.elementClose(_helpers.Link)));
 	
-	  _forOwn(props, _attr);
-	
-	  _skatejs.vdom.attr('onclick', followHref);
-	
-	  _skatejs.vdom.elementOpenEnd('a');
-	
-	  _renderArbitrary(chren());
-	
-	  return _skatejs.vdom.elementClose('a');
+	  return _skatejs.vdom.elementClose('li');
 	};
-	var Layout = exports.Layout = function Layout(props, chren) {
-	  _skatejs.vdom.elementOpen('div', null, null, 'style', 'padding: 20px');
 	
-	  _renderArbitrary(chren());
+	exports.default = function (props) {
+	  _skatejs.vdom.elementOpen('div');
+	
+	  _skatejs.vdom.elementOpen('style');
+	
+	  _renderArbitrary(_index2.default.toString());
+	
+	  _skatejs.vdom.elementClose('style');
+	
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + (props.scrolled ? _index2.default.locals.scrolled : ''));
+	
+	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
+	
+	  _skatejs.vdom.elementOpen(_helpers.Link, null, null, 'href', '/');
+	
+	  _skatejs.vdom.elementVoid('img', null, null, 'alt', props.title, 'src', _logo2.default, 'width', '30');
+	
+	  _skatejs.vdom.elementClose(_helpers.Link);
+	
+	  _skatejs.vdom.elementClose('h1');
+	
+	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '/docs');
+	
+	  _skatejs.vdom.text('Docs');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs', 'external', true);
+	
+	  _skatejs.vdom.text('Github');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementClose('ul');
+	
+	  _skatejs.vdom.elementClose('div');
 	
 	  return _skatejs.vdom.elementClose('div');
 	};
 
 /***/ },
-/* 23 */
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(14)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._1P6DOElNwq3GvvXJFHGg0J{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
+	
+	// exports
+	exports.locals = {
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K"
+	};
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
+
+/***/ },
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4183,55 +4149,87 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.Route = undefined;
 	
 	var _skatejs = __webpack_require__(2);
 	
-	var _helpers = __webpack_require__(22);
+	var _page = __webpack_require__(8);
 	
-	exports.default = (0, _skatejs.define)('sk-page-docs', {
-	  render: function render() {
-	    _skatejs.vdom.elementOpen(_helpers.Layout);
+	var _page2 = _interopRequireDefault(_page);
 	
-	    _skatejs.vdom.elementOpen('p');
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	    _skatejs.vdom.text('The docs are currently being ported over from the ');
+	function createRouteHandler(elem, detail) {
+	  return function () {
+	    (0, _skatejs.emit)(elem, 'RouteChange', { detail: detail });
+	  };
+	}
 	
-	    _skatejs.vdom.elementOpen('a', null, null, 'href', 'https://github.com/skatejs/skatejs');
+	function onRouteUpdate(elem) {
+	  return function (e) {
+	    var _e$target = e.target;
+	    var component = _e$target.component;
+	    var path = _e$target.path;
 	
-	    _skatejs.vdom.text('README');
+	    if (component && path) {
+	      (0, _page2.default)(path, createRouteHandler(elem, component));
+	    }
+	  };
+	}
 	
-	    _skatejs.vdom.elementClose('a');
+	exports.default = (0, _skatejs.define)('sk-router', {
+	  render: function render(elem) {
+	    return _skatejs.vdom.elementVoid('slot', null, null, 'onRouteUpdate', onRouteUpdate(elem));
+	  }
+	});
+	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
+	  props: {
+	    component: {},
+	    path: {}
+	  },
+	  render: function render(elem) {
+	    // We have to use render() to emit an event because there's no lifecycle
+	    // callbacks for:
+	    // - before receiving properties
+	    // - after receiving properties
+	    var component = elem.component;
+	    var path = elem.path;
 	
-	    _skatejs.vdom.text('.');
-	
-	    _skatejs.vdom.elementClose('p');
-	
-	    return _skatejs.vdom.elementClose(_helpers.Layout);
+	    if (component && path) {
+	      (0, _skatejs.emit)(elem, 'RouteUpdate', {
+	        detail: { component: component, path: path }
+	      });
+	    }
 	  }
 	});
 
 /***/ },
-/* 24 */
+/* 21 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (title) {
+	  document.title = title;
+	};
+
+/***/ },
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(7)();
+	exports = module.exports = __webpack_require__(14)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "._2kWNDIfW4mqEKHe3oTRqk3{background-color:#f8f5ec;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3,._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{margin:0;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3{background-color:#dad6ce;font-weight:200}._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{background-color:#f1ede4;font-weight:100}.iYB-ylcS-0bRr059nTAvY{background-color:#111;color:#eee;font-size:14px;margin:10px;width:33%}.iYB-ylcS-0bRr059nTAvY a{color:#fff}.iYB-ylcS-0bRr059nTAvY h3{background-color:#222;font-weight:200}.iYB-ylcS-0bRr059nTAvY p{font-weight:100}.iYB-ylcS-0bRr059nTAvY h3,.iYB-ylcS-0bRr059nTAvY p{margin:0;padding:20px}._2eA-gGgtu95U0T2LIjbefD{background-color:#333;display:flex;padding:10px}._34LLXGQWwpFC-AGNgRE-Zi{background-color:#f4547b;color:#fff;padding:40px}._34LLXGQWwpFC-AGNgRE-Zi h1{font-size:48px;font-weight:200;margin-top:0}._34LLXGQWwpFC-AGNgRE-Zi p{font-size:24px;font-weight:100;margin-bottom:0}", ""]);
+	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
 	
 	// exports
-	exports.locals = {
-		"code-example": "_2kWNDIfW4mqEKHe3oTRqk3",
-		"codeExample": "_2kWNDIfW4mqEKHe3oTRqk3",
-		"feature-pane": "iYB-ylcS-0bRr059nTAvY",
-		"featurePane": "iYB-ylcS-0bRr059nTAvY",
-		"feature-panes": "_2eA-gGgtu95U0T2LIjbefD",
-		"featurePanes": "_2eA-gGgtu95U0T2LIjbefD",
-		"hero": "_34LLXGQWwpFC-AGNgRE-Zi",
-		"hero": "_34LLXGQWwpFC-AGNgRE-Zi"
-	};
+
 
 /***/ }
 /******/ ])
