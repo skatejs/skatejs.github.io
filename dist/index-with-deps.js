@@ -2451,7 +2451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:70px 20px 10px}", ""]);
+	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 0 0}", ""]);
 	
 	// exports
 	exports.locals = {
@@ -2607,7 +2607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "._2pOZ9JVRdOcst-M-V8CIG-{background-color:#333;color:#eee;font-size:12px;padding:10px 20px}.HAjb6JuBA0hiG3VMO17sO{padding:0}.ZXtuSy6oo7L79SnJvwsHt{color:#eee;text-decoration:none}._3k8ml8FyWDLKqwlHkSBmab{padding:0 0 0 20px}", ""]);
+	exports.push([module.id, "._2pOZ9JVRdOcst-M-V8CIG-{background-color:#222;color:#eee;font-size:12px;padding:10px 20px}.HAjb6JuBA0hiG3VMO17sO{padding:0}.ZXtuSy6oo7L79SnJvwsHt{color:#eee;text-decoration:none}._3k8ml8FyWDLKqwlHkSBmab{padding:0 0 0 20px}", ""]);
 	
 	// exports
 	exports.locals = {
@@ -2698,7 +2698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  _skatejs.vdom.elementClose('style');
 	
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + props.scrolled);
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + (props.scrolled ? _index2.default.locals.scrolled : ''));
 	
 	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
 	
@@ -2746,14 +2746,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._10mxIH_-5Sk7Kz5KsJMq0H{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
+	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._1P6DOElNwq3GvvXJFHGg0J{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
 	
 	// exports
 	exports.locals = {
 		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
 		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"header-scrolled": "_10mxIH_-5Sk7Kz5KsJMq0H",
-		"headerScrolled": "_10mxIH_-5Sk7Kz5KsJMq0H",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
 		"list": "_3EU-FaAppzWRdOf0yzUQbO",
 		"list": "_3EU-FaAppzWRdOf0yzUQbO",
 		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
@@ -2830,7 +2830,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var path = _e$target.path;
 	
 	    if (component && path) {
-	      console.log(path, component);
 	      (0, _page2.default)(path, createRouteHandler(elem, component));
 	    }
 	  };
@@ -4050,16 +4049,184 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
 	
 	var _skatejs = __webpack_require__(2);
 	
-	exports.default = (0, _skatejs.define)('sk-page-index', {
+	var skate = _interopRequireWildcard(_skatejs);
+	
+	var _index = __webpack_require__(24);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	var define = skate.define;
+	var vdom = skate.vdom;
+	
+	
+	function format(code) {
+	  var lines = code.split('\n');
+	  var ident = lines[1].match(/^\s*/)[0].length;
+	  return lines.map(function (line) {
+	    return line.substring(ident);
+	  }).join('\n').trim();
+	}
+	
+	var CodeExample = function CodeExample(props, chren) {
+	  vdom.elementOpen('div', null, null, 'class', _index2.default.locals.codeExample);
+	  vdom.elementOpen('div');
+	  vdom.elementOpen('h3');
+	  vdom.text('JS');
+	  vdom.elementClose('h3');
+	  vdom.elementOpen('pre');
+	  vdom.elementOpen('code');
+	
+	  _renderArbitrary(format(props.js));
+	
+	  vdom.elementClose('code');
+	  vdom.elementClose('pre');
+	  vdom.elementClose('div');
+	  vdom.elementOpen('div');
+	  vdom.elementOpen('h3');
+	  vdom.text('HTML');
+	  vdom.elementClose('h3');
+	  vdom.elementOpen('pre');
+	  vdom.elementOpen('code');
+	
+	  _renderArbitrary(format(props.html));
+	
+	  vdom.elementClose('code');
+	  vdom.elementClose('pre');
+	  vdom.elementClose('div');
+	  vdom.elementOpen('div');
+	  vdom.elementOpen('h3');
+	  vdom.text('Result');
+	  vdom.elementClose('h3');
+	  vdom.elementOpen('p');
+	
+	  _renderArbitrary(chren());
+	
+	  vdom.elementClose('p');
+	  vdom.elementClose('div');
+	  return vdom.elementClose('div');
+	};
+	
+	var FeaturePane = function FeaturePane(props, chren) {
+	  vdom.elementOpen('div', null, null, 'class', _index2.default.locals.featurePane);
+	  vdom.elementOpen('h3');
+	
+	  _renderArbitrary(props.title);
+	
+	  vdom.elementClose('h3');
+	  vdom.elementOpen('p');
+	
+	  _renderArbitrary(chren());
+	
+	  vdom.elementClose('p');
+	  return vdom.elementClose('div');
+	};
+	
+	// Examples
+	
+	skate.define('x-hello', {
 	  render: function render() {
-	    _skatejs.vdom.elementOpen('div');
+	    vdom.elementOpen('span');
+	    vdom.text('Hello, ');
+	    vdom.elementVoid('slot');
+	    vdom.text('!');
+	    return vdom.elementClose('span');
+	  }
+	});
 	
-	    _skatejs.vdom.text('index...');
+	skate.define('x-counter', {
+	  props: {
+	    count: skate.prop.number()
+	  },
+	  attached: function attached(elem) {
+	    elem.__ival = setInterval(function () {
+	      return ++elem.count;
+	    }, 1000);
+	  },
+	  detached: function detached(elem) {
+	    clearInterval(elem.__ival);
+	  },
+	  render: function render(elem) {
+	    vdom.elementOpen('span');
+	    vdom.text('Count: ');
 	
-	    return _skatejs.vdom.elementClose('div');
+	    _renderArbitrary(elem.count);
+	
+	    return vdom.elementClose('span');
+	  }
+	});
+	
+	exports.default = define('sk-page-index', {
+	  render: function render() {
+	    vdom.elementOpen('div');
+	    vdom.elementOpen('style');
+	
+	    _renderArbitrary(_index2.default.toString());
+	
+	    vdom.elementClose('style');
+	    vdom.elementOpen('div', null, null, 'class', _index2.default.locals.hero);
+	    vdom.elementOpen('h1');
+	    vdom.text('SkateJS');
+	    vdom.elementClose('h1');
+	    vdom.elementOpen('p');
+	    vdom.text('Skate is a functional, featherweight and cross-framework compatible web component library built on W3C specs.');
+	    vdom.elementClose('p');
+	    vdom.elementClose('div');
+	    vdom.elementOpen('div', null, null, 'class', _index2.default.locals.featurePanes);
+	    vdom.elementOpen(FeaturePane, null, null, 'title', 'Forward-thinking');
+	    vdom.text(' Skate leverages the web platform and is built on top of the ');
+	    vdom.elementOpen('a', null, null, 'href', '');
+	    vdom.text('W3C Web Component specs');
+	    vdom.elementClose('a');
+	    vdom.text('. From this it gets native performance, longevity and cross-framework compatibility. ');
+	    vdom.elementClose(FeaturePane);
+	    vdom.elementOpen(FeaturePane, null, null, 'title', 'Functional');
+	    vdom.elementOpen('a', null, null, 'href', 'https://github.com/google/incremental-dom');
+	    vdom.text('Incremental DOM');
+	    vdom.elementClose('a');
+	    vdom.text(' backs Skate\'s functional rendering pipeline, offering performance, memory-efficiency and simplicity. ');
+	    vdom.elementClose(FeaturePane);
+	    vdom.elementOpen(FeaturePane, null, null, 'title', 'Featherweight');
+	    vdom.text(' Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet. ');
+	    vdom.elementClose(FeaturePane);
+	    vdom.elementClose('div');
+	    vdom.elementOpen(CodeExample, null, null, 'html', '\n            <x-hello>Bob</x-hello>\n          ', 'js', '\n            skate.define(\'x-hello\', {\n              render() {\n                return <span>Hello, <slot />!</span>;\n              },\n            });\n          ');
+	    vdom.elementOpen('x-hello');
+	    vdom.text('Bob');
+	    vdom.elementClose('x-hello');
+	    vdom.elementClose(CodeExample);
+	    vdom.elementOpen(CodeExample, null, null, 'html', '\n            <x-counter count="1"></x-counter>\n          ', 'js', '\n            skate.define(\'x-counter\', {\n              props: {\n                count: skate.prop.number(),\n              },\n              attached(elem) {\n                elem.__ival = setInterval(() => ++elem.count, 1000);\n              },\n              detached(elem) {\n                clearInterval(elem.__ival);\n              },\n              render(elem) {\n                return <span>Count: {elem.count}</span>;\n              },\n            });\n          ');
+	    vdom.elementOpen('x-counter', null, null, 'count', '1');
+	    vdom.elementClose('x-counter');
+	    vdom.elementClose(CodeExample);
+	    return vdom.elementClose('div');
 	  }
 	});
 
@@ -4148,6 +4315,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _skatejs.vdom.elementClose('div');
 	  }
 	});
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2kWNDIfW4mqEKHe3oTRqk3{background-color:#f8f5ec;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3,._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{margin:0;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3{background-color:#dad6ce;font-weight:200}._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{background-color:#f1ede4;font-weight:100}.iYB-ylcS-0bRr059nTAvY{background-color:#111;color:#eee;font-size:14px;margin:10px;width:33%}.iYB-ylcS-0bRr059nTAvY a{color:#fff}.iYB-ylcS-0bRr059nTAvY h3{background-color:#222;font-weight:200}.iYB-ylcS-0bRr059nTAvY p{font-weight:100}.iYB-ylcS-0bRr059nTAvY h3,.iYB-ylcS-0bRr059nTAvY p{margin:0;padding:20px}._2eA-gGgtu95U0T2LIjbefD{background-color:#333;display:flex;padding:10px}._34LLXGQWwpFC-AGNgRE-Zi{background-color:#f4547b;color:#fff;padding:40px}._34LLXGQWwpFC-AGNgRE-Zi h1{font-size:48px;font-weight:200;margin-top:0}._34LLXGQWwpFC-AGNgRE-Zi p{font-size:24px;font-weight:100;margin-bottom:0}", ""]);
+	
+	// exports
+	exports.locals = {
+		"code-example": "_2kWNDIfW4mqEKHe3oTRqk3",
+		"codeExample": "_2kWNDIfW4mqEKHe3oTRqk3",
+		"feature-pane": "iYB-ylcS-0bRr059nTAvY",
+		"featurePane": "iYB-ylcS-0bRr059nTAvY",
+		"feature-panes": "_2eA-gGgtu95U0T2LIjbefD",
+		"featurePanes": "_2eA-gGgtu95U0T2LIjbefD",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi"
+	};
 
 /***/ }
 /******/ ])
