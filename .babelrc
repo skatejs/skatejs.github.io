@@ -1,0 +1,9 @@
+{
+  "plugins": [[
+    "incremental-dom", {
+      "components": true,
+      "prefix": "vdom"
+    }
+  ]],
+  "presets": ["es2015"]
+}
