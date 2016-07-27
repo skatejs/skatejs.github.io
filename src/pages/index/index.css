@@ -19,6 +19,7 @@
 .code-example pre {
   background-color: #F1EDE4;
   font-weight: 100;
+  overflow: auto;
 }
 
 
