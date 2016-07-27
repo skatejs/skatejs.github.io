@@ -12,6 +12,7 @@ function onRouteUpdate(elem) {
     const { component, path } = e.target;
     if (component && path) {
       page(path, createRouteHandler(elem, component));
+      page(window.location.pathname);
     }
   };
 }
