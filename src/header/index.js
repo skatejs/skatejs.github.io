@@ -1,10 +1,11 @@
 import { vdom } from 'skatejs';
+import { Link } from '../helpers';
 import css from './index.css';
 import logo from './logo.png';
 
 const Item = (props, chren) => (
   <li class={css.locals.item}>
-    <a class={css.locals.link} href={props.href}>{chren()}</a>
+    <Link {...props} class={css.locals.link}>{chren()}</Link>
   </li>
 );
 
@@ -13,10 +14,10 @@ export default props => (
     <style>{css.toString()}</style>
     <div class={`${css.locals.header} ${props.scrolled}`}>
       <h1 class={css.locals.title}>
-        <img alt={props.title} src={logo} width="30" />
+        <Link href="/"><img alt={props.title} src={logo} width="30" /></Link>
       </h1>
       <ul class={css.locals.list}>
-        <Item href="">Docs</Item>
+        <Item href="/docs">Docs</Item>
         <Item href="https://github.com/skatejs/skatejs">Github</Item>
         <Item href="">Community</Item>
       </ul>
