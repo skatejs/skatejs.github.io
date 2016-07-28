@@ -1,0 +1,10 @@
+.pane {
+  background-color: #F1EDE4;
+  display: none;
+  margin: 0;
+  padding: 20px;
+}
+
+.pane.selected {
+  display: block;
+}

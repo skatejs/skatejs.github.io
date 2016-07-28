@@ -249,9 +249,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var $props = '____skate_props';
 	  var $ref = '____skate_ref';
 	  var $renderer = '____skate_renderer';
+	  var $rendering = '____skate_rendering';
 	  var $rendererDebounced = '____skate_rendererDebounced';
 	  var $shadowRoot = '____skate_shadowRoot';
-	  var $state = '____skate_state';
 	
 	  var symbols$1 = Object.freeze({
 	    name: $name,
@@ -417,7 +417,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // Handle built-in and custom events.
 	    if (name.indexOf('on') === 0) {
-	      return name in elem ? incrementalDom.applyProp(elem, name, value) : applyEvent(elem, name.substring(2), name, value);
+	      var firstChar = name[2];
+	      var eventName = void 0;
+	
+	      if (firstChar === '-') {
+	        eventName = name.substring(3);
+	      } else if (firstChar === firstChar.toUpperCase()) {
+	        eventName = name.substring(2);
+	      }
+	
+	      if (eventName) {
+	        applyEvent(elem, eventName, value);
+	        return;
+	      }
 	    }
 	
 	    // Set the select attribute instead of name if it was a <slot> translated to
@@ -427,28 +439,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = '[slot="' + value + '"]';
 	    }
 	
+	    // Set defined props on the element directly.
+	    if (name in elem) {
+	      incrementalDom.applyProp(elem, name, value);
+	      return;
+	    }
+	
 	    // Fallback to default IncrementalDOM behaviour.
 	    applyDefault(elem, name, value);
 	  };
 	
 	  // Adds or removes an event listener for an element.
-	  function applyEvent(elem, ename, name, value) {
+	  function applyEvent(elem, ename, newFunc) {
 	    var events = elem.__events;
 	
 	    if (!events) {
 	      events = elem.__events = {};
 	    }
 	
-	    var eFunc = events[ename];
+	    var oldFunc = events[ename];
 	
 	    // Remove old listener so they don't double up.
-	    if (eFunc) {
-	      elem.removeEventListener(ename, eFunc);
+	    if (oldFunc) {
+	      elem.removeEventListener(ename, oldFunc);
 	    }
 	
 	    // Bind new listener.
-	    if (value) {
-	      elem.addEventListener(ename, events[ename] = value);
+	    if (newFunc) {
+	      elem.addEventListener(ename, events[ename] = newFunc);
 	    }
 	  }
 	
@@ -515,7 +533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  function stackOpen(tname, key, statics) {
-	    var props = {};
+	    var props = { key: key, statics: statics };
 	
 	    for (var _len2 = arguments.length, attrs = Array(_len2 > 3 ? _len2 - 3 : 0), _key2 = 3; _key2 < _len2; _key2++) {
 	      attrs[_key2 - 3] = arguments[_key2];
@@ -830,11 +848,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        return Ctor;
 	      }
+	
+	      // This is a default implementation that does strict equality copmarison on
+	      // prevoius props and next props. It synchronously renders on the first prop
+	      // that is different and returns immediately.
+	
 	    }, {
-	      key: 'shouldRender',
-	      value: function shouldRender(elem, prev, curr) {
+	      key: 'updated',
+	      value: function updated(elem, prev) {
+	        if (!prev) {
+	          return true;
+	        }
 	        for (var name in prev) {
-	          if (prev[name] !== curr[name]) {
+	          if (prev[name] !== elem[name]) {
 	            return true;
 	          }
 	        }
@@ -854,53 +880,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }(HTMLElement);
 	
 	  function get$1(elem) {
-	    var state = {};
+	    var props = {};
 	    for (var key in elem.constructor.props) {
-	      state[key] = elem[key];
+	      props[key] = elem[key];
 	    }
-	    return state;
+	    return props;
 	  }
 	
-	  function set$1(elem, newState) {
-	    assign$1(elem, newState);
+	  function set$1(elem, newProps) {
+	    assign$1(elem, newProps);
 	    if (elem.constructor.render) {
 	      elem.constructor[$renderer](elem);
 	    }
 	  }
 	
-	  function state(elem, newState) {
-	    return typeof newState === 'undefined' ? get$1(elem) : set$1(elem, newState);
+	  function props(elem, newProps) {
+	    return typeof newProps === 'undefined' ? get$1(elem) : set$1(elem, newProps);
 	  }
 	
 	  function createRenderer(Ctor) {
 	    var render = Ctor.render;
-	    var shouldRender = Ctor.shouldRender;
+	    var rendered = Ctor.rendered;
+	    var updated = Ctor.updated;
 	
 	    return function (elem) {
-	      // We don't render at all if the user hasn't specified a render function or
-	      // if the element hasn't been connected yet. This saves us from doing
-	      // unnecessary renders.
-	      if (!render || !elem[$connected]) {
+	      if (elem[$rendering] || !elem[$connected]) {
 	        return;
 	      }
 	
-	      var sr = elem[$shadowRoot];
+	      // Flag as rendering. This prevents anything from trying to render - or
+	      // queueing a render - while there is a pending render.
+	      elem[$rendering] = true;
 	
-	      if (shouldRender) {
-	        var prevState = elem[$state];
-	        var currState = state(elem);
-	
-	        // Update the previous state no matter what so it can be compared on the
-	        // next render, even if the component doesn't render this time around.
-	        elem[$state] = currState;
-	
-	        // We always do the initial render, therefore we only check if we should
-	        // render if there is a shadow root. If there is no shadow root, then we
-	        // are in the initial render.
-	        if (sr && !shouldRender(elem, prevState, currState)) {
-	          return;
-	        }
+	      // Call the updated() callback to see if we should render.
+	      var shouldRender = true;
+	      if (updated) {
+	        var prev = elem[$props];
+	        elem[$props] = props(elem);
+	        shouldRender = updated(elem, prev);
 	      }
+	
+	      // Even though this would ideally be checked in the updated() callback,
+	      // it may not be, so we ensure that there is a point in proceeding.
+	      if (!render) {
+	        elem[$rendering] = false;
+	        return;
+	      }
+	
+	      // Try and get the current shadow root (will be setup if not).
+	      var sr = elem[$shadowRoot];
 	
 	      // Setup the shadow root if it hasn't been setup yet.
 	      if (!sr) {
@@ -915,7 +943,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        elem[$shadowRoot] = sr;
 	      }
 	
-	      incrementalDom.patchInner(sr, render, elem);
+	      if (shouldRender) {
+	        incrementalDom.patchInner(sr, render, elem);
+	        if (rendered) {
+	          rendered(elem);
+	        }
+	      }
+	
+	      elem[$rendering] = false;
 	    };
 	  }
 	
@@ -924,37 +959,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var dash = !one || idx % 2 === 0 ? '' : '-';
 	      return '' + one + dash + two.toLowerCase();
 	    });
-	  }
-	
-	  var CustomEvent = function (CustomEvent) {
-	    if (CustomEvent) {
-	      try {
-	        new CustomEvent();
-	      } catch (e) {
-	        return undefined;
-	      }
-	    }
-	    return CustomEvent;
-	  }(window.CustomEvent);
-	
-	  function createCustomEvent(name) {
-	    var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	
-	    if (CustomEvent) {
-	      return new CustomEvent(name, opts);
-	    }
-	    var e = document.createEvent('CustomEvent');
-	    e.initCustomEvent(name, opts.bubbles, opts.cancelable, opts.detail);
-	    return e;
-	  }
-	
-	  function emit(elem, name) {
-	    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-	
-	    /* jshint expr: true */
-	    opts.bubbles === undefined && (opts.bubbles = true);
-	    opts.cancelable === undefined && (opts.cancelable = true);
-	    return elem.disabled ? true : elem.dispatchEvent(createCustomEvent(name, opts));
 	  }
 	
 	  function getDefaultValue(elem, name, opts) {
@@ -1029,18 +1033,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        newValue = opts.coerce(newValue);
 	      }
 	
-	      var propertyHasChanged = newValue !== oldValue;
-	      if (propertyHasChanged && opts.event) {
-	        var canceled = !emit(this, String(opts.event), {
-	          bubbles: false,
-	          detail: { name: name, oldValue: oldValue, newValue: newValue }
-	        });
-	
-	        if (canceled) {
-	          return;
-	        }
-	      }
-	
 	      propData.internalValue = newValue;
 	
 	      var changeData = { name: name, newValue: newValue, oldValue: oldValue };
@@ -1049,8 +1041,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        opts.set(this, changeData);
 	      }
 	
-	      // Queue a re-render.
-	      this[$rendererDebounced](this);
+	      // Queue a re-render only if it's not currently rendering.
+	      if (!this[$rendering]) {
+	        this[$rendererDebounced](this);
+	      }
 	
 	      propData.oldValue = newValue;
 	
@@ -1224,6 +1218,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Ctor;
 	  }
 	
+	  var CustomEvent = function (CustomEvent) {
+	    if (CustomEvent) {
+	      try {
+	        new CustomEvent();
+	      } catch (e) {
+	        return undefined;
+	      }
+	    }
+	    return CustomEvent;
+	  }(window.CustomEvent);
+	
+	  function createCustomEvent(name) {
+	    var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	
+	    if (CustomEvent) {
+	      return new CustomEvent(name, opts);
+	    }
+	    var e = document.createEvent('CustomEvent');
+	    e.initCustomEvent(name, opts.bubbles, opts.cancelable, opts.detail);
+	    return e;
+	  }
+	
+	  function emit(elem, name) {
+	    var opts = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	
+	    /* jshint expr: true */
+	    opts.bubbles === undefined && (opts.bubbles = true);
+	    opts.cancelable === undefined && (opts.cancelable = true);
+	    return elem.disabled ? true : elem.dispatchEvent(createCustomEvent(name, opts));
+	  }
+	
 	  function getValue(elem) {
 	    var type = elem.type;
 	    if (type === 'checkbox' || type === 'radio') {
@@ -1246,9 +1271,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, elem);
 	
 	        obj[propName || e.target.name] = value;
-	        state(elem, defineProperty({}, firstPart, elem[firstPart]));
+	        props(elem, defineProperty({}, firstPart, elem[firstPart]));
 	      } else {
-	        state(elem, defineProperty({}, localTarget, value));
+	        props(elem, defineProperty({}, localTarget, value));
 	      }
 	    };
 	  }
@@ -1269,8 +1294,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  exports.emit = emit;
 	  exports.link = link;
 	  exports.prop = prop;
+	  exports.props = props;
 	  exports.ready = ready;
-	  exports.state = state;
 	  exports.symbols = symbols$1;
 	  exports.vdom = vdom;
 	
@@ -3706,6 +3731,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _index2 = _interopRequireDefault(_index);
 	
+	var _tabs = __webpack_require__(23);
+	
+	var _tabs2 = _interopRequireDefault(_tabs);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -3723,11 +3752,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	var CodeExample = function CodeExample(props, chren) {
-	  vdom.elementOpen('div', null, null, 'class', _index2.default.locals.codeExample);
-	  vdom.elementOpen('div');
-	  vdom.elementOpen('h3');
-	  vdom.text('JS');
-	  vdom.elementClose('h3');
+	  vdom.elementOpen('div', null, null, 'class', _index2.default.locals.code);
+	
+	  _renderArbitrary(props.title ? (vdom.elementOpen('h3', null, null, 'class', _index2.default.locals.title), _renderArbitrary(props.title), vdom.elementClose('h3')) : '');
+	
+	  _renderArbitrary(props.description ? (vdom.elementOpen('p', null, null, 'class', _index2.default.locals.description), _renderArbitrary(props.description), vdom.elementClose('p')) : '');
+	
+	  vdom.elementOpen(_tabs2.default);
+	  vdom.elementOpen(_tabs.Tab, null, null, 'name', 'JS', 'selected', true);
 	  vdom.elementOpen('pre');
 	  vdom.elementOpen('code');
 	
@@ -3735,11 +3767,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  vdom.elementClose('code');
 	  vdom.elementClose('pre');
-	  vdom.elementClose('div');
-	  vdom.elementOpen('div');
-	  vdom.elementOpen('h3');
-	  vdom.text('HTML');
-	  vdom.elementClose('h3');
+	  vdom.elementClose(_tabs.Tab);
+	  vdom.elementOpen(_tabs.Tab, null, null, 'name', 'HTML');
 	  vdom.elementOpen('pre');
 	  vdom.elementOpen('code');
 	
@@ -3747,17 +3776,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  vdom.elementClose('code');
 	  vdom.elementClose('pre');
-	  vdom.elementClose('div');
-	  vdom.elementOpen('div');
-	  vdom.elementOpen('h3');
-	  vdom.text('Result');
-	  vdom.elementClose('h3');
+	  vdom.elementClose(_tabs.Tab);
+	  vdom.elementOpen(_tabs.Tab, null, null, 'name', 'Result');
 	  vdom.elementOpen('p');
 	
 	  _renderArbitrary(chren());
 	
 	  vdom.elementClose('p');
-	  vdom.elementClose('div');
+	  vdom.elementClose(_tabs.Tab);
+	  vdom.elementClose(_tabs2.default);
 	  return vdom.elementClose('div');
 	};
 	
@@ -3844,12 +3871,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    vdom.text(' Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet. ');
 	    vdom.elementClose(FeaturePane);
 	    vdom.elementClose('div');
-	    vdom.elementOpen(CodeExample, null, null, 'html', '\n            <x-hello>Bob</x-hello>\n          ', 'js', '\n            skate.define(\'x-hello\', {\n              render() {\n                return <span>Hello, <slot />!</span>;\n              },\n            });\n          ');
+	    vdom.elementOpen(CodeExample, null, null, 'title', 'Hello World', 'description', 'A simple hello world example.', 'html', '\n            <x-hello>Bob</x-hello>\n          ', 'js', '\n            skate.define(\'x-hello\', {\n              render() {\n                return <span>Hello, <slot />!</span>;\n              },\n            });\n          ');
 	    vdom.elementOpen('x-hello');
 	    vdom.text('Bob');
 	    vdom.elementClose('x-hello');
 	    vdom.elementClose(CodeExample);
-	    vdom.elementOpen(CodeExample, null, null, 'html', '\n            <x-counter count="1"></x-counter>\n          ', 'js', '\n            skate.define(\'x-counter\', {\n              props: {\n                count: skate.prop.number(),\n              },\n              attached(elem) {\n                elem.__ival = setInterval(() => ++elem.count, 1000);\n              },\n              detached(elem) {\n                clearInterval(elem.__ival);\n              },\n              render(elem) {\n                return <span>Count: {elem.count}</span>;\n              },\n            });\n          ');
+	    vdom.elementOpen(CodeExample, null, null, 'title', 'Simple Counter', 'description', 'A simple counter that shows how to use Shadow DOM name slots and re-rendering.', 'html', '\n            <x-counter count="1"></x-counter>\n          ', 'js', '\n            skate.define(\'x-counter\', {\n              props: {\n                count: skate.prop.number(),\n              },\n              attached(elem) {\n                elem.__ival = setInterval(() => ++elem.count, 1000);\n              },\n              detached(elem) {\n                clearInterval(elem.__ival);\n              },\n              render(elem) {\n                return <span>Count: {elem.count}</span>;\n              },\n            });\n          ');
 	    vdom.elementOpen('x-counter', null, null, 'count', '1');
 	    vdom.elementClose('x-counter');
 	    vdom.elementClose(CodeExample);
@@ -3866,12 +3893,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "._2kWNDIfW4mqEKHe3oTRqk3{background-color:#f8f5ec;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3,._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{margin:0;padding:20px}._2kWNDIfW4mqEKHe3oTRqk3 h3{background-color:#dad6ce;font-weight:200}._2kWNDIfW4mqEKHe3oTRqk3 p,._2kWNDIfW4mqEKHe3oTRqk3 pre{background-color:#f1ede4;font-weight:100;overflow:auto}.iYB-ylcS-0bRr059nTAvY{background-color:#111;color:#eee;font-size:14px;margin:10px;width:33%}.iYB-ylcS-0bRr059nTAvY a{color:#fff}.iYB-ylcS-0bRr059nTAvY h3{background-color:#222;font-weight:200}.iYB-ylcS-0bRr059nTAvY p{font-weight:100}.iYB-ylcS-0bRr059nTAvY h3,.iYB-ylcS-0bRr059nTAvY p{margin:0;padding:20px}._2eA-gGgtu95U0T2LIjbefD{background-color:#333;display:flex;padding:10px}._34LLXGQWwpFC-AGNgRE-Zi{background-color:#f4547b;color:#fff;padding:40px}._34LLXGQWwpFC-AGNgRE-Zi h1{font-size:48px;font-weight:200;margin-top:0}._34LLXGQWwpFC-AGNgRE-Zi p{font-size:24px;font-weight:100;margin-bottom:0}", ""]);
+	exports.push([module.id, "._2o8n2ytNJ2UOwNLCVyzNYy{background-color:#dad6ce}._2o8n2ytNJ2UOwNLCVyzNYy ._2mr8X-mQ-giOJSHzOxhpg7{font-weight:200;margin:0;padding:20px}._2o8n2ytNJ2UOwNLCVyzNYy ._2bgY6v_faJIOWaSxG0ZQ17{font-size:14px;font-weight:100;margin:0;padding:20px}.iYB-ylcS-0bRr059nTAvY{background-color:#111;color:#eee;flex-basis:33%;font-size:14px;margin:10px}.iYB-ylcS-0bRr059nTAvY a{color:#fff}.iYB-ylcS-0bRr059nTAvY h3{background-color:#222;font-weight:200}.iYB-ylcS-0bRr059nTAvY p{font-weight:100}.iYB-ylcS-0bRr059nTAvY h3,.iYB-ylcS-0bRr059nTAvY p{margin:0;padding:20px}._2eA-gGgtu95U0T2LIjbefD{background-color:#333;display:flex;overflow:auto;padding:10px}._34LLXGQWwpFC-AGNgRE-Zi{background-color:#f4547b;color:#fff;padding:40px}._34LLXGQWwpFC-AGNgRE-Zi h1{font-size:48px;font-weight:200;margin-top:0}._34LLXGQWwpFC-AGNgRE-Zi p{font-size:24px;font-weight:100;margin-bottom:0}", ""]);
 	
 	// exports
 	exports.locals = {
-		"code-example": "_2kWNDIfW4mqEKHe3oTRqk3",
-		"codeExample": "_2kWNDIfW4mqEKHe3oTRqk3",
+		"code": "_2o8n2ytNJ2UOwNLCVyzNYy",
+		"code": "_2o8n2ytNJ2UOwNLCVyzNYy",
+		"title": "_2mr8X-mQ-giOJSHzOxhpg7",
+		"title": "_2mr8X-mQ-giOJSHzOxhpg7",
+		"description": "_2bgY6v_faJIOWaSxG0ZQ17",
+		"description": "_2bgY6v_faJIOWaSxG0ZQ17",
 		"feature-pane": "iYB-ylcS-0bRr059nTAvY",
 		"featurePane": "iYB-ylcS-0bRr059nTAvY",
 		"feature-panes": "_2eA-gGgtu95U0T2LIjbefD",
@@ -4180,8 +4211,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	exports.default = (0, _skatejs.define)('sk-router', {
-	  render: function render(elem) {
-	    return _skatejs.vdom.elementVoid('slot', null, null, 'onRouteUpdate', onRouteUpdate(elem));
+	  created: function created(elem) {
+	    elem.addEventListener('RouteUpdate', onRouteUpdate(elem));
 	  }
 	});
 	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
@@ -4189,11 +4220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    component: {},
 	    path: {}
 	  },
-	  render: function render(elem) {
-	    // We have to use render() to emit an event because there's no lifecycle
-	    // callbacks for:
-	    // - before receiving properties
-	    // - after receiving properties
+	  updated: function updated(elem) {
 	    var component = elem.component;
 	    var path = elem.path;
 	
@@ -4232,6 +4259,389 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// exports
 
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Tab = undefined;
+	
+	var _jsxWrapper = function _jsxWrapper(func, args) {
+	  var wrapper = args ? function wrapper() {
+	    return func.apply(this, args);
+	  } : func;
+	  wrapper.__jsxDOMWrapper = true;
+	  return wrapper;
+	};
+	
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(2);
+	
+	var _classnames = __webpack_require__(24);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
+	var _index = __webpack_require__(26);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	var _tab = __webpack_require__(30);
+	
+	var _tab2 = _interopRequireDefault(_tab);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function onTabsChanged(elem) {
+	  return function () {
+	    return elem.tabs = [].slice.call(elem.children);
+	  };
+	}
+	
+	function selectTab(tabs, tab) {
+	  return function (e) {
+	    tabs.forEach(function (cur) {
+	      return cur.selected = cur === tab;
+	    });
+	    e.preventDefault();
+	  };
+	}
+	
+	exports.default = (0, _skatejs.define)('sk-tabs', {
+	  props: {
+	    tabs: _skatejs.prop.array()
+	  },
+	  updated: function updated(elem, prev) {
+	    if (_skatejs.Component.updated(elem, prev)) {
+	      return (0, _skatejs.emit)(elem, 'tab-changed', { detail: elem.selected });
+	    }
+	  },
+	  render: function render(elem) {
+	    _skatejs.vdom.elementOpen('div');
+	
+	    _skatejs.vdom.elementOpen('style');
+	
+	    _renderArbitrary(_index2.default.toString());
+	
+	    _skatejs.vdom.elementClose('style');
+	
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.tabs);
+	
+	    _renderArbitrary(elem.tabs.map(function (tab) {
+	      var _cx;
+	
+	      return _jsxWrapper(function (_cx2, _ref, _selectTab, _tab$name) {
+	        _skatejs.vdom.elementOpen('div', null, null, 'class', _cx2);
+	
+	        _skatejs.vdom.elementOpen('a', null, null, 'href', _ref, 'on-click', _selectTab);
+	
+	        _renderArbitrary(_tab$name);
+	
+	        _skatejs.vdom.elementClose('a');
+	
+	        return _skatejs.vdom.elementClose('div');
+	      }, [(0, _classnames2.default)((_cx = {}, _defineProperty(_cx, _index2.default.locals.tab, true), _defineProperty(_cx, _index2.default.locals.selected, tab.selected), _cx)), '#' + tab.name, selectTab(elem.tabs, tab), tab.name]);
+	    }));
+	
+	    _skatejs.vdom.elementClose('div');
+	
+	    _skatejs.vdom.elementVoid('slot', null, null, 'on-slotchange', onTabsChanged(elem));
+	
+	    return _skatejs.vdom.elementClose('div');
+	  }
+	});
+	exports.Tab = _tab2.default;
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+	
+	(function () {
+		'use strict';
+	
+		var hasOwn = {}.hasOwnProperty;
+	
+		function classNames() {
+			var classes = [];
+	
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+	
+				var argType = typeof arg === 'undefined' ? 'undefined' : _typeof(arg);
+	
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+	
+			return classes.join(' ');
+		}
+	
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if ("function" === 'function' && _typeof(__webpack_require__(25)) === 'object' && __webpack_require__(25)) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	})();
+
+/***/ },
+/* 25 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(14)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2Lx4fB9RrtyJZEybizTry_{background-color:#dad6ce}._3jX3hCKqKj9o6D_5Kx_JBv{display:inline-block}._3jX3hCKqKj9o6D_5Kx_JBv a{color:#333;display:inline-block;font-size:18px;font-weight:200;padding:20px;text-decoration:none}._3jX3hCKqKj9o6D_5Kx_JBv._1UoOCaJGOGhObV5161qk5M{background-color:#f1ede4}", ""]);
+	
+	// exports
+	exports.locals = {
+		"tabs": "_2Lx4fB9RrtyJZEybizTry_",
+		"tabs": "_2Lx4fB9RrtyJZEybizTry_",
+		"tab": "_3jX3hCKqKj9o6D_5Kx_JBv",
+		"tab": "_3jX3hCKqKj9o6D_5Kx_JBv",
+		"selected": "_1UoOCaJGOGhObV5161qk5M",
+		"selected": "_1UoOCaJGOGhObV5161qk5M"
+	};
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	/**
+	 * Module dependencies.
+	 */
+	
+	var now = __webpack_require__(28);
+	
+	/**
+	 * Returns a function, that, as long as it continues to be invoked, will not
+	 * be triggered. The function will be called after it stops being called for
+	 * N milliseconds. If `immediate` is passed, trigger the function on the
+	 * leading edge, instead of the trailing.
+	 *
+	 * @source underscore.js
+	 * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+	 * @param {Function} function to wrap
+	 * @param {Number} timeout in ms (`100`)
+	 * @param {Boolean} whether to execute at the beginning (`false`)
+	 * @api public
+	 */
+	
+	module.exports = function debounce(func, wait, immediate) {
+	  var timeout, args, context, timestamp, result;
+	  if (null == wait) wait = 100;
+	
+	  function later() {
+	    var last = now() - timestamp;
+	
+	    if (last < wait && last > 0) {
+	      timeout = setTimeout(later, wait - last);
+	    } else {
+	      timeout = null;
+	      if (!immediate) {
+	        result = func.apply(context, args);
+	        if (!timeout) context = args = null;
+	      }
+	    }
+	  };
+	
+	  return function debounced() {
+	    context = this;
+	    args = arguments;
+	    timestamp = now();
+	    var callNow = immediate && !timeout;
+	    if (!timeout) timeout = setTimeout(later, wait);
+	    if (callNow) {
+	      result = func.apply(context, args);
+	      context = args = null;
+	    }
+	
+	    return result;
+	  };
+	};
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	module.exports = Date.now || now;
+	
+	function now() {
+	    return new Date().getTime();
+	}
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(14)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._3WkQLUyd_5sA_re7EzYvMx{background-color:#f1ede4;display:none;margin:0;padding:20px}._3WkQLUyd_5sA_re7EzYvMx._2nRhrrYvmfuxu34UiGItXs{display:block}", ""]);
+	
+	// exports
+	exports.locals = {
+		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
+		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
+		"selected": "_2nRhrrYvmfuxu34UiGItXs",
+		"selected": "_2nRhrrYvmfuxu34UiGItXs"
+	};
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(2);
+	
+	var _classnames = __webpack_require__(24);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
+	var _tab = __webpack_require__(29);
+	
+	var _tab2 = _interopRequireDefault(_tab);
+	
+	var _debounce = __webpack_require__(27);
+	
+	var _debounce2 = _interopRequireDefault(_debounce);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function emitSlotChange(elem) {
+	  if (!elem.__debouncedSlotChangeEvent) {
+	    elem.__debouncedSlotChangeEvent = (0, _debounce2.default)(_skatejs.emit.bind(null, elem, 'slotchange'), 0);
+	  }
+	  return elem.__debouncedSlotChangeEvent();
+	}
+	
+	exports.default = (0, _skatejs.define)('sk-tabs-tab', {
+	  props: {
+	    name: _skatejs.prop.string(),
+	    selected: _skatejs.prop.boolean()
+	  },
+	  attached: function attached(elem) {
+	    emitSlotChange(elem);
+	  },
+	  detached: function detached(elem) {
+	    emitSlotChange(elem);
+	  },
+	  updated: function updated(elem, prev) {
+	    emitSlotChange(elem);
+	    return _skatejs.Component.updated(elem, prev);
+	  },
+	  render: function render(elem) {
+	    var _cx;
+	
+	    _skatejs.vdom.elementOpen('div', null, null, 'class', (0, _classnames2.default)((_cx = {}, _defineProperty(_cx, _tab2.default.locals.pane, true), _defineProperty(_cx, _tab2.default.locals.selected, elem.selected), _cx)));
+	
+	    _skatejs.vdom.elementOpen('style');
+	
+	    _renderArbitrary(_tab2.default.toString());
+	
+	    _skatejs.vdom.elementClose('style');
+	
+	    _skatejs.vdom.elementVoid('slot');
+	
+	    return _skatejs.vdom.elementClose('div');
+	  }
+	});
 
 /***/ }
 /******/ ])

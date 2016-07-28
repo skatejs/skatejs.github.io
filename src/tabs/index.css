@@ -1,0 +1,20 @@
+.tabs {
+  background-color: #DAD6CE;
+}
+
+.tab {
+  display: inline-block;
+}
+
+.tab a {
+  color: #333;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 200;
+  padding: 20px;
+  text-decoration: none;
+}
+
+.tab.selected {
+  background-color: #F1EDE4;
+}

@@ -1,5 +1,6 @@
 import * as skate from 'skatejs';
 import css from './index.css';
+import Tabs, { Tab } from '../../tabs';
 
 const { define, vdom } = skate;
 
@@ -10,19 +11,20 @@ function format(code) {
 }
 
 const CodeExample = (props, chren) => (
-  <div class={css.locals.codeExample}>
-    <div>
-      <h3>JS</h3>
-      <pre><code>{format(props.js)}</code></pre>
-    </div>
-    <div>
-      <h3>HTML</h3>
-      <pre><code>{format(props.html)}</code></pre>
-    </div>
-    <div>
-      <h3>Result</h3>
-      <p>{chren()}</p>
-    </div>
+  <div class={css.locals.code}>
+    {props.title ? <h3 class={css.locals.title}>{props.title}</h3> : ''}
+    {props.description ? <p class={css.locals.description}>{props.description}</p> : ''}
+    <Tabs>
+      <Tab name="JS" selected>
+        <pre><code>{format(props.js)}</code></pre>
+      </Tab>
+      <Tab name="HTML">
+        <pre><code>{format(props.html)}</code></pre>
+      </Tab>
+      <Tab name="Result">
+        <p>{chren()}</p>
+      </Tab>
+    </Tabs>
   </div>
 );
 
@@ -81,6 +83,8 @@ export default define('sk-page-index', {
           </FeaturePane>
         </div>
         <CodeExample
+          title="Hello World"
+          description="A simple hello world example."
           html="
             <x-hello>Bob</x-hello>
           "
@@ -95,6 +99,8 @@ export default define('sk-page-index', {
           <x-hello>Bob</x-hello>
         </CodeExample>
         <CodeExample
+          title="Simple Counter"
+          description="A simple counter that shows how to use Shadow DOM name slots and re-rendering."
           html="
             <x-counter count=&quot;1&quot;></x-counter>
           "

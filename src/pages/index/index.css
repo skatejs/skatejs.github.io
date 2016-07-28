@@ -1,25 +1,18 @@
-.code-example {
-  background-color: #F8F5EC;
-  padding: 20px;
+.code {
+  background-color: #DAD6CE;
 }
 
-.code-example h3,
-.code-example p,
-.code-example pre {
+.code .title {
+  font-weight: 200;
   margin: 0;
   padding: 20px;
 }
 
-.code-example h3 {
-  background-color: #DAD6CE;
-  font-weight: 200;
-}
-
-.code-example p,
-.code-example pre {
-  background-color: #F1EDE4;
+.code .description {
+  font-size: 14px;
   font-weight: 100;
-  overflow: auto;
+  margin: 0;
+  padding: 20px;
 }
 
 
@@ -27,9 +20,9 @@
 .feature-pane {
   background-color: #111;
   color: #eee;
+  flex-basis: 33%;
   font-size: 14px;
   margin: 10px;
-  width: 33%;
 }
 
 .feature-pane a {
@@ -54,6 +47,7 @@
 .feature-panes {
   background-color: #333;
   display: flex;
+  overflow: auto;
   padding: 10px;
 }
 

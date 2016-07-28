@@ -1,4 +1,4 @@
-import { define, emit, vdom } from 'skatejs';
+import { Component, define, emit, vdom } from 'skatejs';
 import page from 'page';
 
 function createRouteHandler(elem, detail) {
@@ -21,8 +21,8 @@ function onRouteUpdate(elem) {
 }
 
 export default define('sk-router', {
-  render(elem) {
-    return <slot onRouteUpdate={onRouteUpdate(elem)} />;
+  created(elem) {
+    elem.addEventListener('RouteUpdate', onRouteUpdate(elem));
   },
 });
 
@@ -31,11 +31,7 @@ export const Route = define('sk-router-route', {
     component: {},
     path: {},
   },
-  render(elem) {
-    // We have to use render() to emit an event because there's no lifecycle
-    // callbacks for:
-    // - before receiving properties
-    // - after receiving properties
+  updated(elem) {
     const { component, path } = elem;
     if (component && path) {
       emit(elem, 'RouteUpdate', {

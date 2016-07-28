@@ -31,7 +31,9 @@
     }
   },
   "dependencies": {
+    "classnames": "^2.2.5",
+    "debounce": "^1.0.0",
     "page": "^1.7.1",
-    "skatejs": "^1.0.0-beta.17"
+    "skatejs": "^1.0.0-beta.19"
   }
 }
