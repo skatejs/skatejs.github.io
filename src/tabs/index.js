@@ -4,7 +4,7 @@ import css from './index.css';
 import Tab from './tab';
 
 function onTabsChanged(elem) {
-  return () => (elem.tabs = [].slice.call(elem.children));
+  return () => (elem.tabs = [...elem.children]);
 }
 
 function selectTab(tabs, tab) {

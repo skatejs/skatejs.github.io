@@ -61,11 +61,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.App = undefined;
 	
-	var _index = __webpack_require__(1);
+	__webpack_require__(1);
+	
+	__webpack_require__(2);
+	
+	var _index = __webpack_require__(6);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _index3 = __webpack_require__(22);
+	var _index3 = __webpack_require__(33);
 	
 	var _index4 = _interopRequireDefault(_index3);
 	
@@ -76,6 +80,1767 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	/**
+	 * @license
+	 * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+	 * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+	 * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+	 * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+	 * Code distributed by Google as part of the polymer project is also
+	 * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+	 */
+	
+	/**
+	 * 2.3
+	 * http://w3c.github.io/webcomponents/spec/custom/#dfn-element-definition
+	 * @typedef {{
+	 *  name: string,
+	 *  localName: string,
+	 *  constructor: Function,
+	 *  connectedCallback: Function,
+	 *  disconnectedCallback: Function,
+	 *  attributeChangedCallback: Function,
+	 *  observedAttributes: Array<string>,
+	 * }}
+	 */
+	var CustomElementDefinition;
+	
+	(function () {
+	  'use strict';
+	
+	  var doc = document;
+	  var win = window;
+	
+	  // name validation
+	  // https://html.spec.whatwg.org/multipage/scripting.html#valid-custom-element-name
+	
+	  /**
+	   * @const
+	   * @type {Array<string>}
+	   */
+	  var reservedTagList = ['annotation-xml', 'color-profile', 'font-face', 'font-face-src', 'font-face-uri', 'font-face-format', 'font-face-name', 'missing-glyph'];
+	
+	  /** @const */
+	  var customNameValidation = /^[a-z][.0-9_a-z]*-[\-.0-9_a-z]*$/;
+	  function isValidCustomElementName(name) {
+	    return customNameValidation.test(name) && reservedTagList.indexOf(name) === -1;
+	  }
+	
+	  function createTreeWalker(root) {
+	    // IE 11 requires the third and fourth arguments be present. If the third
+	    // arg is null, it applies the default behaviour. However IE also requires
+	    // the fourth argument be present even though the other browsers ignore it.
+	    return doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+	  }
+	
+	  function isElement(node) {
+	    return node.nodeType === Node.ELEMENT_NODE;
+	  }
+	
+	  /**
+	   * A registry of custom element definitions.
+	   *
+	   * See https://html.spec.whatwg.org/multipage/scripting.html#customelementsregistry
+	   *
+	   * @constructor
+	   * @property {boolean} polyfilled Whether this registry is polyfilled
+	   * @property {boolean} enableFlush Set to true to enable the flush() method
+	   *   to work. This should only be done for tests, as it causes a memory leak.
+	   */
+	  function CustomElementsRegistry() {
+	    /** @private {Map<string, CustomElementDefinition>} **/
+	    this._definitions = new Map();
+	
+	    /** @private {Map<Function, CustomElementDefinition>} **/
+	    this._constructors = new Map();
+	
+	    this._whenDefinedMap = new Map();
+	
+	    /** @private {Set<MutationObserver>} **/
+	    this._observers = new Set();
+	
+	    /** @private {MutationObserver} **/
+	    this._attributeObserver = new MutationObserver(this._handleAttributeChange.bind(this));
+	
+	    /** @private {HTMLElement} **/
+	    this._newInstance = null;
+	
+	    this.polyfilled = true;
+	    this.enableFlush = false;
+	
+	    this._observeRoot(document);
+	  }
+	
+	  CustomElementsRegistry.prototype = {
+	
+	    // HTML spec part 4.13.4
+	    // https://html.spec.whatwg.org/multipage/scripting.html#dom-customelementsregistry-define
+	    define: function define(name, constructor, options) {
+	      name = name.toString().toLowerCase();
+	
+	      // 1:
+	      if (typeof constructor !== 'function') {
+	        throw new TypeError('constructor must be a Constructor');
+	      }
+	
+	      // 2. If constructor is an interface object whose corresponding interface
+	      //    either is HTMLElement or has HTMLElement in its set of inherited
+	      //    interfaces, throw a TypeError and abort these steps.
+	      //
+	      // It doesn't appear possible to check this condition from script
+	
+	      // 3:
+	      if (!isValidCustomElementName(name)) {
+	        throw new SyntaxError('The element name \'' + name + '\' is not valid.');
+	      }
+	
+	      // 4, 5:
+	      // Note: we don't track being-defined names and constructors because
+	      // define() isn't normally reentrant. The only time user code can run
+	      // during define() is when getting callbacks off the prototype, which
+	      // would be highly-unusual. We can make define() reentrant-safe if needed.
+	      if (this._definitions.has(name)) {
+	        throw new Error('An element with name \'' + name + '\' is already defined');
+	      }
+	
+	      // 6, 7:
+	      if (this._constructors.has(constructor)) {
+	        throw new Error('Definition failed for \'' + name + '\': ' + 'The constructor is already used.');
+	      }
+	
+	      // 8:
+	      var localName = name;
+	
+	      // 9, 10: We do not support extends currently.
+	
+	      // 11, 12, 13: Our define() isn't rentrant-safe
+	
+	      // 14.1:
+	      var prototype = constructor.prototype;
+	
+	      // 14.2:
+	      if ((typeof prototype === 'undefined' ? 'undefined' : _typeof(prototype)) !== 'object') {
+	        throw new TypeError('Definition failed for \'' + name + '\': ' + 'constructor.prototype must be an object');
+	      }
+	
+	      function getCallback(calllbackName) {
+	        var callback = prototype[calllbackName];
+	        if (callback !== undefined && typeof callback !== 'function') {
+	          throw new Error(localName + ' \'' + calllbackName + '\' is not a Function');
+	        }
+	        return callback;
+	      }
+	
+	      // 3, 4:
+	      var connectedCallback = getCallback('connectedCallback');
+	
+	      // 5, 6:
+	      var disconnectedCallback = getCallback('disconnectedCallback');
+	
+	      // Divergence from spec: we always throw if attributeChangedCallback is
+	      // not a function, and always get observedAttributes.
+	
+	      // 7, 9.1:
+	      var attributeChangedCallback = getCallback('attributeChangedCallback');
+	
+	      // 8, 9.2, 9.3:
+	      var observedAttributes = constructor['observedAttributes'] || [];
+	
+	      // 15:
+	      // @type {CustomElementDefinition}
+	      var definition = {
+	        name: name,
+	        localName: localName,
+	        constructor: constructor,
+	        connectedCallback: connectedCallback,
+	        disconnectedCallback: disconnectedCallback,
+	        attributeChangedCallback: attributeChangedCallback,
+	        observedAttributes: observedAttributes
+	      };
+	
+	      // 16:
+	      this._definitions.set(localName, definition);
+	      this._constructors.set(constructor, localName);
+	
+	      // 17, 18, 19:
+	      this._addNodes(doc.childNodes);
+	
+	      // 20:
+	      var deferred = this._whenDefinedMap.get(localName);
+	      if (deferred) {
+	        deferred.resolve(undefined);
+	        this._whenDefinedMap.delete(localName);
+	      }
+	    },
+	
+	    /**
+	     * Returns the constructor defined for `name`, or `null`.
+	     *
+	     * @param {string} name
+	     * @return {Function|undefined}
+	     */
+	    get: function get(name) {
+	      // https://html.spec.whatwg.org/multipage/scripting.html#custom-elements-api
+	      var def = this._definitions.get(name);
+	      return def ? def.constructor : undefined;
+	    },
+	
+	    /**
+	     * Returns a `Promise` that resolves when a custom element for `name` has
+	     * been defined.
+	     *
+	     * @param {string} name
+	     * @return {Promise}
+	     */
+	    whenDefined: function whenDefined(name) {
+	      // https://html.spec.whatwg.org/multipage/scripting.html#dom-customelementsregistry-whendefined
+	      if (!customNameValidation.test(name)) {
+	        return Promise.reject(new SyntaxError('The element name \'' + name + '\' is not valid.'));
+	      }
+	      if (this._definitions.has(name)) {
+	        return Promise.resolve();
+	      }
+	      var deferred = {
+	        promise: null
+	      };
+	      deferred.promise = new Promise(function (resolve, _) {
+	        deferred.resolve = resolve;
+	      });
+	      this._whenDefinedMap.set(name, deferred);
+	      return deferred.promise;
+	    },
+	
+	    /**
+	     * Causes all pending mutation records to be processed, and thus all
+	     * customization, upgrades and custom element reactions to be called.
+	     * `enableFlush` must be true for this to work. Only use during tests!
+	     */
+	    flush: function flush() {
+	      if (this.enableFlush) {
+	        console.warn("flush!!!");
+	        this._observers.forEach(function (observer) {
+	          this._handleMutations(observer.takeRecords());
+	        }, this);
+	      }
+	    },
+	
+	    _setNewInstance: function _setNewInstance(instance) {
+	      this._newInstance = instance;
+	    },
+	
+	    /**
+	     * Observes a DOM root for mutations that trigger upgrades and reactions.
+	     * @private
+	     */
+	    _observeRoot: function _observeRoot(root) {
+	      root.__observer = new MutationObserver(this._handleMutations.bind(this));
+	      root.__observer.observe(root, { childList: true, subtree: true });
+	      if (this.enableFlush) {
+	        // this is memory leak, only use in tests
+	        this._observers.add(root.__observer);
+	      }
+	    },
+	
+	    /**
+	     * @private
+	     */
+	    _unobserveRoot: function _unobserveRoot(root) {
+	      if (root.__observer) {
+	        root.__observer.disconnect();
+	        root.__observer = null;
+	        if (this.enableFlush) {
+	          this._observers.delete(root.__observer);
+	        }
+	      }
+	    },
+	
+	    /**
+	     * @private
+	     */
+	    _handleMutations: function _handleMutations(mutations) {
+	      for (var i = 0; i < mutations.length; i++) {
+	        var mutation = mutations[i];
+	        if (mutation.type === 'childList') {
+	          // Note: we can't get an ordering between additions and removals, and
+	          // so might diverge from spec reaction ordering
+	          this._addNodes(mutation.addedNodes);
+	          this._removeNodes(mutation.removedNodes);
+	        }
+	      }
+	    },
+	
+	    /**
+	     * @param {NodeList} nodeList
+	     * @private
+	     */
+	    _addNodes: function _addNodes(nodeList) {
+	      for (var i = 0; i < nodeList.length; i++) {
+	        var root = nodeList[i];
+	
+	        if (!isElement(root)) {
+	          continue;
+	        }
+	
+	        // Since we're adding this node to an observed tree, we can unobserve
+	        this._unobserveRoot(root);
+	
+	        var walker = createTreeWalker(root);
+	        do {
+	          var node = /** @type {HTMLElement} */walker.currentNode;
+	          var definition = this._definitions.get(node.localName);
+	          if (definition) {
+	            if (!node.__upgraded) {
+	              this._upgradeElement(node, definition, true);
+	            }
+	            if (node.__upgraded && !node.__attached) {
+	              node.__attached = true;
+	              if (definition && definition.connectedCallback) {
+	                definition.connectedCallback.call(node);
+	              }
+	            }
+	          }
+	          if (node.shadowRoot) {
+	            // TODO(justinfagnani): do we need to check that the shadowRoot
+	            // is observed?
+	            this._addNodes(node.shadowRoot.childNodes);
+	          }
+	          if (node.tagName === 'LINK') {
+	            var onLoad = function () {
+	              var link = node;
+	              return function () {
+	                link.removeEventListener('load', onLoad);
+	                this._observeRoot(link.import);
+	                this._addNodes(link.import.childNodes);
+	              }.bind(this);
+	            }.bind(this)();
+	            if (node.import) {
+	              onLoad();
+	            } else {
+	              node.addEventListener('load', onLoad);
+	            }
+	          }
+	        } while (walker.nextNode());
+	      }
+	    },
+	
+	    /**
+	     * @param {NodeList} nodeList
+	     * @private
+	     */
+	    _removeNodes: function _removeNodes(nodeList) {
+	      for (var i = 0; i < nodeList.length; i++) {
+	        var root = nodeList[i];
+	
+	        if (!isElement(root)) {
+	          continue;
+	        }
+	
+	        // Since we're detatching this element from an observed root, we need to
+	        // reobserve it.
+	        // TODO(justinfagnani): can we do this in a microtask so we don't thrash
+	        // on creating and destroying MutationObservers on batch DOM mutations?
+	        this._observeRoot(root);
+	
+	        var walker = createTreeWalker(root);
+	        do {
+	          var node = walker.currentNode;
+	          if (node.__upgraded && node.__attached) {
+	            node.__attached = false;
+	            var definition = this._definitions.get(node.localName);
+	            if (definition && definition.disconnectedCallback) {
+	              definition.disconnectedCallback.call(node);
+	            }
+	          }
+	        } while (walker.nextNode());
+	      }
+	    },
+	
+	    /**
+	     * Upgrades or customizes a custom element.
+	     *
+	     * @param {HTMLElement} element
+	     * @param {CustomElementDefinition} definition
+	     * @param {boolean} callConstructor
+	     * @private
+	     */
+	    _upgradeElement: function _upgradeElement(element, definition, callConstructor) {
+	      var prototype = definition.constructor.prototype;
+	      element.__proto__ = prototype;
+	      if (callConstructor) {
+	        this._setNewInstance(element);
+	        element.__upgraded = true;
+	        new definition.constructor();
+	        console.assert(this._newInstance == null);
+	      }
+	
+	      var observedAttributes = definition.observedAttributes;
+	      if (definition.attributeChangedCallback && observedAttributes.length > 0) {
+	        this._attributeObserver.observe(element, {
+	          attributes: true,
+	          attributeOldValue: true,
+	          attributeFilter: observedAttributes
+	        });
+	
+	        // Trigger attributeChangedCallback for existing attributes.
+	        // https://html.spec.whatwg.org/multipage/scripting.html#upgrades
+	        for (var i = 0; i < observedAttributes.length; i++) {
+	          var name = observedAttributes[i];
+	          if (element.hasAttribute(name)) {
+	            var value = element.getAttribute(name);
+	            element.attributeChangedCallback(name, null, value);
+	          }
+	        }
+	      }
+	    },
+	
+	    /**
+	     * @private
+	     */
+	    _handleAttributeChange: function _handleAttributeChange(mutations) {
+	      for (var i = 0; i < mutations.length; i++) {
+	        var mutation = mutations[i];
+	        if (mutation.type === 'attributes') {
+	          var name = mutation.attributeName;
+	          var oldValue = mutation.oldValue;
+	          var target = mutation.target;
+	          var newValue = target.getAttribute(name);
+	          var namespace = mutation.attributeNamespace;
+	          target['attributeChangedCallback'](name, oldValue, newValue, namespace);
+	        }
+	      }
+	    }
+	  };
+	
+	  // Closure Compiler Exports
+	  window['CustomElementsRegistry'] = CustomElementsRegistry;
+	  CustomElementsRegistry.prototype['define'] = CustomElementsRegistry.prototype.define;
+	  CustomElementsRegistry.prototype['get'] = CustomElementsRegistry.prototype.get;
+	  CustomElementsRegistry.prototype['whenDefined'] = CustomElementsRegistry.prototype.whenDefined;
+	  CustomElementsRegistry.prototype['flush'] = CustomElementsRegistry.prototype.flush;
+	  CustomElementsRegistry.prototype['polyfilled'] = CustomElementsRegistry.prototype.polyfilled;
+	  CustomElementsRegistry.prototype['enableFlush'] = CustomElementsRegistry.prototype.enableFlush;
+	
+	  // patch window.HTMLElement
+	
+	  var origHTMLElement = win.HTMLElement;
+	  win.HTMLElement = function HTMLElement() {
+	    var customElements = win['customElements'];
+	    if (customElements._newInstance) {
+	      var i = customElements._newInstance;
+	      customElements._newInstance = null;
+	      return i;
+	    }
+	    if (this.constructor) {
+	      var tagName = customElements._constructors.get(this.constructor);
+	      return doc._createElement(tagName, false);
+	    }
+	    throw new Error('unknown constructor. Did you call customElements.define()?');
+	  };
+	  win.HTMLElement.prototype = Object.create(origHTMLElement.prototype);
+	  Object.defineProperty(win.HTMLElement.prototype, 'constructor', { value: win.HTMLElement });
+	
+	  // patch all built-in subclasses of HTMLElement to inherit from the new HTMLElement
+	  // See https://html.spec.whatwg.org/multipage/indices.html#element-interfaces
+	
+	  /** @const */
+	  var htmlElementSubclasses = ['Button', 'Canvas', 'Data', 'Head', 'Mod', 'TableCell', 'TableCol', 'Anchor', 'Area', 'Base', 'Body', 'BR', 'DataList', 'Details', 'Dialog', 'Div', 'DList', 'Embed', 'FieldSet', 'Form', 'Heading', 'HR', 'Html', 'IFrame', 'Image', 'Input', 'Keygen', 'Label', 'Legend', 'LI', 'Link', 'Map', 'Media', 'Menu', 'MenuItem', 'Meta', 'Meter', 'Object', 'OList', 'OptGroup', 'Option', 'Output', 'Paragraph', 'Param', 'Picture', 'Pre', 'Progress', 'Quote', 'Script', 'Select', 'Slot', 'Source', 'Span', 'Style', 'TableCaption', 'Table', 'TableRow', 'TableSection', 'Template', 'TextArea', 'Time', 'Title', 'Track', 'UList', 'Unknown'];
+	
+	  for (var i = 0; i < htmlElementSubclasses.length; i++) {
+	    var ctor = window['HTML' + htmlElementSubclasses[i] + 'Element'];
+	    if (ctor) {
+	      ctor.prototype.__proto__ = win.HTMLElement.prototype;
+	    }
+	  }
+	
+	  // patch doc.createElement
+	
+	  var rawCreateElement = doc.createElement;
+	  doc._createElement = function (tagName, callConstructor) {
+	    var customElements = win['customElements'];
+	    var element = rawCreateElement.call(doc, tagName);
+	    var definition = customElements._definitions.get(tagName.toLowerCase());
+	    if (definition) {
+	      customElements._upgradeElement(element, definition, callConstructor);
+	    }
+	    customElements._observeRoot(element);
+	    return element;
+	  };
+	  doc.createElement = function (tagName) {
+	    return doc._createElement(tagName, true);
+	  };
+	
+	  // patch doc.createElementNS
+	
+	  var HTMLNS = 'http://www.w3.org/1999/xhtml';
+	  var _origCreateElementNS = doc.createElementNS;
+	  doc.createElementNS = function (namespaceURI, qualifiedName) {
+	    if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
+	      return doc.createElement(qualifiedName);
+	    } else {
+	      return _origCreateElementNS.call(document, namespaceURI, qualifiedName);
+	    }
+	  };
+	
+	  // patch Element.attachShadow
+	
+	  var _origAttachShadow = Element.prototype['attachShadow'];
+	  if (_origAttachShadow) {
+	    Object.defineProperty(Element.prototype, 'attachShadow', {
+	      value: function value(options) {
+	        var root = _origAttachShadow.call(this, options);
+	        var customElements = win['customElements'];
+	        customElements._observeRoot(root);
+	        return root;
+	      }
+	    });
+	  }
+	
+	  /** @type {CustomElementsRegistry} */
+	  window['customElements'] = new CustomElementsRegistry();
+	})();
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	(function (global, factory) {
+	  ( false ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(3), __webpack_require__(5)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(3), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skatejsNamedSlots = global.skatejsNamedSlots || {}, global.debounce, global.customEventPolyfill);
+	})(undefined, function (exports, debounce, customEventPolyfill) {
+	
+	  debounce = 'default' in debounce ? debounce['default'] : debounce;
+	
+	  function eachChildNode(node, func) {
+	    if (!node) {
+	      return;
+	    }
+	
+	    var chs = node.childNodes;
+	    var chsLen = chs.length;
+	    for (var a = 0; a < chsLen; a++) {
+	      var ret = func(chs[a], a, chs);
+	      if (typeof ret !== 'undefined') {
+	        return ret; // eslint-disable-line consistent-return
+	      }
+	    }
+	  }
+	
+	  // Re-implemented to avoid Array.prototype.slice.call for performance reasons
+	  function reverse(arr) {
+	    var reversedArray = [];
+	    for (var i = arr.length - 1; i >= 0; i--) {
+	      reversedArray.push(arr[i]);
+	    }
+	    return reversedArray;
+	  }
+	
+	  /**
+	   * Execute func over all child nodes or a document fragment, or a single node
+	   * @param node the node or document fragment
+	   * @param func a function to execute on node or the children of node, if node is a document fragment.
+	   *        func may optionally append the node elsewhere, in the case of a document fragment
+	   */
+	  function eachNodeOrFragmentNodes(node, func) {
+	    if (node instanceof DocumentFragment) {
+	      var chs = node.childNodes;
+	      var chsLen = chs.length;
+	
+	      // We must iterate in reverse to handle the case where child nodes are moved elsewhere during execution
+	      for (var a = chsLen - 1; a >= 0; a--) {
+	        var thisNode = reverse(node.childNodes)[a];
+	        func(thisNode, a);
+	      }
+	    } else {
+	      func(node, 0);
+	    }
+	  }
+	
+	  var div = document.createElement('div');
+	
+	  function getPrototype(obj, key) {
+	    var descriptor = void 0;
+	
+	    while (obj && !(descriptor = Object.getOwnPropertyDescriptor(obj, key))) {
+	      // eslint-disable-line no-cond-assign
+	      obj = Object.getPrototypeOf(obj);
+	    }
+	    return descriptor;
+	  }
+	  function getPropertyDescriptor(obj, key) {
+	    if (obj instanceof Node) {
+	      obj = div;
+	    }
+	    var proto = getPrototype(obj, key);
+	
+	    if (proto) {
+	      var getter = proto.get;
+	      var setter = proto.set;
+	      var _descriptor = {
+	        configurable: true,
+	        enumerable: true
+	      };
+	
+	      if (getter) {
+	        _descriptor.get = getter;
+	        _descriptor.set = setter;
+	        return _descriptor;
+	      } else if (typeof obj[key] === 'function') {
+	        _descriptor.value = obj[key];
+	        return _descriptor;
+	      }
+	    }
+	
+	    var descriptor = Object.getOwnPropertyDescriptor(obj, key);
+	    if (descriptor && descriptor.get) {
+	      return descriptor;
+	    }
+	  }
+	
+	  var nativeParentNode = getPropertyDescriptor(Element.prototype, 'innerHTML');
+	
+	  var canPatchNativeAccessors = !!nativeParentNode;
+	
+	  /**
+	   * See https://w3c.github.io/DOM-Parsing/#serializing
+	   * @param {TextNode}
+	   * @returns {string}
+	   */
+	  function getEscapedTextContent(textNode) {
+	    return textNode.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	  }
+	
+	  /**
+	   * @returns {string}
+	   * @param {commentNode}
+	   */
+	  function getCommentNodeOuterHtml(commentNode) {
+	    return commentNode.text || "<!--" + commentNode.textContent + "-->";
+	  }
+	
+	  function isSlotNode(node) {
+	    return node.tagName === 'SLOT';
+	  }
+	
+	  function findSlots(root) {
+	    var slots = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+	    var childNodes = root.childNodes;
+	
+	    if (!childNodes || root.nodeType !== Node.ELEMENT_NODE) {
+	      return slots;
+	    }
+	
+	    var length = childNodes.length;
+	
+	    for (var a = 0; a < length; a++) {
+	      var childNode = childNodes[a];
+	
+	      if (isSlotNode(childNode)) {
+	        slots.push(childNode);
+	      }
+	      findSlots(childNode, slots);
+	    }
+	
+	    return slots;
+	  }
+	
+	  function isRootNode(node) {
+	    return node.tagName === '_SHADOW_ROOT_';
+	  }
+	
+	  var pseudoArrayToArray = function pseudoArrayToArray(pseudoArray) {
+	    return Array.prototype.slice.call(pseudoArray);
+	  };
+	
+	  var version = '0.0.1';
+	
+	  /**
+	   * @license
+	   * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+	   * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+	   * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+	   * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+	   * Code distributed by Google as part of the polymer project is also
+	   * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+	   */
+	
+	  if (typeof WeakMap === 'undefined') {
+	    (function () {
+	      var defineProperty = Object.defineProperty;
+	      var counter = Date.now() % 1e9;
+	
+	      var WeakMap = function WeakMap() {
+	        this.name = '__st' + (Math.random() * 1e9 >>> 0) + (counter++ + '__');
+	      };
+	
+	      WeakMap.prototype = {
+	        set: function set(key, value) {
+	          var entry = key[this.name];
+	          if (entry && entry[0] === key) entry[1] = value;else defineProperty(key, this.name, { value: [key, value], writable: true });
+	          return this;
+	        },
+	        get: function get(key) {
+	          var entry;
+	          return (entry = key[this.name]) && entry[0] === key ? entry[1] : undefined;
+	        },
+	        delete: function _delete(key) {
+	          var entry = key[this.name];
+	          if (!entry || entry[0] !== key) return false;
+	          entry[0] = entry[1] = undefined;
+	          return true;
+	        },
+	        has: function has(key) {
+	          var entry = key[this.name];
+	          if (!entry) return false;
+	          return entry[0] === key;
+	        }
+	      };
+	
+	      window.WeakMap = WeakMap;
+	    })();
+	  }
+	
+	  var arrProto = Array.prototype;
+	  var forEach = arrProto.forEach;
+	
+	  // We use a real DOM node for a shadow root. This is because the host node
+	  // basically becomes a virtual entry point for your element leaving the shadow
+	  // root the only thing that can receive instructions on how the host should
+	  // render to the browser.
+	
+	  var defaultShadowRootTagName = '_shadow_root_';
+	
+	  // * WebKit only *
+	  //
+	  // These members we need cannot override as we require native access to their
+	  // original values at some point.
+	  var polyfillAtRuntime = ['childNodes', 'parentNode'];
+	
+	  // Some properties that should not be overridden in the Text prototype.
+	  var doNotOverridePropertiesInTextNodes = ['textContent'];
+	
+	  // Some new properties that should be defined in the Text prototype.
+	  var defineInTextNodes = ['assignedSlot'];
+	
+	  // Some properties that should not be overridden in the Comment prototype.
+	  var doNotOverridePropertiesInCommNodes = ['textContent'];
+	
+	  // Some new properties that should be defined in the Comment prototype.
+	  var defineInCommNodes = [];
+	
+	  // Nodes that should be slotted
+	  var slottedNodeTypes = [Node.ELEMENT_NODE, Node.TEXT_NODE];
+	
+	  // Private data stores.
+	  var assignedToSlotMap = new WeakMap();
+	  var hostToModeMap = new WeakMap();
+	  var hostToRootMap = new WeakMap();
+	  var nodeToChildNodesMap = new WeakMap();
+	  var nodeToParentNodeMap = new WeakMap();
+	  var nodeToSlotMap = new WeakMap();
+	  var rootToHostMap = new WeakMap();
+	  var rootToSlotMap = new WeakMap();
+	  var slotToRootMap = new WeakMap();
+	
+	  // Unfortunately manual DOM parsing is because of WebKit.
+	  var parser = new DOMParser();
+	  function parse(html) {
+	    var tree = document.createElement('div');
+	
+	    // Everything not WebKit can do this easily.
+	    if (canPatchNativeAccessors) {
+	      tree.__innerHTML = html;
+	      return tree;
+	    }
+	
+	    var parsed = parser.parseFromString('<div>' + html + '</div>', 'text/html').body.firstChild;
+	
+	    while (parsed.hasChildNodes()) {
+	      var firstChild = parsed.firstChild;
+	      parsed.removeChild(firstChild);
+	      tree.appendChild(firstChild);
+	    }
+	
+	    // Need to import the node to initialise the custom elements from the parser.
+	    return document.importNode(tree, true);
+	  }
+	
+	  function staticProp(obj, name, value) {
+	    Object.defineProperty(obj, name, {
+	      configurable: true,
+	      get: function get() {
+	        return value;
+	      }
+	    });
+	  }
+	
+	  // Slotting helpers.
+	
+	  function arrayItem(idx) {
+	    return this[idx];
+	  }
+	
+	  function makeLikeNodeList(arr) {
+	    arr.item = arrayItem;
+	    return arr;
+	  }
+	
+	  function isHostNode(node) {
+	    return !!hostToRootMap.get(node);
+	  }
+	
+	  function getNodeType(node) {
+	    if (isHostNode(node)) {
+	      return 'host';
+	    }
+	
+	    if (isSlotNode(node)) {
+	      return 'slot';
+	    }
+	
+	    if (isRootNode(node)) {
+	      return 'root';
+	    }
+	
+	    return 'node';
+	  }
+	
+	  function findClosest(node, func) {
+	    while (node) {
+	      if (node === document) {
+	        break;
+	      }
+	      if (func(node)) {
+	        return node;
+	      }
+	      node = node.parentNode;
+	    }
+	  }
+	
+	  function getSlotNameFromSlot(node) {
+	    return node.getAttribute && node.getAttribute('name') || 'default';
+	  }
+	
+	  function getSlotNameFromNode(node) {
+	    return node.getAttribute && node.getAttribute('slot') || 'default';
+	  }
+	
+	  function slotNodeIntoSlot(slot, node, insertBefore) {
+	    // Don't slot nodes that have content but are only whitespace. This is an
+	    // anomaly that I don't think the spec deals with.
+	    //
+	    // The problem is:
+	    //
+	    // - If you insert HTML with indentation into the page, there will be
+	    //   whitespace and if that's inserted it messes with fallback content
+	    //   calculation where there is formatting, but no meaningful content, so in
+	    //   theory it should fallback. Since you can attach a shadow root after we
+	    //   mean to insert an empty text node and have it "count", we can't really
+	    //   discard nodes that are considered formatting at the time of attachment.
+	    // - You can insert a text node and modify its text content later.
+	    //   Incremental DOM seems to do this. Every way I look at it, it seems
+	    //   problematic that we should have to screen for content, but I don't seems
+	    //   much of a way around it at the moment.
+	    if (node.nodeType === 3 && node.textContent && node.textContent.trim().length === 0) {
+	      return;
+	    }
+	
+	    // only Text and Element nodes should be slotted
+	    if (slottedNodeTypes.indexOf(node.nodeType) === -1) {
+	      return;
+	    }
+	
+	    var assignedNodes = slot.assignedNodes();
+	    var shouldGoIntoContentMode = assignedNodes.length === 0;
+	    var slotInsertBeforeIndex = assignedNodes.indexOf(insertBefore);
+	
+	    // Assign the slot to the node internally.
+	    nodeToSlotMap.set(node, slot);
+	
+	    // Remove the fallback content and state if we're going into content mode.
+	    if (shouldGoIntoContentMode) {
+	      forEach.call(slot.childNodes, function (child) {
+	        return slot.__removeChild(child);
+	      });
+	    }
+	
+	    if (slotInsertBeforeIndex > -1) {
+	      slot.__insertBefore(node, insertBefore !== undefined ? insertBefore : null);
+	      assignedNodes.splice(slotInsertBeforeIndex, 0, node);
+	    } else {
+	      slot.__appendChild(node);
+	      assignedNodes.push(node);
+	    }
+	
+	    slot.____triggerSlotChangeEvent();
+	  }
+	
+	  function slotNodeFromSlot(node) {
+	    var slot = node.assignedSlot;
+	
+	    if (slot) {
+	      var assignedNodes = slot.assignedNodes();
+	      var index = assignedNodes.indexOf(node);
+	
+	      if (index > -1) {
+	        var shouldGoIntoDefaultMode = assignedNodes.length === 1;
+	
+	        assignedNodes.splice(index, 1);
+	        nodeToSlotMap.set(node, null);
+	
+	        // Actually remove the child.
+	        slot.__removeChild(node);
+	
+	        // If this was the last slotted node, then insert fallback content.
+	        if (shouldGoIntoDefaultMode) {
+	          forEach.call(slot.childNodes, function (child) {
+	            return slot.__appendChild(child);
+	          });
+	        }
+	
+	        slot.____triggerSlotChangeEvent();
+	      }
+	    }
+	  }
+	
+	  // Returns the index of the node in the host's childNodes.
+	  function indexOfNode(host, node) {
+	    var chs = host.childNodes;
+	    var chsLen = chs.length;
+	    for (var a = 0; a < chsLen; a++) {
+	      if (chs[a] === node) {
+	        return a;
+	      }
+	    }
+	    return -1;
+	  }
+	
+	  // Adds the node to the list of childNodes on the host and fakes any necessary
+	  // information such as parentNode.
+	  function registerNode(host, node, insertBefore, func) {
+	    var index = indexOfNode(host, insertBefore);
+	    eachNodeOrFragmentNodes(node, function (eachNode, eachIndex) {
+	      func(eachNode, eachIndex);
+	
+	      if (canPatchNativeAccessors) {
+	        nodeToParentNodeMap.set(eachNode, host);
+	      } else {
+	        staticProp(eachNode, 'parentNode', host);
+	      }
+	
+	      if (index > -1) {
+	        arrProto.splice.call(host.childNodes, index + eachIndex, 0, eachNode);
+	      } else {
+	        arrProto.push.call(host.childNodes, eachNode);
+	      }
+	    });
+	  }
+	
+	  // Cleans up registerNode().
+	  function unregisterNode(host, node, func) {
+	    var index = indexOfNode(host, node);
+	
+	    if (index > -1) {
+	      func(node, 0);
+	
+	      if (canPatchNativeAccessors) {
+	        nodeToParentNodeMap.set(node, null);
+	      } else {
+	        staticProp(node, 'parentNode', null);
+	      }
+	
+	      arrProto.splice.call(host.childNodes, index, 1);
+	    }
+	  }
+	
+	  function addNodeToNode(host, node, insertBefore) {
+	    registerNode(host, node, insertBefore, function (eachNode) {
+	      host.__insertBefore(eachNode, insertBefore !== undefined ? insertBefore : null);
+	    });
+	  }
+	
+	  function addNodeToHost(host, node, insertBefore) {
+	    registerNode(host, node, insertBefore, function (eachNode) {
+	      var rootNode = hostToRootMap.get(host);
+	      var slotNodes = rootToSlotMap.get(rootNode);
+	      var slotNode = slotNodes[getSlotNameFromNode(eachNode)];
+	      if (slotNode) {
+	        slotNodeIntoSlot(slotNode, eachNode, insertBefore);
+	      }
+	    });
+	  }
+	
+	  function addSlotToRoot(root, slot) {
+	    var slotName = getSlotNameFromSlot(slot);
+	
+	    // Ensure a slot node's childNodes are overridden at the earliest point
+	    // possible for WebKit.
+	    if (!canPatchNativeAccessors && !Array.isArray(slot.childNodes)) {
+	      staticProp(slot, 'childNodes', pseudoArrayToArray(slot.childNodes));
+	    }
+	
+	    rootToSlotMap.get(root)[slotName] = slot;
+	
+	    if (!slotToRootMap.has(slot)) {
+	      slotToRootMap.set(slot, root);
+	    }
+	
+	    eachChildNode(rootToHostMap.get(root), function (eachNode) {
+	      if (!eachNode.assignedSlot && slotName === getSlotNameFromNode(eachNode)) {
+	        slotNodeIntoSlot(slot, eachNode);
+	      }
+	    });
+	  }
+	
+	  function addNodeToRoot(root, node, insertBefore) {
+	    eachNodeOrFragmentNodes(node, function (child) {
+	      if (isSlotNode(child)) {
+	        addSlotToRoot(root, child);
+	      } else {
+	        var slotNodes = findSlots(child);
+	        if (slotNodes) {
+	          var slotNodesLen = slotNodes.length;
+	          for (var a = 0; a < slotNodesLen; a++) {
+	            addSlotToRoot(root, slotNodes[a]);
+	          }
+	        }
+	      }
+	    });
+	    addNodeToNode(root, node, insertBefore);
+	  }
+	
+	  // Adds a node to a slot. In other words, adds default content to a slot. It
+	  // ensures that if the slot doesn't have any assigned nodes yet, that the node
+	  // is actually displayed, otherwise it's just registered as child content.
+	  function addNodeToSlot(slot, node, insertBefore) {
+	    var isInDefaultMode = slot.assignedNodes().length === 0;
+	    registerNode(slot, node, insertBefore, function (eachNode) {
+	      if (isInDefaultMode) {
+	        slot.__insertBefore(eachNode, insertBefore !== undefined ? insertBefore : null);
+	      }
+	    });
+	  }
+	
+	  // Removes a node from a slot (default content). It ensures that if the slot
+	  // doesn't have any assigned nodes yet, that the node is actually removed,
+	  // otherwise it's just unregistered.
+	  function removeNodeFromSlot(slot, node) {
+	    var isInDefaultMode = slot.assignedNodes().length === 0;
+	    unregisterNode(slot, node, function () {
+	      if (isInDefaultMode) {
+	        slot.__removeChild(node);
+	      }
+	    });
+	  }
+	
+	  function removeNodeFromNode(host, node) {
+	    unregisterNode(host, node, function () {
+	      host.__removeChild(node);
+	    });
+	  }
+	
+	  function removeNodeFromHost(host, node) {
+	    unregisterNode(host, node, function () {
+	      slotNodeFromSlot(node);
+	    });
+	  }
+	
+	  function removeSlotFromRoot(root, node) {
+	    node.assignedNodes().forEach(slotNodeFromSlot);
+	    delete rootToSlotMap.get(root)[getSlotNameFromSlot(node)];
+	    slotToRootMap.delete(node);
+	  }
+	
+	  function removeNodeFromRoot(root, node) {
+	    unregisterNode(root, node, function () {
+	      if (isSlotNode(node)) {
+	        removeSlotFromRoot(root, node);
+	      } else {
+	        var nodes = findSlots(node);
+	        if (nodes) {
+	          for (var a = 0; a < nodes.length; a++) {
+	            removeSlotFromRoot(root, nodes[a]);
+	          }
+	        }
+	      }
+	      root.__removeChild(node);
+	    });
+	  }
+	
+	  // TODO terribly inefficient
+	  function getRootNode(host) {
+	    if (isRootNode(host)) {
+	      return host;
+	    }
+	
+	    if (!host.parentNode) {
+	      return;
+	    }
+	
+	    return getRootNode(host.parentNode);
+	  }
+	
+	  function appendChildOrInsertBefore(host, newNode, refNode) {
+	    var nodeType = getNodeType(host);
+	    var parentNode = newNode.parentNode;
+	    var rootNode = getRootNode(host);
+	
+	    // Ensure childNodes is patched so we can manually update it for WebKit.
+	    if (!canPatchNativeAccessors && !Array.isArray(host.childNodes)) {
+	      staticProp(host, 'childNodes', pseudoArrayToArray(host.childNodes));
+	    }
+	
+	    if (rootNode && getNodeType(newNode) === 'slot') {
+	      addSlotToRoot(rootNode, newNode);
+	    }
+	
+	    // If we append a child to a host, the host tells the shadow root to distribute
+	    // it. If the root decides it doesn't need to be distributed, it is never
+	    // removed from the old parent because in polyfill land we store a reference
+	    // to the node but we don't move it. Due to that, we must explicitly remove the
+	    // node from its old parent.
+	    if (parentNode && getNodeType(parentNode) === 'host') {
+	      if (canPatchNativeAccessors) {
+	        nodeToParentNodeMap.set(newNode, null);
+	      } else {
+	        staticProp(newNode, 'parentNode', null);
+	      }
+	    }
+	
+	    if (nodeType === 'node') {
+	      if (canPatchNativeAccessors) {
+	        nodeToParentNodeMap.set(newNode, host);
+	        return host.__insertBefore(newNode, refNode !== undefined ? refNode : null);
+	      }
+	
+	      return addNodeToNode(host, newNode, refNode);
+	    }
+	
+	    if (nodeType === 'slot') {
+	      return addNodeToSlot(host, newNode, refNode);
+	    }
+	
+	    if (nodeType === 'host') {
+	      return addNodeToHost(host, newNode, refNode);
+	    }
+	
+	    if (nodeType === 'root') {
+	      return addNodeToRoot(host, newNode, refNode);
+	    }
+	  }
+	
+	  function syncSlotChildNodes(node) {
+	    if (canPatchNativeAccessors && getNodeType(node) === 'slot' && node.__childNodes.length !== node.childNodes.length) {
+	      while (node.hasChildNodes()) {
+	        node.removeChild(node.firstChild);
+	      }
+	
+	      forEach.call(node.__childNodes, function (child) {
+	        return node.appendChild(child);
+	      });
+	    }
+	  }
+	
+	  var members = {
+	    // For testing purposes.
+	    ____assignedNodes: {
+	      get: function get() {
+	        return this.______assignedNodes || (this.______assignedNodes = []);
+	      }
+	    },
+	
+	    // For testing purposes.
+	    ____isInFallbackMode: {
+	      get: function get() {
+	        return this.assignedNodes().length === 0;
+	      }
+	    },
+	
+	    ____slotChangeListeners: {
+	      get: function get() {
+	        if (typeof this.______slotChangeListeners === 'undefined') {
+	          this.______slotChangeListeners = 0;
+	        }
+	        return this.______slotChangeListeners;
+	      },
+	      set: function set(value) {
+	        this.______slotChangeListeners = value;
+	      }
+	    },
+	    ____triggerSlotChangeEvent: {
+	      value: debounce(function callback() {
+	        if (this.____slotChangeListeners) {
+	          this.dispatchEvent(new CustomEvent('slotchange', {
+	            bubbles: false,
+	            cancelable: false
+	          }));
+	        }
+	      })
+	    },
+	    addEventListener: {
+	      value: function value(name, func, opts) {
+	        if (name === 'slotchange' && isSlotNode(this)) {
+	          this.____slotChangeListeners++;
+	        }
+	        return this.__addEventListener(name, func, opts);
+	      }
+	    },
+	    appendChild: {
+	      value: function value(newNode) {
+	        appendChildOrInsertBefore(this, newNode);
+	        return newNode;
+	      }
+	    },
+	    assignedSlot: {
+	      get: function get() {
+	        var slot = nodeToSlotMap.get(this);
+	
+	        if (!slot) {
+	          return null;
+	        }
+	
+	        var root = slotToRootMap.get(slot);
+	        var host = rootToHostMap.get(root);
+	        var mode = hostToModeMap.get(host);
+	
+	        return mode === 'open' ? slot : null;
+	      }
+	    },
+	    attachShadow: {
+	      value: function value(opts) {
+	        var _this = this;
+	
+	        var mode = opts && opts.mode;
+	        if (mode !== 'closed' && mode !== 'open') {
+	          throw new Error('You must specify { mode } as "open" or "closed" to attachShadow().');
+	        }
+	
+	        // Return the existing shadow root if it exists.
+	        var existingShadowRoot = hostToRootMap.get(this);
+	        if (existingShadowRoot) {
+	          return existingShadowRoot;
+	        }
+	
+	        var lightNodes = makeLikeNodeList([].slice.call(this.childNodes));
+	        var shadowRoot = document.createElement(opts.polyfillShadowRootTagName || defaultShadowRootTagName);
+	
+	        // Host and shadow root data.
+	        hostToModeMap.set(this, mode);
+	        hostToRootMap.set(this, shadowRoot);
+	        rootToHostMap.set(shadowRoot, this);
+	        rootToSlotMap.set(shadowRoot, {});
+	
+	        if (canPatchNativeAccessors) {
+	          nodeToChildNodesMap.set(this, lightNodes);
+	        } else {
+	          staticProp(this, 'childNodes', lightNodes);
+	        }
+	
+	        // Process light DOM.
+	        lightNodes.forEach(function (node) {
+	          // Existing children should be removed from being displayed, but still
+	          // appear to be child nodes. This is how light DOM works; they're still
+	          // child nodes but not in the composed DOM yet as there won't be any
+	          // slots for them to go into.
+	          _this.__removeChild(node);
+	
+	          // We must register the parentNode here as this has the potential to
+	          // become out of sync if the node is moved before being slotted.
+	          if (canPatchNativeAccessors) {
+	            nodeToParentNodeMap.set(node, _this);
+	          } else {
+	            staticProp(node, 'parentNode', _this);
+	          }
+	        });
+	
+	        // The shadow root is actually the only child of the host.
+	        return this.__appendChild(shadowRoot);
+	      }
+	    },
+	    childElementCount: {
+	      get: function get() {
+	        return this.children.length;
+	      }
+	    },
+	    childNodes: {
+	      get: function get() {
+	        if (canPatchNativeAccessors && getNodeType(this) === 'node') {
+	          return this.__childNodes;
+	        }
+	        var childNodes = nodeToChildNodesMap.get(this);
+	
+	        if (!childNodes) {
+	          nodeToChildNodesMap.set(this, childNodes = makeLikeNodeList([]));
+	        }
+	
+	        return childNodes;
+	      }
+	    },
+	    children: {
+	      get: function get() {
+	        var chs = [];
+	        eachChildNode(this, function (node) {
+	          if (node.nodeType === 1) {
+	            chs.push(node);
+	          }
+	        });
+	        return makeLikeNodeList(chs);
+	      }
+	    },
+	    firstChild: {
+	      get: function get() {
+	        return this.childNodes[0] || null;
+	      }
+	    },
+	    firstElementChild: {
+	      get: function get() {
+	        return this.children[0] || null;
+	      }
+	    },
+	    assignedNodes: {
+	      value: function value() {
+	        if (isSlotNode(this)) {
+	          var assigned = assignedToSlotMap.get(this);
+	
+	          if (!assigned) {
+	            assignedToSlotMap.set(this, assigned = []);
+	          }
+	
+	          return assigned;
+	        }
+	      }
+	    },
+	    hasChildNodes: {
+	      value: function value() {
+	        return this.childNodes.length > 0;
+	      }
+	    },
+	    innerHTML: {
+	      get: function get() {
+	        var innerHTML = '';
+	
+	        var getHtmlNodeOuterHtml = function getHtmlNodeOuterHtml(node) {
+	          return node.outerHTML;
+	        };
+	        var getOuterHtmlByNodeType = {
+	          1: getHtmlNodeOuterHtml,
+	          3: getEscapedTextContent,
+	          8: getCommentNodeOuterHtml
+	        };
+	
+	        eachChildNode(this, function (node) {
+	          var getOuterHtml = getOuterHtmlByNodeType[node.nodeType] || getHtmlNodeOuterHtml;
+	          innerHTML += getOuterHtml(node);
+	        });
+	        return innerHTML;
+	      },
+	      set: function set(innerHTML) {
+	        var parsed = parse(innerHTML);
+	
+	        while (this.hasChildNodes()) {
+	          this.removeChild(this.firstChild);
+	        }
+	
+	        // when we are doing this: root.innerHTML = "<slot><div></div></slot>";
+	        // slot.__childNodes is out of sync with slot.childNodes.
+	        // to fix it we have to manually remove and insert them
+	        var slots = findSlots(parsed);
+	        forEach.call(slots, function (slot) {
+	          return syncSlotChildNodes(slot);
+	        });
+	
+	        while (parsed.hasChildNodes()) {
+	          var firstChild = parsed.firstChild;
+	
+	          // When we polyfill everything on HTMLElement.prototype, we overwrite
+	          // properties. This makes it so that parentNode reports null even though
+	          // it's actually a parent of the HTML parser. For this reason,
+	          // cleanNode() won't work and we must manually remove it from the
+	          // parser before it is moved to the host just in case it's added as a
+	          // light node but not assigned to a slot.
+	          parsed.removeChild(firstChild);
+	
+	          this.appendChild(firstChild);
+	        }
+	      }
+	    },
+	    insertBefore: {
+	      value: function value(newNode, refNode) {
+	        appendChildOrInsertBefore(this, newNode, refNode);
+	
+	        return newNode;
+	      }
+	    },
+	    lastChild: {
+	      get: function get() {
+	        var ch = this.childNodes;
+	        return ch[ch.length - 1] || null;
+	      }
+	    },
+	    lastElementChild: {
+	      get: function get() {
+	        var ch = this.children;
+	        return ch[ch.length - 1] || null;
+	      }
+	    },
+	    name: {
+	      get: function get() {
+	        return this.getAttribute('name');
+	      },
+	      set: function set(name) {
+	        return this.setAttribute('name', name);
+	      }
+	    },
+	    nextSibling: {
+	      get: function get() {
+	        var host = this;
+	        return eachChildNode(this.parentNode, function (child, index, nodes) {
+	          if (host === child) {
+	            return nodes[index + 1] || null;
+	          }
+	        });
+	      }
+	    },
+	    nextElementSibling: {
+	      get: function get() {
+	        var host = this;
+	        var found = void 0;
+	        return eachChildNode(this.parentNode, function (child) {
+	          if (found && child.nodeType === 1) {
+	            return child;
+	          }
+	          if (host === child) {
+	            found = true;
+	          }
+	        });
+	      }
+	    },
+	    outerHTML: {
+	      get: function get() {
+	        var name = this.tagName.toLowerCase();
+	        var attributes = Array.prototype.slice.call(this.attributes).map(function (attr) {
+	          return ' ' + attr.name + (attr.value ? '="' + attr.value + '"' : '');
+	        }).join('');
+	        return '<' + name + attributes + '>' + this.innerHTML + '</' + name + '>';
+	      },
+	      set: function set(outerHTML) {
+	        if (this.parentNode) {
+	          var parsed = parse(outerHTML);
+	          this.parentNode.replaceChild(parsed.firstChild, this);
+	        } else {
+	          if (canPatchNativeAccessors) {
+	            this.__outerHTML = outerHTML; // this will throw a native error;
+	          } else {
+	            throw new Error('Failed to set the \'outerHTML\' property on \'Element\': This element has no parent node.');
+	          }
+	        }
+	      }
+	    },
+	    parentElement: {
+	      get: function get() {
+	        return findClosest(this.parentNode, function (node) {
+	          return node.nodeType === 1;
+	        });
+	      }
+	    },
+	    parentNode: {
+	      get: function get() {
+	        return nodeToParentNodeMap.get(this) || this.__parentNode || null;
+	      }
+	    },
+	    previousSibling: {
+	      get: function get() {
+	        var host = this;
+	        return eachChildNode(this.parentNode, function (child, index, nodes) {
+	          if (host === child) {
+	            return nodes[index - 1] || null;
+	          }
+	        });
+	      }
+	    },
+	    previousElementSibling: {
+	      get: function get() {
+	        var host = this;
+	        var found = void 0;
+	        return eachChildNode(this.parentNode, function (child) {
+	          if (found && host === child) {
+	            return found;
+	          }
+	          if (child.nodeType === 1) {
+	            found = child;
+	          }
+	        });
+	      }
+	    },
+	    removeChild: {
+	      value: function value(refNode) {
+	        var nodeType = getNodeType(this);
+	
+	        switch (nodeType) {
+	          case 'node':
+	            if (canPatchNativeAccessors) {
+	              nodeToParentNodeMap.set(refNode, null);
+	              return this.__removeChild(refNode);
+	            }
+	            removeNodeFromNode(this, refNode);
+	            break;
+	          case 'slot':
+	            removeNodeFromSlot(this, refNode);
+	            break;
+	          case 'host':
+	            removeNodeFromHost(this, refNode);
+	            break;
+	          case 'root':
+	            removeNodeFromRoot(this, refNode);
+	            break;
+	          default:
+	            break;
+	        }
+	        return refNode;
+	      }
+	    },
+	    removeEventListener: {
+	      value: function value(name, func, opts) {
+	        if (name === 'slotchange' && this.____slotChangeListeners && isSlotNode(this)) {
+	          this.____slotChangeListeners--;
+	        }
+	        return this.__removeEventListener(name, func, opts);
+	      }
+	    },
+	    replaceChild: {
+	      value: function value(newNode, refNode) {
+	        this.insertBefore(newNode, refNode);
+	        return this.removeChild(refNode);
+	      }
+	    },
+	    shadowRoot: {
+	      get: function get() {
+	        return hostToModeMap.get(this) === 'open' ? hostToRootMap.get(this) : null;
+	      }
+	    },
+	    textContent: {
+	      get: function get() {
+	        var textContent = '';
+	        eachChildNode(this, function (node) {
+	          if (node.nodeType !== Node.COMMENT_NODE) {
+	            textContent += node.textContent;
+	          }
+	        });
+	        return textContent;
+	      },
+	      set: function set(textContent) {
+	        while (this.hasChildNodes()) {
+	          this.removeChild(this.firstChild);
+	        }
+	        if (!textContent) {
+	          return;
+	        }
+	        this.appendChild(document.createTextNode(textContent));
+	      }
+	    }
+	  };
+	
+	  if (!('attachShadow' in document.createElement('div'))) {
+	    (function () {
+	      var commProto = Comment.prototype;
+	      var elementProto = HTMLElement.prototype;
+	      var svgProto = SVGElement.prototype;
+	      var textProto = Text.prototype;
+	      var textNode = document.createTextNode('');
+	      var commNode = document.createComment('');
+	
+	      Object.keys(members).forEach(function (memberName) {
+	        var memberProperty = members[memberName];
+	
+	        // All properties should be configurable.
+	        memberProperty.configurable = true;
+	
+	        // Applying to the data properties only since we can't have writable accessor properties.
+	        if (memberProperty.hasOwnProperty('value')) {
+	          memberProperty.writable = true;
+	        }
+	
+	        // Polyfill as much as we can and work around WebKit in other areas.
+	        if (canPatchNativeAccessors || polyfillAtRuntime.indexOf(memberName) === -1) {
+	          var nativeDescriptor = getPropertyDescriptor(elementProto, memberName);
+	          var nativeTextDescriptor = getPropertyDescriptor(textProto, memberName);
+	          var nativeCommDescriptor = getPropertyDescriptor(commProto, memberName);
+	          var shouldOverrideInTextNode = memberName in textNode && doNotOverridePropertiesInTextNodes.indexOf(memberName) === -1 || ~defineInTextNodes.indexOf(memberName);
+	          var shouldOverrideInCommentNode = memberName in commNode && doNotOverridePropertiesInCommNodes.indexOf(memberName) === -1 || ~defineInCommNodes.indexOf(memberName);
+	          var nativeMemberName = '__' + memberName;
+	
+	          Object.defineProperty(elementProto, memberName, memberProperty);
+	          Object.defineProperty(svgProto, memberName, memberProperty);
+	
+	          if (nativeDescriptor) {
+	            Object.defineProperty(elementProto, nativeMemberName, nativeDescriptor);
+	            Object.defineProperty(svgProto, nativeMemberName, nativeDescriptor);
+	          }
+	
+	          if (shouldOverrideInTextNode) {
+	            Object.defineProperty(textProto, memberName, memberProperty);
+	          }
+	
+	          if (shouldOverrideInTextNode && nativeTextDescriptor) {
+	            Object.defineProperty(textProto, nativeMemberName, nativeTextDescriptor);
+	          }
+	
+	          if (shouldOverrideInCommentNode) {
+	            Object.defineProperty(commProto, memberName, memberProperty);
+	          }
+	
+	          if (shouldOverrideInCommentNode && nativeCommDescriptor) {
+	            Object.defineProperty(commProto, nativeMemberName, nativeCommDescriptor);
+	          }
+	        }
+	      });
+	    })();
+	  }
+	
+	  exports['default'] = version;
+	
+	  Object.defineProperty(exports, '__esModule', { value: true });
+	});
+	//# sourceMappingURL=index.js.map
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	/**
+	 * Module dependencies.
+	 */
+	
+	var now = __webpack_require__(4);
+	
+	/**
+	 * Returns a function, that, as long as it continues to be invoked, will not
+	 * be triggered. The function will be called after it stops being called for
+	 * N milliseconds. If `immediate` is passed, trigger the function on the
+	 * leading edge, instead of the trailing.
+	 *
+	 * @source underscore.js
+	 * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+	 * @param {Function} function to wrap
+	 * @param {Number} timeout in ms (`100`)
+	 * @param {Boolean} whether to execute at the beginning (`false`)
+	 * @api public
+	 */
+	
+	module.exports = function debounce(func, wait, immediate) {
+	  var timeout, args, context, timestamp, result;
+	  if (null == wait) wait = 100;
+	
+	  function later() {
+	    var last = now() - timestamp;
+	
+	    if (last < wait && last > 0) {
+	      timeout = setTimeout(later, wait - last);
+	    } else {
+	      timeout = null;
+	      if (!immediate) {
+	        result = func.apply(context, args);
+	        if (!timeout) context = args = null;
+	      }
+	    }
+	  };
+	
+	  return function debounced() {
+	    context = this;
+	    args = arguments;
+	    timestamp = now();
+	    var callNow = immediate && !timeout;
+	    if (!timeout) timeout = setTimeout(later, wait);
+	    if (callNow) {
+	      result = func.apply(context, args);
+	      context = args = null;
+	    }
+	
+	    return result;
+	  };
+	};
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	module.exports = Date.now || now;
+	
+	function now() {
+	    return new Date().getTime();
+	}
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	// Polyfill for creating CustomEvents on IE9/10/11
+	
+	// code pulled from:
+	// https://github.com/d4tocchini/customevent-polyfill
+	// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
+	
+	try {
+	    var ce = new window.CustomEvent('test', {
+	        bubbles: false,
+	        cancelable: true,
+	        detail: {
+	            x: 'y'
+	        }
+	    });
+	    ce.preventDefault();
+	    if (ce.defaultPrevented !== true) {
+	        // IE has problems with .preventDefault() on custom events
+	        // http://stackoverflow.com/questions/23349191
+	        throw new Error('Could not prevent default');
+	    }
+	} catch (e) {
+	    var CustomEvent = function CustomEvent(event, params) {
+	        var evt;
+	        params = params || {
+	            bubbles: false,
+	            cancelable: false,
+	            detail: undefined
+	        };
+	
+	        evt = document.createEvent("CustomEvent");
+	        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+	        var origPrevent = evt.preventDefault;
+	        evt.preventDefault = function () {
+	            origPrevent.call(this);
+	            try {
+	                Object.defineProperty(this, 'defaultPrevented', {
+	                    get: function get() {
+	                        return true;
+	                    }
+	                });
+	            } catch (e) {
+	                this.defaultPrevented = true;
+	            }
+	        };
+	        return evt;
+	    };
+	
+	    CustomEvent.prototype = window.Event.prototype;
+	    window.CustomEvent = CustomEvent; // expose definition to window
+	}
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -83,24 +1848,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
 	
-	var _skatejs = __webpack_require__(2);
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
 	
-	var _pages = __webpack_require__(5);
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
 	
-	var _body = __webpack_require__(15);
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(7);
+	
+	var _pages = __webpack_require__(10);
+	
+	var _body = __webpack_require__(26);
 	
 	var _body2 = _interopRequireDefault(_body);
 	
-	var _header = __webpack_require__(17);
+	var _header = __webpack_require__(28);
 	
 	var _header2 = _interopRequireDefault(_header);
 	
-	var _router = __webpack_require__(20);
+	var _router = __webpack_require__(31);
 	
 	var _router2 = _interopRequireDefault(_router);
 	
-	var _title = __webpack_require__(21);
+	var _title = __webpack_require__(32);
 	
 	var _title2 = _interopRequireDefault(_title);
 	
@@ -139,7 +1925,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    _skatejs.vdom.elementOpen(_body2.default);
 	
-	    _skatejs.vdom.elementVoid(Page);
+	    _renderArbitrary(Page ? _skatejs.vdom.elementVoid(Page) : '');
 	
 	    _skatejs.vdom.elementClose(_body2.default);
 	
@@ -148,7 +1934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 2 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -156,7 +1942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	(function (global, factory) {
-	  ( false ? 'undefined' : _typeof2(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(3), __webpack_require__(4)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skate = global.skate || {}, global.IncrementalDOM, global.isNativeRegex);
+	  ( false ? 'undefined' : _typeof2(exports)) === 'object' && typeof module !== 'undefined' ? factory(exports, __webpack_require__(8), __webpack_require__(9)) :  true ? !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(8), __webpack_require__(9)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)) : factory(global.skate = global.skate || {}, global.IncrementalDOM, global.isNativeRegex);
 	})(undefined, function (exports, incrementalDom, isNativeRegex) {
 	
 	  isNativeRegex = 'default' in isNativeRegex ? isNativeRegex['default'] : isNativeRegex;
@@ -1304,7 +3090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=index.js.map
 
 /***/ },
-/* 3 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2380,7 +4166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=incremental-dom-cjs.js.map
 
 /***/ },
-/* 4 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2407,7 +4193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = new RegExp(re);
 
 /***/ },
-/* 5 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2417,11 +4203,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.Index = exports.Docs = undefined;
 	
-	var _docs = __webpack_require__(6);
+	var _docs = __webpack_require__(11);
 	
 	var _docs2 = _interopRequireDefault(_docs);
 	
-	var _index = __webpack_require__(12);
+	var _index = __webpack_require__(17);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
@@ -2431,7 +4217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Index = _index2.default;
 
 /***/ },
-/* 6 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2440,9 +4226,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	
-	var _skatejs = __webpack_require__(2);
+	var _skatejs = __webpack_require__(7);
 	
-	var _helpers = __webpack_require__(7);
+	var _helpers = __webpack_require__(12);
 	
 	exports.default = (0, _skatejs.define)('sk-page-docs', {
 	  render: function render() {
@@ -2467,7 +4253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 7 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2503,9 +4289,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	var _skatejs = __webpack_require__(2);
+	var _skatejs = __webpack_require__(7);
 	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(13);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
@@ -2538,7 +4324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/* globals require, module */
@@ -2549,7 +4335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Module dependencies.
 	 */
 	
-	var pathtoRegexp = __webpack_require__(10);
+	var pathtoRegexp = __webpack_require__(15);
 	
 	/**
 	 * Module exports.
@@ -3152,10 +4938,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	page.sameOrigin = sameOrigin;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 9 */
+/* 14 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3285,14 +5071,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 10 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
-	var isarray = __webpack_require__(11);
+	var isarray = __webpack_require__(16);
 	
 	/**
 	 * Expose `pathToRegexp`.
@@ -3683,7 +5469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 11 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3693,7 +5479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3723,15 +5509,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	var _skatejs = __webpack_require__(2);
+	var _skatejs = __webpack_require__(7);
 	
 	var skate = _interopRequireWildcard(_skatejs);
 	
-	var _index = __webpack_require__(13);
+	var _index = __webpack_require__(18);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _tabs = __webpack_require__(23);
+	var _tabs = __webpack_require__(20);
 	
 	var _tabs2 = _interopRequireDefault(_tabs);
 	
@@ -3885,10 +5671,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 /***/ },
-/* 13 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(14)();
+	exports = module.exports = __webpack_require__(19)();
 	// imports
 	
 	
@@ -3912,7 +5698,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 19 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3967,301 +5753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var _hasOwn = Object.prototype.hasOwnProperty;
-	
-	var _forOwn = function _forOwn(object, iterator) {
-	  for (var prop in object) {
-	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
-	  }
-	};
-	
-	var _renderArbitrary = function _renderArbitrary(child) {
-	  var type = typeof child;
-	
-	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.text(child);
-	  } else if (type === 'function' && child.__jsxDOMWrapper) {
-	    child();
-	  } else if (Array.isArray(child)) {
-	    child.forEach(_renderArbitrary);
-	  } else if (type === 'object' && String(child) === '[object Object]') {
-	    _forOwn(child, _renderArbitrary);
-	  }
-	};
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _index = __webpack_require__(16);
-	
-	var _index2 = _interopRequireDefault(_index);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = function (props, chren) {
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
-	
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(_index2.default.toString());
-	
-	  _skatejs.vdom.elementClose('style');
-	
-	  _renderArbitrary(chren());
-	
-	  return _skatejs.vdom.elementClose('div');
-	};
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(14)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 0 0}", ""]);
-	
-	// exports
-	exports.locals = {
-		"body": "JotV9DC7cFGUX61mmETT1",
-		"body": "JotV9DC7cFGUX61mmETT1"
-	};
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _renderArbitrary = function _renderArbitrary(child) {
-	  var type = typeof child;
-	
-	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
-	    _skatejs.vdom.text(child);
-	  } else if (type === 'function' && child.__jsxDOMWrapper) {
-	    child();
-	  } else if (Array.isArray(child)) {
-	    child.forEach(_renderArbitrary);
-	  } else if (type === 'object' && String(child) === '[object Object]') {
-	    _forOwn(child, _renderArbitrary);
-	  }
-	};
-	
-	var _attr = function _attr(value, name) {
-	  _skatejs.vdom.attr(name, value);
-	};
-	
-	var _hasOwn = Object.prototype.hasOwnProperty;
-	
-	var _forOwn = function _forOwn(object, iterator) {
-	  for (var prop in object) {
-	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
-	  }
-	};
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _helpers = __webpack_require__(7);
-	
-	var _index = __webpack_require__(18);
-	
-	var _index2 = _interopRequireDefault(_index);
-	
-	var _logo = __webpack_require__(19);
-	
-	var _logo2 = _interopRequireDefault(_logo);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var Item = function Item(props, chren) {
-	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
-	
-	  _renderArbitrary(props.external ? ((_skatejs.vdom.elementOpenStart('a'), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd('a')), _renderArbitrary(chren()), _skatejs.vdom.elementClose('a')) : ((_skatejs.vdom.elementOpenStart(_helpers.Link), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd(_helpers.Link)), _renderArbitrary(chren()), _skatejs.vdom.elementClose(_helpers.Link)));
-	
-	  return _skatejs.vdom.elementClose('li');
-	};
-	
-	exports.default = function (props) {
-	  _skatejs.vdom.elementOpen('div');
-	
-	  _skatejs.vdom.elementOpen('style');
-	
-	  _renderArbitrary(_index2.default.toString());
-	
-	  _skatejs.vdom.elementClose('style');
-	
-	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + (props.scrolled ? _index2.default.locals.scrolled : ''));
-	
-	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
-	
-	  _skatejs.vdom.elementOpen(_helpers.Link, null, null, 'href', '/');
-	
-	  _skatejs.vdom.elementVoid('img', null, null, 'alt', props.title, 'src', _logo2.default, 'width', '30');
-	
-	  _skatejs.vdom.elementClose(_helpers.Link);
-	
-	  _skatejs.vdom.elementClose('h1');
-	
-	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
-	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '/docs');
-	
-	  _skatejs.vdom.text('Docs');
-	
-	  _skatejs.vdom.elementClose(Item);
-	
-	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs', 'external', true);
-	
-	  _skatejs.vdom.text('Github');
-	
-	  _skatejs.vdom.elementClose(Item);
-	
-	  _skatejs.vdom.elementClose('ul');
-	
-	  _skatejs.vdom.elementClose('div');
-	
-	  return _skatejs.vdom.elementClose('div');
-	};
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(14)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._1P6DOElNwq3GvvXJFHGg0J{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
-	
-	// exports
-	exports.locals = {
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
-		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
-		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"list": "_3EU-FaAppzWRdOf0yzUQbO",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"title": "_1O98iTVLbgr87bKcZ1xtCv",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K",
-		"link": "_3gAAJyILxgLXLUDHVCLw1K"
-	};
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
-
-/***/ },
 /* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.Route = undefined;
-	
-	var _skatejs = __webpack_require__(2);
-	
-	var _page = __webpack_require__(8);
-	
-	var _page2 = _interopRequireDefault(_page);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function createRouteHandler(elem, detail) {
-	  return function () {
-	    (0, _skatejs.emit)(elem, 'RouteChange', { detail: detail });
-	  };
-	}
-	
-	function onRouteUpdate(elem) {
-	  return function (e) {
-	    var _e$target = e.target;
-	    var component = _e$target.component;
-	    var path = _e$target.path;
-	
-	    if (component && path) {
-	      var curr = window.location.pathname;
-	      (0, _page2.default)(path, createRouteHandler(elem, component));
-	      if (curr === path) {
-	        (0, _page2.default)(curr);
-	      }
-	    }
-	  };
-	}
-	
-	exports.default = (0, _skatejs.define)('sk-router', {
-	  created: function created(elem) {
-	    elem.addEventListener('RouteUpdate', onRouteUpdate(elem));
-	  }
-	});
-	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
-	  props: {
-	    component: {},
-	    path: {}
-	  },
-	  updated: function updated(elem) {
-	    var component = elem.component;
-	    var path = elem.path;
-	
-	    if (component && path) {
-	      (0, _skatejs.emit)(elem, 'RouteUpdate', {
-	        detail: { component: component, path: path }
-	      });
-	    }
-	  }
-	});
-
-/***/ },
-/* 21 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	exports.default = function (title) {
-	  document.title = title;
-	};
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(14)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4301,17 +5793,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	var _skatejs = __webpack_require__(2);
+	var _skatejs = __webpack_require__(7);
 	
-	var _classnames = __webpack_require__(24);
+	var _classnames = __webpack_require__(21);
 	
 	var _classnames2 = _interopRequireDefault(_classnames);
 	
-	var _index = __webpack_require__(26);
+	var _index = __webpack_require__(23);
 	
 	var _index2 = _interopRequireDefault(_index);
 	
-	var _tab = __webpack_require__(30);
+	var _tab = __webpack_require__(24);
 	
 	var _tab2 = _interopRequireDefault(_tab);
 	
@@ -4319,9 +5811,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
 	function onTabsChanged(elem) {
 	  return function () {
-	    return elem.tabs = [].slice.call(elem.children);
+	    return elem.tabs = [].concat(_toConsumableArray(elem.children));
 	  };
 	}
 	
@@ -4380,7 +5874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Tab = _tab2.default;
 
 /***/ },
-/* 24 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -4426,7 +5920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		if (typeof module !== 'undefined' && module.exports) {
 			module.exports = classNames;
-		} else if ("function" === 'function' && _typeof(__webpack_require__(25)) === 'object' && __webpack_require__(25)) {
+		} else if ("function" === 'function' && _typeof(__webpack_require__(22)) === 'object' && __webpack_require__(22)) {
 			// register as 'classnames', consistent with npm package name
 			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
@@ -4437,7 +5931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 /***/ },
-/* 25 */
+/* 22 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -4445,10 +5939,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 26 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(14)();
+	exports = module.exports = __webpack_require__(19)();
 	// imports
 	
 	
@@ -4466,97 +5960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	/**
-	 * Module dependencies.
-	 */
-	
-	var now = __webpack_require__(28);
-	
-	/**
-	 * Returns a function, that, as long as it continues to be invoked, will not
-	 * be triggered. The function will be called after it stops being called for
-	 * N milliseconds. If `immediate` is passed, trigger the function on the
-	 * leading edge, instead of the trailing.
-	 *
-	 * @source underscore.js
-	 * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
-	 * @param {Function} function to wrap
-	 * @param {Number} timeout in ms (`100`)
-	 * @param {Boolean} whether to execute at the beginning (`false`)
-	 * @api public
-	 */
-	
-	module.exports = function debounce(func, wait, immediate) {
-	  var timeout, args, context, timestamp, result;
-	  if (null == wait) wait = 100;
-	
-	  function later() {
-	    var last = now() - timestamp;
-	
-	    if (last < wait && last > 0) {
-	      timeout = setTimeout(later, wait - last);
-	    } else {
-	      timeout = null;
-	      if (!immediate) {
-	        result = func.apply(context, args);
-	        if (!timeout) context = args = null;
-	      }
-	    }
-	  };
-	
-	  return function debounced() {
-	    context = this;
-	    args = arguments;
-	    timestamp = now();
-	    var callNow = immediate && !timeout;
-	    if (!timeout) timeout = setTimeout(later, wait);
-	    if (callNow) {
-	      result = func.apply(context, args);
-	      context = args = null;
-	    }
-	
-	    return result;
-	  };
-	};
-
-/***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	module.exports = Date.now || now;
-	
-	function now() {
-	    return new Date().getTime();
-	}
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(14)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "._3WkQLUyd_5sA_re7EzYvMx{background-color:#f1ede4;display:none;margin:0;padding:20px}._3WkQLUyd_5sA_re7EzYvMx._2nRhrrYvmfuxu34UiGItXs{display:block}", ""]);
-	
-	// exports
-	exports.locals = {
-		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
-		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
-		"selected": "_2nRhrrYvmfuxu34UiGItXs",
-		"selected": "_2nRhrrYvmfuxu34UiGItXs"
-	};
-
-/***/ },
-/* 30 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4586,17 +5990,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	var _skatejs = __webpack_require__(2);
+	var _skatejs = __webpack_require__(7);
 	
-	var _classnames = __webpack_require__(24);
+	var _classnames = __webpack_require__(21);
 	
 	var _classnames2 = _interopRequireDefault(_classnames);
 	
-	var _tab = __webpack_require__(29);
+	var _tab = __webpack_require__(25);
 	
 	var _tab2 = _interopRequireDefault(_tab);
 	
-	var _debounce = __webpack_require__(27);
+	var _debounce = __webpack_require__(3);
 	
 	var _debounce2 = _interopRequireDefault(_debounce);
 	
@@ -4642,6 +6046,319 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _skatejs.vdom.elementClose('div');
 	  }
 	});
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(19)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._3WkQLUyd_5sA_re7EzYvMx{background-color:#f1ede4;display:none;margin:0;padding:20px}._3WkQLUyd_5sA_re7EzYvMx._2nRhrrYvmfuxu34UiGItXs{display:block}", ""]);
+	
+	// exports
+	exports.locals = {
+		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
+		"pane": "_3WkQLUyd_5sA_re7EzYvMx",
+		"selected": "_2nRhrrYvmfuxu34UiGItXs",
+		"selected": "_2nRhrrYvmfuxu34UiGItXs"
+	};
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(7);
+	
+	var _index = __webpack_require__(27);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = function (props, chren) {
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.body);
+	
+	  _skatejs.vdom.elementOpen('style');
+	
+	  _renderArbitrary(_index2.default.toString());
+	
+	  _skatejs.vdom.elementClose('style');
+	
+	  _renderArbitrary(chren());
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(19)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".JotV9DC7cFGUX61mmETT1{background-color:#fefefe;color:#333;font-size:16px;padding:60px 0 0}", ""]);
+	
+	// exports
+	exports.locals = {
+		"body": "JotV9DC7cFGUX61mmETT1",
+		"body": "JotV9DC7cFGUX61mmETT1"
+	};
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _renderArbitrary = function _renderArbitrary(child) {
+	  var type = typeof child;
+	
+	  if (type === 'number' || type === 'string' || type === 'object' && child instanceof String) {
+	    _skatejs.vdom.text(child);
+	  } else if (type === 'function' && child.__jsxDOMWrapper) {
+	    child();
+	  } else if (Array.isArray(child)) {
+	    child.forEach(_renderArbitrary);
+	  } else if (type === 'object' && String(child) === '[object Object]') {
+	    _forOwn(child, _renderArbitrary);
+	  }
+	};
+	
+	var _attr = function _attr(value, name) {
+	  _skatejs.vdom.attr(name, value);
+	};
+	
+	var _hasOwn = Object.prototype.hasOwnProperty;
+	
+	var _forOwn = function _forOwn(object, iterator) {
+	  for (var prop in object) {
+	    if (_hasOwn.call(object, prop)) iterator(object[prop], prop);
+	  }
+	};
+	
+	var _skatejs = __webpack_require__(7);
+	
+	var _helpers = __webpack_require__(12);
+	
+	var _index = __webpack_require__(29);
+	
+	var _index2 = _interopRequireDefault(_index);
+	
+	var _logo = __webpack_require__(30);
+	
+	var _logo2 = _interopRequireDefault(_logo);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Item = function Item(props, chren) {
+	  _skatejs.vdom.elementOpen('li', null, null, 'class', _index2.default.locals.item);
+	
+	  _renderArbitrary(props.external ? ((_skatejs.vdom.elementOpenStart('a'), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd('a')), _renderArbitrary(chren()), _skatejs.vdom.elementClose('a')) : ((_skatejs.vdom.elementOpenStart(_helpers.Link), _forOwn(props, _attr), _skatejs.vdom.attr('class', _index2.default.locals.link), _skatejs.vdom.elementOpenEnd(_helpers.Link)), _renderArbitrary(chren()), _skatejs.vdom.elementClose(_helpers.Link)));
+	
+	  return _skatejs.vdom.elementClose('li');
+	};
+	
+	exports.default = function (props) {
+	  _skatejs.vdom.elementOpen('div');
+	
+	  _skatejs.vdom.elementOpen('style');
+	
+	  _renderArbitrary(_index2.default.toString());
+	
+	  _skatejs.vdom.elementClose('style');
+	
+	  _skatejs.vdom.elementOpen('div', null, null, 'class', _index2.default.locals.header + ' ' + (props.scrolled ? _index2.default.locals.scrolled : ''));
+	
+	  _skatejs.vdom.elementOpen('h1', null, null, 'class', _index2.default.locals.title);
+	
+	  _skatejs.vdom.elementOpen(_helpers.Link, null, null, 'href', '/');
+	
+	  _skatejs.vdom.elementVoid('img', null, null, 'alt', props.title, 'src', _logo2.default, 'width', '30');
+	
+	  _skatejs.vdom.elementClose(_helpers.Link);
+	
+	  _skatejs.vdom.elementClose('h1');
+	
+	  _skatejs.vdom.elementOpen('ul', null, null, 'class', _index2.default.locals.list);
+	
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', '/docs');
+	
+	  _skatejs.vdom.text('Docs');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementOpen(Item, null, null, 'href', 'https://github.com/skatejs/skatejs', 'external', true);
+	
+	  _skatejs.vdom.text('Github');
+	
+	  _skatejs.vdom.elementClose(Item);
+	
+	  _skatejs.vdom.elementClose('ul');
+	
+	  _skatejs.vdom.elementClose('div');
+	
+	  return _skatejs.vdom.elementClose('div');
+	};
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(19)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "._2Hd5KzDR5h1JLZaLAhkdnL{background-color:#fefefe;color:#333;position:fixed;transition:box-shadow .3s ease;width:100%}._1P6DOElNwq3GvvXJFHGg0J{box-shadow:0 0 15px 0 #333}._3EU-FaAppzWRdOf0yzUQbO{list-style:none}._3EU-FaAppzWRdOf0yzUQbO,._3h8r-c6pyf3k8OkYptB6eQ{display:inline-block;margin:0;padding:0}._1O98iTVLbgr87bKcZ1xtCv{display:inline-block;margin:0 20px 0 10px;padding:0;position:relative;left:14px;top:8px}._3gAAJyILxgLXLUDHVCLw1K{color:#333;display:inline-block;font-size:18px;margin:0;padding:20px;text-decoration:none;transition:background-color .3s ease}._3gAAJyILxgLXLUDHVCLw1K:hover{background-color:#eee}", ""]);
+	
+	// exports
+	exports.locals = {
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"header": "_2Hd5KzDR5h1JLZaLAhkdnL",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
+		"scrolled": "_1P6DOElNwq3GvvXJFHGg0J",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"list": "_3EU-FaAppzWRdOf0yzUQbO",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"item": "_3h8r-c6pyf3k8OkYptB6eQ",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"title": "_1O98iTVLbgr87bKcZ1xtCv",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K",
+		"link": "_3gAAJyILxgLXLUDHVCLw1K"
+	};
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "dist/cdcf8f64994df2f0ca865f88e17aaa59.png";
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Route = undefined;
+	
+	var _skatejs = __webpack_require__(7);
+	
+	var _page = __webpack_require__(13);
+	
+	var _page2 = _interopRequireDefault(_page);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function createRouteHandler(elem, detail) {
+	  return function () {
+	    (0, _skatejs.emit)(elem, 'RouteChange', { detail: detail });
+	  };
+	}
+	
+	function onRouteUpdate(elem) {
+	  return function (e) {
+	    var _e$target = e.target;
+	    var component = _e$target.component;
+	    var path = _e$target.path;
+	
+	    if (component && path) {
+	      var curr = window.location.pathname;
+	      (0, _page2.default)(path, createRouteHandler(elem, component));
+	      if (curr === path) {
+	        (0, _page2.default)(curr);
+	      }
+	    }
+	  };
+	}
+	
+	exports.default = (0, _skatejs.define)('sk-router', {
+	  created: function created(elem) {
+	    elem.addEventListener('RouteUpdate', onRouteUpdate(elem));
+	  }
+	});
+	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
+	  props: {
+	    component: {},
+	    path: {}
+	  },
+	  updated: function updated(elem) {
+	    var component = elem.component;
+	    var path = elem.path;
+	
+	    if (component && path) {
+	      (0, _skatejs.emit)(elem, 'RouteUpdate', {
+	        detail: { component: component, path: path }
+	      });
+	    }
+	  }
+	});
+
+/***/ },
+/* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (title) {
+	  document.title = title;
+	};
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(19)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "html{font-family:Helvetica;font-size:14px}body{margin:0}a{color:#333}", ""]);
+	
+	// exports
+
 
 /***/ }
 /******/ ])

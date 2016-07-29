@@ -26,7 +26,7 @@ export default define('sk-app', {
           <Route component={Docs} path="/docs" />
         </Router>
         <Header scrolled={elem.scrolled} title="SkateJS" />
-        <Body><Page /></Body>
+        <Body>{Page ? <Page /> : ''}</Body>
       </div>
     );
   },
