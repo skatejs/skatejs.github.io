@@ -1,7 +1,12 @@
+:host {
+  display: block;
+}
+
 .pane {
   background-color: #F1EDE4;
   display: none;
   margin: 0;
+  overflow: auto;
   padding: 20px;
 }
 
