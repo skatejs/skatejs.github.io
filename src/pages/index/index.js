@@ -14,8 +14,6 @@ function format(code, lang = 'markup') {
   return highlighted;
 }
 
-console.log(cssPrism);
-
 const CodeExample = (props, chren) => (
   <div class={css.locals.code}>
     <style>{cssPrism.toString()}</style>
