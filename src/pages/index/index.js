@@ -1,27 +1,34 @@
 import * as skate from 'skatejs';
 import css from './index.css';
+import cssPrism from '!css!prismjs/themes/prism.css';
+import Prism from 'prismjs';
 import Tabs, { Tab } from '../../tabs';
 
 const { define, vdom } = skate;
 
-function format(code) {
+function format(code, lang = 'markup') {
   const lines = code.split('\n');
   const ident = lines[1].match(/^\s*/)[0].length;
-  return lines.map(line => line.substring(ident)).join('\n').trim();
+  const formatted = lines.map(line => line.substring(ident)).join('\n').trim();
+  const highlighted = Prism.highlight(formatted, Prism.languages[lang]);
+  return highlighted;
 }
+
+console.log(cssPrism);
 
 const CodeExample = (props, chren) => (
   <div class={css.locals.code}>
+    <style>{cssPrism.toString()}</style>
     {props.title ? <h3 class={css.locals.title}>{props.title}</h3> : ''}
     <Tabs>
       <Tab name="Result" selected>
         <p>{chren()}</p>
       </Tab>
       <Tab name="JS">
-        <pre><code>{format(props.js)}</code></pre>
+        <pre><code ref={e => (e.innerHTML = format(props.js, 'javascript'))}></code></pre>
       </Tab>
       <Tab name="HTML">
-        <pre><code>{format(props.html)}</code></pre>
+        <pre><code ref={e => (e.innerHTML = format(props.html, 'markup'))}></code></pre>
       </Tab>
     </Tabs>
   </div>
