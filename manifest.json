@@ -1,0 +1,13 @@
+{
+  "name": "SkateJS",
+  "short_name": "SkateJS",
+  "icons": [{
+    "src": "dist/cdcf8f64994df2f0ca865f88e17aaa59.png",
+    "sizes": "358x358",
+    "type": "image/png"
+  }],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F4547B",
+  "theme_color": "#FFF"
+}

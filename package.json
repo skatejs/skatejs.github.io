@@ -23,6 +23,7 @@
     "file-loader": "^0.9.0",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
+    "react-hot-loader": "3.0.0-beta.1",
     "skatejs-build": "^6.0.0"
   },
   "config": {
@@ -33,6 +34,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "debounce": "^1.0.0",
+    "glamor": "^2.2.0",
     "page": "^1.7.1",
     "prismjs": "^1.5.1",
     "skatejs": "^1.0.0-beta.19",
