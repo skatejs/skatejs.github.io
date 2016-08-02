@@ -3,7 +3,7 @@ import page from 'page';
 
 function createRouteHandler(elem, detail) {
   return () => {
-    emit(elem, 'RouteChange', { detail });
+    emit(elem, 'route-change', { detail });
   };
 }
 
@@ -22,7 +22,7 @@ function onRouteUpdate(elem) {
 
 export default define('sk-router', {
   created(elem) {
-    elem.addEventListener('RouteUpdate', onRouteUpdate(elem));
+    elem.addEventListener('route-update', onRouteUpdate(elem));
   },
 });
 
@@ -34,7 +34,7 @@ export const Route = define('sk-router-route', {
   updated(elem) {
     const { component, path } = elem;
     if (component && path) {
-      emit(elem, 'RouteUpdate', {
+      emit(elem, 'route-update', {
         detail: { component, path },
       });
     }

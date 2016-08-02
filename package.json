@@ -37,7 +37,7 @@
     "glamor": "^2.2.0",
     "page": "^1.7.1",
     "prismjs": "^1.5.1",
-    "skatejs": "^1.0.0-beta.19",
+    "skatejs": "^1.0.0-beta.20",
     "skatejs-named-slots": "^0.3.1",
     "webcomponents.js": "webcomponents/webcomponentsjs#b77ca743edecb6ec262d4ffe8443708dbe0be49b"
   }

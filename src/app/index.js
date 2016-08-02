@@ -21,7 +21,7 @@ export default define('sk-app', {
     title('SkateJS - functional web components');
     return (
       <div>
-        <Router onRouteChange={e => (elem.page = e.detail)}>
+        <Router on-route-change={e => (elem.page = e.detail)}>
           <Route component={Index} path="/" />
           <Route component={Docs} path="/docs" />
         </Router>
