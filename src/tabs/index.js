@@ -1,15 +1,7 @@
-import { merge, renderStatic, style } from 'glamor';
 import { Component, define, emit, prop, vdom } from 'skatejs';
+import cx from 'classnames';
+import css from './index.css';
 import Tab from './tab';
-
-const css = renderStatic(() => {
-  style({ backgroundColor: '#DAD6CE' });
-  style({ display: 'inline-block' });
-  style({ color: '#333', display: 'inline-block', fontSize: '18px', fontWeight: '200', padding: '20px', textDecoration: 'none' });
-  style({ backgroundColor: '#F1EDE4' });
-});
-
-console.log(css);
 
 function onTabsChanged(elem) {
   return () => (elem.tabs = [...elem.children]);
@@ -34,11 +26,11 @@ export default define('sk-tabs', {
   render(elem) {
     return (
       <div>
-        <style>{}</style>
-        <div {...sheet.tabs}>
+        <style>{css.toString()}</style>
+        <div class={css.locals.tabs}>
           {elem.tabs.map(tab => (
-            <div {...merge(sheet.tab, tab.selected ? sheet.tabSelected : null)}>
-              <a href={`#${tab.name}`} on-click={selectTab(elem.tabs, tab)} {...sheet.tabAnchor}>{tab.name}</a>
+            <div class={cx({ [css.locals.tab]: true, [css.locals.selected]: tab.selected })}>
+              <a href={`#${tab.name}`} on-click={selectTab(elem.tabs, tab)}>{tab.name}</a>
             </div>
           ))}
         </div>
