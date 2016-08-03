@@ -61,9 +61,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.App = undefined;
 	
-	__webpack_require__(1);
-	
 	__webpack_require__(2);
+	
+	__webpack_require__(1);
 	
 	var _index = __webpack_require__(6);
 	
@@ -8437,8 +8437,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
 	var define = skate.define;
 	var vdom = skate.vdom;
 	
@@ -8569,22 +8567,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	skate.define('x-todo', {
 	  props: {
-	    items: skate.prop.array(),
+	    items: skate.prop.array({ initial: function initial(e) {
+	        return e.children;
+	      } }),
 	    title: skate.prop.string({ attribute: true }),
 	    value: skate.prop.string({ attribute: true })
-	  },
-	  attached: function attached(elem) {
-	    elem.mo = new MutationObserver(function () {
-	      return elem.items = [].concat(_toConsumableArray(elem.children));
-	    });
-	    elem.mo.observe(elem, { childList: true });
-	  },
-	  detached: function detached(elem) {
-	    elem.mo.disconnect();
 	  },
 	  render: function render(elem) {
 	    var numItems = elem.items.length;
 	    vdom.elementOpen('div');
+	    vdom.elementVoid('slot', null, null, 'on-slotchange', function () {
+	      return elem.items = elem.children;
+	    });
 	    vdom.elementOpen('h3');
 	
 	    _renderArbitrary(elem.title);

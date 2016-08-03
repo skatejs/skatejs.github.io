@@ -95,21 +95,15 @@ function submit(elem) {
 
 skate.define('x-todo', {
   props: {
-    items: skate.prop.array(),
+    items: skate.prop.array({ initial: e => e.children }),
     title: skate.prop.string({ attribute: true }),
     value: skate.prop.string({ attribute: true }),
-  },
-  attached(elem) {
-    elem.mo = new MutationObserver(() => (elem.items = [...elem.children]));
-    elem.mo.observe(elem, { childList: true });
-  },
-  detached(elem) {
-    elem.mo.disconnect();
   },
   render(elem) {
     const numItems = elem.items.length;
     return (
       <div>
+        <slot on-slotchange={() => (elem.items = elem.children)} />
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
           <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
