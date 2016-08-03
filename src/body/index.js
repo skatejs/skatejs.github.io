@@ -6,11 +6,12 @@ const css = style({
   backgroundColor: '#fefefe',
   color: '#333',
   fontSize: 16,
-  padding: '60px 0 0 0' ,
+  padding: '60px 0 0 0',
 });
 
 export default (props, chren) => (
-  <Css {...css}>
+  <div {...css}>
+    <Css for={css} />
     {chren()}
-  </Css>
+  </div>
 );

@@ -1,6 +1,7 @@
 import { define, prop, vdom } from 'skatejs';
 import { Docs, Index } from '../pages';
 import Body from '../body';
+import Footer from '../footer';
 import Header from '../header';
 import Router, { Route } from '../router';
 import title from '../_/title';
@@ -27,6 +28,7 @@ export default define('sk-app', {
         </Router>
         <Header scrolled={elem.scrolled} title="SkateJS" />
         <Body>{Page ? <Page /> : ''}</Body>
+        {/* <Footer /> */}
       </div>
     );
   },
