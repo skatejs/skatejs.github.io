@@ -8413,6 +8413,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
 	var _skatejs = __webpack_require__(7);
 	
 	var skate = _interopRequireWildcard(_skatejs);
@@ -8436,6 +8438,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var define = skate.define;
 	var vdom = skate.vdom;
@@ -8462,6 +8470,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  vdom.elementClose('style');
 	
 	  _renderArbitrary(props.title ? (vdom.elementOpen('h3', null, null, 'class', _index2.default.locals.title), _renderArbitrary(props.title), vdom.elementClose('h3')) : '');
+	
+	  _renderArbitrary(props.description ? (vdom.elementOpen('h3', null, null, 'class', _index2.default.locals.description), _renderArbitrary(props.description), vdom.elementClose('h3')) : '');
 	
 	  vdom.elementOpen(_tabs2.default);
 	  vdom.elementOpen(_tabs.Tab, null, null, 'name', 'Result', 'selected', true);
@@ -8565,20 +8575,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 	
-	skate.define('x-todo', {
+	var Xtodo = skate.define('x-todo', {
 	  props: {
-	    items: skate.prop.array({ initial: function initial(e) {
-	        return e.children;
-	      } }),
+	    items: skate.prop.array({}),
 	    title: skate.prop.string({ attribute: true }),
 	    value: skate.prop.string({ attribute: true })
+	  },
+	  attached: function attached(elem) {
+	    elem.items = elem.children;
 	  },
 	  render: function render(elem) {
 	    var numItems = elem.items.length;
 	    vdom.elementOpen('div');
 	    vdom.elementVoid('slot', null, null, 'on-slotchange', function () {
 	      return elem.items = elem.children;
-	    });
+	    }, 'style', { display: 'none' });
 	    vdom.elementOpen('h3');
 	
 	    _renderArbitrary(elem.title);
@@ -8634,12 +8645,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  todo.removeChild(item);
 	}
 	
-	skate.define('x-todo-smart', {
-	  created: function created(elem) {
-	    elem.addEventListener('x-todo-add', addTodo);
-	    elem.addEventListener('x-todo-remove', removeTodo);
+	skate.define('x-todo-smart', function (_Xtodo) {
+	  _inherits(_class, _Xtodo);
+	
+	  function _class() {
+	    _classCallCheck(this, _class);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).apply(this, arguments));
 	  }
-	});
+	
+	  _createClass(_class, null, [{
+	    key: 'created',
+	    value: function created(elem) {
+	      elem.addEventListener('x-todo-add', addTodo);
+	      elem.addEventListener('x-todo-remove', removeTodo);
+	    }
+	  }]);
+	
+	  return _class;
+	}(Xtodo));
 	
 	exports.default = define('sk-page-index', {
 	  render: function render() {
@@ -8685,16 +8709,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    vdom.elementOpen('x-counter', null, null, 'count', '1');
 	    vdom.elementClose('x-counter');
 	    vdom.elementClose(CodeExample);
-	    vdom.elementOpen(CodeExample, null, null, 'title', 'Todo List', 'html', '\n              <x-todo-smart>\n                <x-todo title="Things I need to do">\n                  <x-item>Get milk</x-item>\n                  <x-item>Feed cats</x-item>\n                </x-todo>\n              </x-todo-smart>\n            ', 'js', '\n              // Dumb component that just emits events when something happens.\n\n              function remove(elem, indx) {\n                return () => {\n                  skate.emit(elem, \'x-todo-remove\', { detail: {\n                    todo: elem,\n                    item: elem.children[indx],\n                  } });\n                };\n              }\n\n              function submit(elem) {\n                return e => {\n                  skate.emit(elem, \'x-todo-add\', { detail: {\n                    todo: elem,\n                    item: elem.value,\n                  } });\n                  e.preventDefault();\n                };\n              }\n\n              skate.define(\'x-todo\', {\n                props: {\n                  items: skate.prop.array(),\n                  title: skate.prop.string({ attribute: true }),\n                  value: skate.prop.string({ attribute: true }),\n                },\n                attached(elem) {\n                  elem.mo = new MutationObserver(() => (elem.items = [...elem.children]));\n                  elem.mo.observe(elem, { childList: true });\n                },\n                detached(elem) {\n                  elem.mo.disconnect();\n                },\n                render(elem) {\n                  const numItems = elem.items.length;\n                  return (\n                    <div>\n                      <h3>{elem.title}{numItems ? ` (${numItems})` : \'\'}</h3>\n                      <form on-submit={submit(elem)}>\n                        <input on-keyup={skate.link(elem)} type="text" value={elem.value} />\n                        <button type="submit">Add {elem.value}</button>\n                      </form>\n                      {numItems ? (\n                        <ol>\n                          {elem.items.map((item, indx) => (\n                            <li>\n                              {item.textContent}\n                              <button on-click={remove(elem, indx)}>x</button>\n                            </li>\n                          ))}\n                        </ol>\n                      ) : (\n                        <p>There is nothing to do.</p>\n                      )}\n                    </div>\n                  );\n                },\n              });\n\n\n              // Smart component so <x-todo> doesn\'t mutate itself.\n\n              function addTodo(e) {\n                const { item, todo } = e.detail;\n                const xitem = document.createElement(\'x-item\');\n                xitem.textContent = item;\n                todo.appendChild(xitem);\n                todo.value = \'\';\n              }\n\n              function removeTodo(e) {\n                const { item, todo } = e.detail;\n                todo.removeChild(item);\n              }\n\n              skate.define(\'x-todo-smart\', {\n                created(elem) {\n                  elem.addEventListener(\'x-todo-add\', addTodo);\n                  elem.addEventListener(\'x-todo-remove\', removeTodo);\n                },\n              });\n            ');
-	    vdom.elementOpen('x-todo-smart');
-	    vdom.elementOpen('x-todo', null, null, 'title', 'Things I need to do');
+	    vdom.elementOpen(CodeExample, null, null, 'title', 'Todo List', 'description', 'The todo list is broken down into two separate components: a stateful one and a stateless one. The stateless one can be used anywhere and it does not mutate it\'s own state, however, you have to wire up the state / DOM changes. This is useful integrating with any library / framework that needs to control the state / DOM mutations such as some React apps. The smart one wires this up for you and is simpler for most use-cases that don\'t care if the component maintains its own state.', 'html', '\n              <x-todo-smart title="Things to do">\n                <x-item>Get milk</x-item>\n                <x-item>Feed cats</x-item>\n              </x-todo-smart>\n            ', 'js', '\n              // Dumb component that just emits events when something happens.\n\n              function remove(elem, indx) {\n                return () => {\n                  skate.emit(elem, \'x-todo-remove\', { detail: {\n                    todo: elem,\n                    item: elem.children[indx],\n                  } });\n                };\n              }\n\n              function submit(elem) {\n                return e => {\n                  skate.emit(elem, \'x-todo-add\', { detail: {\n                    todo: elem,\n                    item: elem.value,\n                  } });\n                  e.preventDefault();\n                };\n              }\n\n              const Xtodo = skate.define(\'x-todo\', {\n                props: {\n                  items: skate.prop.array({}),\n                  title: skate.prop.string({ attribute: true }),\n                  value: skate.prop.string({ attribute: true }),\n                },\n                attached(elem) {\n                  elem.items = elem.children;\n                },\n                render(elem) {\n                  const numItems = elem.items.length;\n                  return (\n                    <div>\n                      <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: \'none\' }} />\n                      <h3>{elem.title}{numItems ? ` (${numItems})` : \'\'}</h3>\n                      <form on-submit={submit(elem)}>\n                        <input on-keyup={skate.link(elem)} type="text" value={elem.value} />\n                        <button type="submit">Add {elem.value}</button>\n                      </form>\n                      {numItems ? (\n                        <ol>\n                          {elem.items.map((item, indx) => (\n                            <li>\n                              {item.textContent}\n                              <button on-click={remove(elem, indx)}>x</button>\n                            </li>\n                          ))}\n                        </ol>\n                      ) : (\n                        <p>There is nothing to do.</p>\n                      )}\n                    </div>\n                  );\n                },\n              });\n\n\n              // Smart component so <x-todo> doesn\'t mutate itself.\n\n              function addTodo(e) {\n                const { item, todo } = e.detail;\n                const xitem = document.createElement(\'x-item\');\n                xitem.textContent = item;\n                todo.appendChild(xitem);\n                todo.value = \'\';\n              }\n\n              function removeTodo(e) {\n                const { item, todo } = e.detail;\n                todo.removeChild(item);\n              }\n\n              skate.define(\'x-todo-smart\', class extends Xtodo {\n                static created(elem) {\n                  elem.addEventListener(\'x-todo-add\', addTodo);\n                  elem.addEventListener(\'x-todo-remove\', removeTodo);\n                }\n              });\n            ');
+	    vdom.elementOpen('x-todo-smart', null, null, 'title', 'Things to do');
 	    vdom.elementOpen('x-item');
 	    vdom.text('Get milk');
 	    vdom.elementClose('x-item');
 	    vdom.elementOpen('x-item');
 	    vdom.text('Feed cats');
 	    vdom.elementClose('x-item');
-	    vdom.elementClose('x-todo');
 	    vdom.elementClose('x-todo-smart');
 	    vdom.elementClose(CodeExample);
 	    vdom.elementClose('div');

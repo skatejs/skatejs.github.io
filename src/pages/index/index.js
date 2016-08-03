@@ -18,6 +18,7 @@ const CodeExample = (props, chren) => (
   <div class={css.locals.code}>
     <style>{cssPrism.toString()}</style>
     {props.title ? <h3 class={css.locals.title}>{props.title}</h3> : ''}
+    {props.description ? <h3 class={css.locals.description}>{props.description}</h3> : ''}
     <Tabs>
       <Tab name="Result" selected>
         <p>{chren()}</p>
@@ -93,17 +94,20 @@ function submit(elem) {
   };
 }
 
-skate.define('x-todo', {
+const Xtodo = skate.define('x-todo', {
   props: {
-    items: skate.prop.array({ initial: e => e.children }),
+    items: skate.prop.array({}),
     title: skate.prop.string({ attribute: true }),
     value: skate.prop.string({ attribute: true }),
+  },
+  attached(elem) {
+    elem.items = elem.children;
   },
   render(elem) {
     const numItems = elem.items.length;
     return (
       <div>
-        <slot on-slotchange={() => (elem.items = elem.children)} />
+        <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
           <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
@@ -142,11 +146,11 @@ function removeTodo(e) {
   todo.removeChild(item);
 }
 
-skate.define('x-todo-smart', {
-  created(elem) {
+skate.define('x-todo-smart', class extends Xtodo {
+  static created(elem) {
     elem.addEventListener('x-todo-add', addTodo);
     elem.addEventListener('x-todo-remove', removeTodo);
-  },
+  }
 });
 
 
@@ -215,12 +219,11 @@ export default define('sk-page-index', {
           </CodeExample>
           <CodeExample 
             title="Todo List"
+            description="The todo list is broken down into two separate components: a stateful one and a stateless one. The stateless one can be used anywhere and it does not mutate it's own state, however, you have to wire up the state / DOM changes. This is useful integrating with any library / framework that needs to control the state / DOM mutations such as some React apps. The smart one wires this up for you and is simpler for most use-cases that don't care if the component maintains its own state."
             html="
-              <x-todo-smart>
-                <x-todo title=&quot;Things I need to do&quot;>
-                  <x-item>Get milk</x-item>
-                  <x-item>Feed cats</x-item>
-                </x-todo>
+              <x-todo-smart title=&quot;Things to do&quot;>
+                <x-item>Get milk</x-item>
+                <x-item>Feed cats</x-item>
               </x-todo-smart>
             "
             js="
@@ -245,23 +248,20 @@ export default define('sk-page-index', {
                 };
               }
 
-              skate.define('x-todo', {
+              const Xtodo = skate.define('x-todo', {
                 props: {
-                  items: skate.prop.array(),
+                  items: skate.prop.array({}),
                   title: skate.prop.string({ attribute: true }),
                   value: skate.prop.string({ attribute: true }),
                 },
                 attached(elem) {
-                  elem.mo = new MutationObserver(() => (elem.items = [...elem.children]));
-                  elem.mo.observe(elem, { childList: true });
-                },
-                detached(elem) {
-                  elem.mo.disconnect();
+                  elem.items = elem.children;
                 },
                 render(elem) {
                   const numItems = elem.items.length;
                   return (
                     <div>
+                      <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
                       <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
                       <form on-submit={submit(elem)}>
                         <input on-keyup={skate.link(elem)} type=&quot;text&quot; value={elem.value} />
@@ -300,19 +300,17 @@ export default define('sk-page-index', {
                 todo.removeChild(item);
               }
 
-              skate.define('x-todo-smart', {
-                created(elem) {
+              skate.define('x-todo-smart', class extends Xtodo {
+                static created(elem) {
                   elem.addEventListener('x-todo-add', addTodo);
                   elem.addEventListener('x-todo-remove', removeTodo);
-                },
+                }
               });
             "
           >
-            <x-todo-smart>
-              <x-todo title="Things I need to do">
-                <x-item>Get milk</x-item>
-                <x-item>Feed cats</x-item>
-              </x-todo>
+            <x-todo-smart title="Things to do">
+              <x-item>Get milk</x-item>
+              <x-item>Feed cats</x-item>
             </x-todo-smart>
           </CodeExample>
         </div>
