@@ -96,17 +96,19 @@ function submit(elem) {
 
 const Xtodo = skate.define('x-todo', {
   props: {
-    items: skate.prop.array({}),
+    items: skate.prop.array(),
     title: skate.prop.string({ attribute: true }),
     value: skate.prop.string({ attribute: true }),
   },
   attached(elem) {
+    // Setup the initial list of items from the current children.
     elem.items = elem.children;
   },
   render(elem) {
     const numItems = elem.items.length;
     return (
       <div>
+        {/* Updates the list of items when the slot receives new assigned nodes. */}
         <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
@@ -250,17 +252,19 @@ export default define('sk-page-index', {
 
               const Xtodo = skate.define('x-todo', {
                 props: {
-                  items: skate.prop.array({}),
+                  items: skate.prop.array(),
                   title: skate.prop.string({ attribute: true }),
                   value: skate.prop.string({ attribute: true }),
                 },
                 attached(elem) {
+                  // Setup the initial list of items from the current children.
                   elem.items = elem.children;
                 },
                 render(elem) {
                   const numItems = elem.items.length;
                   return (
                     <div>
+                      {/* Updates the list of items when the slot receives new assigned nodes. */}
                       <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
                       <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
                       <form on-submit={submit(elem)}>
