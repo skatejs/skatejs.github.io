@@ -54,10 +54,10 @@ const Item = (props, chren) => (
     }
   </li>
 );
-
+const allCss = Object.keys(css).map((k) => css[k]);
 export default props => (
   <div>
-    <Css for={merge(...css)} />
+    <Css for={allCss} />
     <div {...css.header} {...(props.scrolled ? css.scrolled : {})}>
       <h1 {...css.title}>
         <Link href="/"><img alt={props.title} src={logo} width="30" /></Link>
