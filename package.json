@@ -24,7 +24,7 @@
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-hot-loader": "3.0.0-beta.1",
-    "skatejs-build": "^6.0.0"
+    "skatejs-build": "8.x"
   },
   "config": {
     "commitizen": {
@@ -32,13 +32,12 @@
     }
   },
   "dependencies": {
-    "classnames": "^2.x",
-    "debounce": "^1.x",
-    "glamor": "^2.x",
-    "page": "^1.x",
-    "prismjs": "^1.x",
-    "skatejs": "^1.x",
-    "skatejs-named-slots": "^0.3.x",
-    "webcomponents.js": "webcomponents/webcomponentsjs#b77ca743edecb6ec262d4ffe8443708dbe0be49b"
+    "classnames": "2.x",
+    "debounce": "1.x",
+    "glamor": "2.x",
+    "page": "1.x",
+    "prismjs": "1.x",
+    "skatejs": "2.x",
+    "skatejs-web-components": "1.x"
   }
 }

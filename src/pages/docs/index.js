@@ -1,4 +1,4 @@
-import { define, vdom } from 'skatejs';
+import { define, h } from 'skatejs';
 import { Layout } from '../../helpers';
 
 export default define('sk-page-docs', {

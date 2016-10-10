@@ -1,4 +1,4 @@
-import { Component, define, emit, vdom } from 'skatejs';
+import { define, emit } from 'skatejs';
 import page from 'page';
 
 function createRouteHandler(elem, detail) {

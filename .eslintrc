@@ -33,7 +33,7 @@
   },
   "settings": {
     "react": {
-      "pragma": "vdom"
+      "pragma": "h"
     }
   }
 }

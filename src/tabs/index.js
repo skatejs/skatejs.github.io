@@ -1,4 +1,4 @@
-import { Component, define, emit, prop, vdom } from 'skatejs';
+import { Component, define, emit, prop, h } from 'skatejs';
 import cx from 'classnames';
 import css from './index.css';
 import Tab from './tab';

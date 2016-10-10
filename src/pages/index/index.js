@@ -4,11 +4,11 @@ import cssPrism from '!css!prismjs/themes/prism.css';
 import Prism from 'prismjs';
 import Tabs, { Tab } from '../../tabs';
 
-const { define, vdom } = skate;
+const { define, h } = skate;
 
 function format(code, lang = 'markup') {
   const lines = code.split('\n');
-  const ident = lines[1].match(/^\s*/)[0].length;
+  const ident = (lines[1] || '').match(/^\s*/)[0].length;
   const formatted = lines.map(line => line.substring(ident)).join('\n').trim();
   const highlighted = Prism.highlight(formatted, Prism.languages[lang]);
   return highlighted;
@@ -21,7 +21,7 @@ const CodeExample = (props, chren) => (
     {props.description ? <h3 class={css.locals.description}>{props.description}</h3> : ''}
     <Tabs>
       <Tab name="Result" selected>
-        <p>{chren()}</p>
+        <p>{chren}</p>
       </Tab>
       <Tab name="JS">
         <pre><code ref={e => (e.innerHTML = format(props.js, 'javascript'))}></code></pre>
@@ -36,7 +36,7 @@ const CodeExample = (props, chren) => (
 const FeaturePane = (props, chren) => (
   <div class={css.locals.featurePane}>
     <h3>{props.title}</h3>
-    <p>{chren()}</p>
+    <p>{chren}</p>
   </div>
 );
 
@@ -94,22 +94,23 @@ function submit(elem) {
   };
 }
 
+const symItems = Symbol();
 const Xtodo = skate.define('x-todo', {
   props: {
-    items: skate.prop.array(),
+    [symItems]: skate.prop.array(),
     title: skate.prop.string({ attribute: true }),
     value: skate.prop.string({ attribute: true }),
   },
-  attached(elem) {
-    // Setup the initial list of items from the current children.
-    elem.items = elem.children;
-  },
   render(elem) {
-    const numItems = elem.items.length;
+    const numItems = elem[symItems].length;
     return (
       <div>
-        {/* Updates the list of items when the slot receives new assigned nodes. */}
-        <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
+        {/* To hide a slot, it must be wrapped in an element that is hidden.
+          Setting display to none doesn't seem to work on slot elements. */}
+        <div style={{ display: 'none' }}>
+          {/* Updates the list of items when the slot receives new assigned nodes. */}
+          <slot on-slotchange={() => (elem[symItems] = [...elem.children])} />
+        </div>
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
           <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
@@ -117,7 +118,7 @@ const Xtodo = skate.define('x-todo', {
         </form>
         {numItems ? (
           <ol>
-            {elem.items.map((item, indx) => (
+            {elem[symItems].map((item, indx) => (
               <li>
                 {item.textContent}
                 <button on-click={remove(elem, indx)}>x</button>
@@ -181,26 +182,26 @@ export default define('sk-page-index', {
           <CodeExample
             title="Hello World"
             description="A simple hello world example."
-            html="
+            html={`
               <x-hello>Bob</x-hello>
-            "
-            js="
+            `}
+            js={`
               skate.define('x-hello', {
                 render() {
                   return <span>Hello, <slot />!</span>;
                 },
               });
-            "
+            `}
           >
             <x-hello>Bob</x-hello>
           </CodeExample>
           <CodeExample
             title="Simple Counter"
             description="A simple counter that shows how to use Shadow DOM name slots and re-rendering."
-            html="
-              <x-counter count=&quot;1&quot;></x-counter>
-            "
-            js="
+            html={`
+              <x-counter count="1"></x-counter>
+            `}
+            js={`
               skate.define('x-counter', {
                 props: {
                   count: skate.prop.number(),
@@ -215,20 +216,20 @@ export default define('sk-page-index', {
                   return <span>Count: {elem.count}</span>;
                 },
               });
-            "
+            `}
           >
             <x-counter count="1"></x-counter>
           </CodeExample>
-          <CodeExample 
+          <CodeExample
             title="Todo List"
             description="The todo list is broken down into two separate components: a stateful one and a stateless one. The stateless one can be used anywhere and it does not mutate it's own state, however, you have to wire up the state / DOM changes. This is useful integrating with any library / framework that needs to control the state / DOM mutations such as some React apps. The smart one wires this up for you and is simpler for most use-cases that don't care if the component maintains its own state."
-            html="
-              <x-todo-smart title=&quot;Things to do&quot;>
+            html={`
+              <x-todo-smart title="Things to do">
                 <x-item>Get milk</x-item>
                 <x-item>Feed cats</x-item>
               </x-todo-smart>
-            "
-            js="
+            `}
+            js={`
               // Dumb component that just emits events when something happens.
 
               function remove(elem, indx) {
@@ -250,30 +251,31 @@ export default define('sk-page-index', {
                 };
               }
 
+              const symItems = Symbol();
               const Xtodo = skate.define('x-todo', {
                 props: {
-                  items: skate.prop.array(),
+                  [symItems]: skate.prop.array(),
                   title: skate.prop.string({ attribute: true }),
                   value: skate.prop.string({ attribute: true }),
                 },
-                attached(elem) {
-                  // Setup the initial list of items from the current children.
-                  elem.items = elem.children;
-                },
                 render(elem) {
-                  const numItems = elem.items.length;
+                  const numItems = elem[symItems].length;
                   return (
                     <div>
-                      {/* Updates the list of items when the slot receives new assigned nodes. */}
-                      <slot on-slotchange={() => (elem.items = elem.children)} style={{ display: 'none' }} />
-                      <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
+                      {/* To hide a slot, it must be wrapped in an element that is hidden.
+                        Setting display to none doesn't seem to work on slot elements. */}
+                      <div style={{ display: 'none' }}>
+                        {/* Updates the list of items when the slot receives new assigned nodes. */}
+                        <slot on-slotchange={() => (elem[symItems] = [...elem.children])} />
+                      </div>
+                      <h3>{elem.title}{numItems ? \` (\${numItems})\` : ''}</h3>
                       <form on-submit={submit(elem)}>
-                        <input on-keyup={skate.link(elem)} type=&quot;text&quot; value={elem.value} />
-                        <button type=&quot;submit&quot;>Add {elem.value}</button>
+                        <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
+                        <button type="submit">Add {elem.value}</button>
                       </form>
                       {numItems ? (
                         <ol>
-                          {elem.items.map((item, indx) => (
+                          {elem[symItems].map((item, indx) => (
                             <li>
                               {item.textContent}
                               <button on-click={remove(elem, indx)}>x</button>
@@ -310,7 +312,7 @@ export default define('sk-page-index', {
                   elem.addEventListener('x-todo-remove', removeTodo);
                 }
               });
-            "
+            `}
           >
             <x-todo-smart title="Things to do">
               <x-item>Get milk</x-item>

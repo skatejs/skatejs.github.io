@@ -1,4 +1,4 @@
-import { vdom } from 'skatejs';
+import { h } from 'skatejs';
 import { Css, Link } from '../helpers';
 import { hover, merge, style } from 'glamor';
 import logo from './logo.png';
@@ -49,8 +49,8 @@ const css = {
 const Item = (props, chren) => (
   <li {...css.item}>
     {props.external ?
-      <a {...props} {...css.link}>{chren()}</a> :
-      <Link {...props} {...css.link}>{chren()}</Link>
+      <a {...props} {...css.link}>{chren}</a> :
+      <Link {...props} {...css.link}>{chren}</Link>
     }
   </li>
 );

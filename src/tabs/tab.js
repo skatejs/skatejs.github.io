@@ -1,4 +1,4 @@
-import { Component, define, emit, prop, vdom } from 'skatejs';
+import { Component, define, emit, prop, h } from 'skatejs';
 import cx from 'classnames';
 import css from './tab.css';
 import debounce from 'debounce';
@@ -12,8 +12,8 @@ function emitSlotChange(elem) {
 
 export default define('sk-tabs-tab', {
   props: {
-    name: prop.string(),
-    selected: prop.boolean(),
+    name: prop.string({ attribute: true }),
+    selected: prop.boolean({ attribute: true }),
   },
   attached(elem) {
     emitSlotChange(elem);

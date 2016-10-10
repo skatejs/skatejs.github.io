@@ -1,4 +1,4 @@
-import { vdom } from 'skatejs';
+import { h } from 'skatejs';
 import { Css } from '../helpers';
 import { style } from 'glamor';
 
@@ -12,6 +12,6 @@ const css = style({
 export default (props, chren) => (
   <div {...css}>
     <Css for={css} />
-    {chren()}
+    {chren}
   </div>
 );

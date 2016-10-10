@@ -1,5 +1,5 @@
 import { merge, style } from 'glamor';
-import { vdom } from 'skatejs';
+import { h } from 'skatejs';
 import { Css } from '../helpers';
 
 const css = {

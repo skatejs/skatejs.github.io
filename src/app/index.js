@@ -1,7 +1,7 @@
-import { define, prop, vdom } from 'skatejs';
+import { define, prop, h } from 'skatejs';
 import { Docs, Index } from '../pages';
 import Body from '../body';
-import Footer from '../footer';
+// import Footer from '../footer';
 import Header from '../header';
 import Router, { Route } from '../router';
 import title from '../_/title';
