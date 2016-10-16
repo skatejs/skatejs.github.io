@@ -28,8 +28,10 @@ export default define('sk-router', {
 
 export const Route = define('sk-router-route', {
   props: {
-    component: {},
-    path: {},
+    // We shouldn't need to specify these as attributes but there is currently
+    // a syncing issue: https://github.com/skatejs/skatejs/issues/840
+    component: { attribute: true },
+    path: { attribute: true },
   },
   updated(elem) {
     const { component, path } = elem;

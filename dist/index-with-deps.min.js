@@ -11501,29 +11501,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            js: '\n              skate.define(\'x-counter\', {\n                props: {\n                  count: skate.prop.number(),\n                },\n                attached(elem) {\n                  elem.__ival = setInterval(() => ++elem.count, 1000);\n                },\n                detached(elem) {\n                  clearInterval(elem.__ival);\n                },\n                render(elem) {\n                  return <span>Count: {elem.count}</span>;\n                },\n              });\n            '
 	          },
 	          h('x-counter', { count: '1' })
-	        ),
-	        h(
-	          CodeExample,
-	          {
-	            title: 'Todo List',
-	            description: 'The todo list is broken down into two separate components: a stateful one and a stateless one. The stateless one can be used anywhere and it does not mutate it\'s own state, however, you have to wire up the state / DOM changes. This is useful integrating with any library / framework that needs to control the state / DOM mutations such as some React apps. The smart one wires this up for you and is simpler for most use-cases that don\'t care if the component maintains its own state.',
-	            html: '\n              <x-todo-smart title="Things to do">\n                <x-item>Get milk</x-item>\n                <x-item>Feed cats</x-item>\n              </x-todo-smart>\n            ',
-	            js: '\n              // Dumb component that just emits events when something happens.\n\n              function remove (elem, indx) {\n                return () => {\n                  skate.emit(elem, \'x-todo-remove\', { detail: {\n                    todo: elem,\n                    item: elem.children[indx],\n                  } });\n                };\n              }\n\n              function submit (elem) {\n                return e => {\n                  skate.emit(elem, \'x-todo-add\', { detail: {\n                    todo: elem,\n                    item: elem.value,\n                  } });\n                  e.preventDefault();\n                };\n              }\n\n\n\n              // This is currently in RFC: https://github.com/skatejs/skatejs/issues/863\n              const { MutationObserver } = window;\n              const symCache = Symbol();\n              const symDefault = Symbol();\n              const symMap = Symbol();\n              const symMo = Symbol();\n              const symProps = Symbol();\n\n              function distribute (cache, child) {\n                const slot = child.getAttribute(\'slot\') || symDefault;\n                cache[slot] = cache[slot] || [];\n                cache[slot].push(child);\n                return cache;\n              }\n\n              function distributed ({ children }) {\n                return [...children].reduce(distribute, {});\n              }\n\n              function slotMap (elem, name) {\n                return elem[symMap][name] || symDefault;\n              }\n\n              function updateProp (elem, name, distributed) {\n                elem[name] = distributed[slotMap(elem, name)];\n              }\n\n              function updateProps ({ target: elem }) {\n                const dist = distributed(elem);\n                elem[symProps].forEach(name => updateProp(elem, name, dist));\n              }\n\n              const slot = skate.prop.create({\n                slot: null,\n                get (elem, { name }) {\n                  if (!elem[symMo]) {\n                    const mo = new MutationObserver(muts => muts.forEach(updateProps));\n                    mo.observe(elem, { childList: true });\n                    elem[symMo] = mo;\n                    elem[symCache] = distributed(elem);\n                    elem[symMap] = {};\n                    elem[symProps] = [];\n                  }\n                  elem[symMap][name] = this.slot;\n                  elem[symProps].push(name);\n                  return elem[symCache][slotMap(elem, name)];\n                },\n                set (elem, { name, newValue }) {\n                  elem[symCache][slotMap(elem, name)] = newValue || [];\n                }\n              });\n\n\n\n              const symItems = Symbol();\n              const Xtodo = skate.define(\'x-todo\', {\n                props: {\n                  [symItems]: slot(),\n                  title: skate.prop.string({ attribute: true }),\n                  value: skate.prop.string({ attribute: true })\n                },\n                render (elem) {\n                  const numItems = elem[symItems].length;\n                  return (\n                    <div>\n                      <h3>{elem.title} ({numItems})</h3>\n                      <form on-submit={submit(elem)}>\n                        <input on-keyup={skate.link(elem)} type="text" value={elem.value} />\n                        <button type="submit">Add {elem.value}</button>\n                      </form>\n                      {numItems ? (\n                        <ol>\n                          {elem[symItems].map((item, indx) => (\n                            <li>\n                              {item.textContent}\n                              <button on-click={remove(elem, indx)}>x</button>\n                            </li>\n                          ))}\n                        </ol>\n                      ) : (\n                        <p>There is nothing to do.</p>\n                      )}\n                    </div>\n                  );\n                }\n              });\n\n\n              // Smart component so <x-todo> doesn\'t mutate itself.\n\n              function addTodo (e) {\n                const { item, todo } = e.detail;\n                const xitem = document.createElement(\'x-item\');\n                xitem.textContent = item;\n                todo.appendChild(xitem);\n                todo.value = \'\';\n              }\n\n              function removeTodo (e) {\n                const { item, todo } = e.detail;\n                todo.removeChild(item);\n              }\n\n              skate.define(\'x-todo-smart\', class extends Xtodo {\n                static created (elem) {\n                  elem.addEventListener(\'x-todo-add\', addTodo);\n                  elem.addEventListener(\'x-todo-remove\', removeTodo);\n                }\n              });\n            '
-	          },
-	          h(
-	            'x-todo-smart',
-	            { title: 'Things to do' },
-	            h(
-	              'x-item',
-	              null,
-	              'Get milk'
-	            ),
-	            h(
-	              'x-item',
-	              null,
-	              'Feed cats'
-	            )
-	          )
 	        )
 	      )
 	    );
@@ -12959,8 +12936,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	var Route = exports.Route = (0, _skatejs.define)('sk-router-route', {
 	  props: {
-	    component: {},
-	    path: {}
+	    // We shouldn't need to specify these as attributes but there is currently
+	    // a syncing issue: https://github.com/skatejs/skatejs/issues/840
+	    component: { attribute: true },
+	    path: { attribute: true }
 	  },
 	  updated: function updated(elem) {
 	    var component = elem.component;
