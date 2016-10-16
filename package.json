@@ -23,8 +23,7 @@
     "file-loader": "^0.9.0",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
-    "react-hot-loader": "^3.0.0-beta.6",
-    "skatejs-build": "^9.1.0"
+    "react-hot-loader": "^3.0.0-beta.6"
   },
   "config": {
     "commitizen": {
@@ -38,6 +37,7 @@
     "page": "1.x",
     "prismjs": "1.x",
     "skatejs": "^3.1.0",
-    "skatejs-web-components": "1.x"
+    "skatejs-build": "^9.2.1",
+    "skatejs-web-components": "1.2.4"
   }
 }

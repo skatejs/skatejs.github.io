@@ -96,6 +96,7 @@ function submit (elem) {
 
 
 
+// This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
 const { MutationObserver } = window;
 const symCache = Symbol();
 const symDefault = Symbol();
@@ -160,7 +161,7 @@ const Xtodo = skate.define('x-todo', {
     const numItems = elem[symItems].length;
     return (
       <div>
-        <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
+        <h3>{elem.title} ({numItems})</h3>
         <form on-submit={submit(elem)}>
           <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
           <button type="submit">Add {elem.value}</button>
@@ -281,7 +282,7 @@ export default define('sk-page-index', {
             js={`
               // Dumb component that just emits events when something happens.
 
-              function remove(elem, indx) {
+              function remove (elem, indx) {
                 return () => {
                   skate.emit(elem, 'x-todo-remove', { detail: {
                     todo: elem,
@@ -290,7 +291,7 @@ export default define('sk-page-index', {
                 };
               }
 
-              function submit(elem) {
+              function submit (elem) {
                 return e => {
                   skate.emit(elem, 'x-todo-add', { detail: {
                     todo: elem,
@@ -300,24 +301,74 @@ export default define('sk-page-index', {
                 };
               }
 
+
+
+              // This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
+              const { MutationObserver } = window;
+              const symCache = Symbol();
+              const symDefault = Symbol();
+              const symMap = Symbol();
+              const symMo = Symbol();
+              const symProps = Symbol();
+
+              function distribute (cache, child) {
+                const slot = child.getAttribute('slot') || symDefault;
+                cache[slot] = cache[slot] || [];
+                cache[slot].push(child);
+                return cache;
+              }
+
+              function distributed ({ children }) {
+                return [...children].reduce(distribute, {});
+              }
+
+              function slotMap (elem, name) {
+                return elem[symMap][name] || symDefault;
+              }
+
+              function updateProp (elem, name, distributed) {
+                elem[name] = distributed[slotMap(elem, name)];
+              }
+
+              function updateProps ({ target: elem }) {
+                const dist = distributed(elem);
+                elem[symProps].forEach(name => updateProp(elem, name, dist));
+              }
+
+              const slot = skate.prop.create({
+                slot: null,
+                get (elem, { name }) {
+                  if (!elem[symMo]) {
+                    const mo = new MutationObserver(muts => muts.forEach(updateProps));
+                    mo.observe(elem, { childList: true });
+                    elem[symMo] = mo;
+                    elem[symCache] = distributed(elem);
+                    elem[symMap] = {};
+                    elem[symProps] = [];
+                  }
+                  elem[symMap][name] = this.slot;
+                  elem[symProps].push(name);
+                  return elem[symCache][slotMap(elem, name)];
+                },
+                set (elem, { name, newValue }) {
+                  elem[symCache][slotMap(elem, name)] = newValue || [];
+                }
+              });
+
+
+
               const symItems = Symbol();
               const Xtodo = skate.define('x-todo', {
                 props: {
-                  [symItems]: skate.prop.array(),
+                  [symItems]: slot(),
                   title: skate.prop.string({ attribute: true }),
-                  value: skate.prop.string({ attribute: true }),
+                  value: skate.prop.string({ attribute: true })
                 },
-                render(elem) {
+                render (elem) {
                   const numItems = elem[symItems].length;
                   return (
                     <div>
-                      {/* To hide a slot, it must be wrapped in an element that is hidden.
-                        Setting display to none doesn't seem to work on slot elements. */}
-                      <div style={{ display: 'none' }}>
-                        {/* Updates the list of items when the slot receives new assigned nodes. */}
-                        <slot on-slotchange={() => (elem[symItems] = [...elem.children])} />
-                      </div>
-                      <h3>{elem.title}{numItems ? \` (\${numItems})\` : ''}</h3>
+                      <h3>{elem.title} ({numItems})</h3>
                       <form on-submit={submit(elem)}>
                         <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
                         <button type="submit">Add {elem.value}</button>
@@ -336,13 +387,13 @@ export default define('sk-page-index', {
                       )}
                     </div>
                   );
-                },
+                }
               });
 
 
               // Smart component so <x-todo> doesn't mutate itself.
 
-              function addTodo(e) {
+              function addTodo (e) {
                 const { item, todo } = e.detail;
                 const xitem = document.createElement('x-item');
                 xitem.textContent = item;
@@ -350,13 +401,13 @@ export default define('sk-page-index', {
                 todo.value = '';
               }
 
-              function removeTodo(e) {
+              function removeTodo (e) {
                 const { item, todo } = e.detail;
                 todo.removeChild(item);
               }
 
               skate.define('x-todo-smart', class extends Xtodo {
-                static created(elem) {
+                static created (elem) {
                   elem.addEventListener('x-todo-add', addTodo);
                   elem.addEventListener('x-todo-remove', removeTodo);
                 }
