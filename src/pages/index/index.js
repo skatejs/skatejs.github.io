@@ -6,7 +6,7 @@ import Tabs, { Tab } from '../../tabs';
 
 const { define, h } = skate;
 
-function format(code, lang = 'markup') {
+function format (code, lang = 'markup') {
   const lines = code.split('\n');
   const ident = (lines[1] || '').match(/^\s*/)[0].length;
   const formatted = lines.map(line => line.substring(ident)).join('\n').trim();
@@ -45,9 +45,9 @@ const FeaturePane = (props, chren) => (
 // Hello World
 
 skate.define('x-hello', {
-  render() {
+  render () {
     return <span>Hello, <slot />!</span>;
-  },
+  }
 });
 
 
@@ -58,15 +58,15 @@ skate.define('x-counter', {
   props: {
     count: skate.prop.number(),
   },
-  attached(elem) {
+  attached (elem) {
     elem.__ival = setInterval(() => ++elem.count, 1000);
   },
-  detached(elem) {
+  detached (elem) {
     clearInterval(elem.__ival);
   },
-  render(elem) {
+  render (elem) {
     return <span>Count: {elem.count}</span>;
-  },
+  }
 });
 
 
@@ -75,7 +75,7 @@ skate.define('x-counter', {
 
 // Dumb component that just emits events when something happens.
 
-function remove(elem, indx) {
+function remove (elem, indx) {
   return () => {
     skate.emit(elem, 'x-todo-remove', { detail: {
       todo: elem,
@@ -84,7 +84,7 @@ function remove(elem, indx) {
   };
 }
 
-function submit(elem) {
+function submit (elem) {
   return e => {
     skate.emit(elem, 'x-todo-add', { detail: {
       todo: elem,
@@ -94,14 +94,48 @@ function submit(elem) {
   };
 }
 
+
+
+const { MutationObserver } = window;
+const symMo = Symbol();
+const symProps = Symbol();
+
+function getSlottedNodes ({ children }, slot) {
+  return [...children].filter(node => node.getAttribute('slot') === slot);
+}
+function updateProps (muts) {
+  muts.forEach(({ target }) => {
+    target[symProps].forEach(([ name, slot ]) => {
+      console.log(name, slot);
+      target[name] = getSlottedNodes(target, slot);
+    });
+  });
+}
+
+const slot = skate.prop.create({
+  slot: null,
+  initial (elem, { name }) {
+    if (!elem[symMo]) {
+      const mo = new MutationObserver(updateProps);
+      mo.observe(elem, { childList: true });
+      elem[symMo] = mo;
+      elem[symProps] = [];
+    }
+    elem[symProps].push([ name, this.slot ]);
+    return getSlottedNodes(elem, this.slot);
+  }
+});
+
+
+
 const symItems = Symbol();
 const Xtodo = skate.define('x-todo', {
   props: {
-    [symItems]: skate.prop.array(),
+    [symItems]: slot(),
     title: skate.prop.string({ attribute: true }),
-    value: skate.prop.string({ attribute: true }),
+    value: skate.prop.string({ attribute: true })
   },
-  render(elem) {
+  render (elem) {
     const numItems = elem[symItems].length;
     return (
       <div>
@@ -109,7 +143,7 @@ const Xtodo = skate.define('x-todo', {
           Setting display to none doesn't seem to work on slot elements. */}
         <div style={{ display: 'none' }}>
           {/* Updates the list of items when the slot receives new assigned nodes. */}
-          <slot on-slotchange={() => (elem[symItems] = [...elem.children])} />
+          <slot />
         </div>
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
@@ -130,13 +164,13 @@ const Xtodo = skate.define('x-todo', {
         )}
       </div>
     );
-  },
+  }
 });
 
 
 // Smart component so <x-todo> doesn't mutate itself.
 
-function addTodo(e) {
+function addTodo (e) {
   const { item, todo } = e.detail;
   const xitem = document.createElement('x-item');
   xitem.textContent = item;
@@ -144,13 +178,13 @@ function addTodo(e) {
   todo.value = '';
 }
 
-function removeTodo(e) {
+function removeTodo (e) {
   const { item, todo } = e.detail;
   todo.removeChild(item);
 }
 
 skate.define('x-todo-smart', class extends Xtodo {
-  static created(elem) {
+  static created (elem) {
     elem.addEventListener('x-todo-add', addTodo);
     elem.addEventListener('x-todo-remove', removeTodo);
   }
@@ -159,7 +193,7 @@ skate.define('x-todo-smart', class extends Xtodo {
 
 
 export default define('sk-page-index', {
-  render() {
+  render () {
     return (
       <div>
         <style>{css.toString()}</style>

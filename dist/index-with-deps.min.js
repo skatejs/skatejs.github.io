@@ -11108,6 +11108,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _props;
 	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
 	var _skatejs = __webpack_require__(9);
 	
 	var skate = _interopRequireWildcard(_skatejs);
@@ -11138,9 +11140,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	var define = skate.define;
 	var h = skate.h;
@@ -11293,9 +11295,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 	
+	var _window = window;
+	var MutationObserver = _window.MutationObserver;
+	
+	var symMo = Symbol();
+	var symProps = Symbol();
+	
+	function getSlottedNodes(_ref, slot) {
+	  var children = _ref.children;
+	
+	  return [].concat(_toConsumableArray(children)).filter(function (node) {
+	    return node.getAttribute('slot') === slot;
+	  });
+	}
+	function updateProps(muts) {
+	  muts.forEach(function (_ref2) {
+	    var target = _ref2.target;
+	
+	    target[symProps].forEach(function (_ref3) {
+	      var _ref4 = _slicedToArray(_ref3, 2);
+	
+	      var name = _ref4[0];
+	      var slot = _ref4[1];
+	
+	      console.log(name, slot);
+	      target[name] = getSlottedNodes(target, slot);
+	    });
+	  });
+	}
+	
+	var slot = skate.prop.create({
+	  slot: null,
+	  initial: function initial(elem, _ref5) {
+	    var name = _ref5.name;
+	
+	    if (!elem[symMo]) {
+	      var mo = new MutationObserver(updateProps);
+	      mo.observe(elem, { childList: true });
+	      elem[symMo] = mo;
+	      elem[symProps] = [];
+	    }
+	    elem[symProps].push([name, this.slot]);
+	    return getSlottedNodes(elem, this.slot);
+	  }
+	});
+	
 	var symItems = Symbol();
 	var Xtodo = skate.define('x-todo', {
-	  props: (_props = {}, _defineProperty(_props, symItems, skate.prop.array()), _defineProperty(_props, 'title', skate.prop.string({ attribute: true })), _defineProperty(_props, 'value', skate.prop.string({ attribute: true })), _props),
+	  props: (_props = {}, _defineProperty(_props, symItems, slot()), _defineProperty(_props, 'title', skate.prop.string({ attribute: true })), _defineProperty(_props, 'value', skate.prop.string({ attribute: true })), _props),
 	  render: function render(elem) {
 	    var numItems = elem[symItems].length;
 	    return h(
@@ -11304,9 +11351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      h(
 	        'div',
 	        { style: { display: 'none' } },
-	        h('slot', { 'on-slotchange': function onSlotchange() {
-	            return elem[symItems] = [].concat(_toConsumableArray(elem.children));
-	          } })
+	        h('slot', null)
 	      ),
 	      h(
 	        'h3',
