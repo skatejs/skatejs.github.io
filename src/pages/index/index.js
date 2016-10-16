@@ -97,32 +97,53 @@ function submit (elem) {
 
 
 const { MutationObserver } = window;
+const symCache = Symbol();
+const symDefault = Symbol();
+const symMap = Symbol();
 const symMo = Symbol();
 const symProps = Symbol();
 
-function getSlottedNodes ({ children }, slot) {
-  return [...children].filter(node => node.getAttribute('slot') === slot);
+function distribute (cache, child) {
+  const slot = child.getAttribute('slot') || symDefault;
+  cache[slot] = cache[slot] || [];
+  cache[slot].push(child);
+  return cache;
 }
-function updateProps (muts) {
-  muts.forEach(({ target }) => {
-    target[symProps].forEach(([ name, slot ]) => {
-      console.log(name, slot);
-      target[name] = getSlottedNodes(target, slot);
-    });
-  });
+
+function distributed ({ children }) {
+  return [...children].reduce(distribute, {});
+}
+
+function slotMap (elem, name) {
+  return elem[symMap][name] || symDefault;
+}
+
+function updateProp (elem, name, distributed) {
+  elem[name] = distributed[slotMap(elem, name)];
+}
+
+function updateProps ({ target: elem }) {
+  const dist = distributed(elem);
+  elem[symProps].forEach(name => updateProp(elem, name, dist));
 }
 
 const slot = skate.prop.create({
   slot: null,
-  initial (elem, { name }) {
+  get (elem, { name }) {
     if (!elem[symMo]) {
-      const mo = new MutationObserver(updateProps);
+      const mo = new MutationObserver(muts => muts.forEach(updateProps));
       mo.observe(elem, { childList: true });
       elem[symMo] = mo;
+      elem[symCache] = distributed(elem);
+      elem[symMap] = {};
       elem[symProps] = [];
     }
-    elem[symProps].push([ name, this.slot ]);
-    return getSlottedNodes(elem, this.slot);
+    elem[symMap][name] = this.slot;
+    elem[symProps].push(name);
+    return elem[symCache][slotMap(elem, name)];
+  },
+  set (elem, { name, newValue }) {
+    elem[symCache][slotMap(elem, name)] = newValue || [];
   }
 });
 
@@ -139,12 +160,6 @@ const Xtodo = skate.define('x-todo', {
     const numItems = elem[symItems].length;
     return (
       <div>
-        {/* To hide a slot, it must be wrapped in an element that is hidden.
-          Setting display to none doesn't seem to work on slot elements. */}
-        <div style={{ display: 'none' }}>
-          {/* Updates the list of items when the slot receives new assigned nodes. */}
-          <slot />
-        </div>
         <h3>{elem.title}{numItems ? ` (${numItems})` : ''}</h3>
         <form on-submit={submit(elem)}>
           <input on-keyup={skate.link(elem)} type="text" value={elem.value} />

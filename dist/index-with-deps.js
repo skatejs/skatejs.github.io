@@ -11108,8 +11108,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _props;
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
 	var _skatejs = __webpack_require__(9);
 	
 	var skate = _interopRequireWildcard(_skatejs);
@@ -11298,45 +11296,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _window = window;
 	var MutationObserver = _window.MutationObserver;
 	
+	var symCache = Symbol();
+	var symDefault = Symbol();
+	var symMap = Symbol();
 	var symMo = Symbol();
 	var symProps = Symbol();
 	
-	function getSlottedNodes(_ref, slot) {
+	function distribute(cache, child) {
+	  var slot = child.getAttribute('slot') || symDefault;
+	  cache[slot] = cache[slot] || [];
+	  cache[slot].push(child);
+	  return cache;
+	}
+	
+	function distributed(_ref) {
 	  var children = _ref.children;
 	
-	  return [].concat(_toConsumableArray(children)).filter(function (node) {
-	    return node.getAttribute('slot') === slot;
-	  });
+	  return [].concat(_toConsumableArray(children)).reduce(distribute, {});
 	}
-	function updateProps(muts) {
-	  muts.forEach(function (_ref2) {
-	    var target = _ref2.target;
 	
-	    target[symProps].forEach(function (_ref3) {
-	      var _ref4 = _slicedToArray(_ref3, 2);
+	function slotMap(elem, name) {
+	  return elem[symMap][name] || symDefault;
+	}
 	
-	      var name = _ref4[0];
-	      var slot = _ref4[1];
+	function updateProp(elem, name, distributed) {
+	  elem[name] = distributed[slotMap(elem, name)];
+	}
 	
-	      console.log(name, slot);
-	      target[name] = getSlottedNodes(target, slot);
-	    });
+	function updateProps(_ref2) {
+	  var elem = _ref2.target;
+	
+	  var dist = distributed(elem);
+	  elem[symProps].forEach(function (name) {
+	    return updateProp(elem, name, dist);
 	  });
 	}
 	
 	var slot = skate.prop.create({
 	  slot: null,
-	  initial: function initial(elem, _ref5) {
-	    var name = _ref5.name;
+	  get: function get(elem, _ref3) {
+	    var name = _ref3.name;
 	
 	    if (!elem[symMo]) {
-	      var mo = new MutationObserver(updateProps);
+	      var mo = new MutationObserver(function (muts) {
+	        return muts.forEach(updateProps);
+	      });
 	      mo.observe(elem, { childList: true });
 	      elem[symMo] = mo;
+	      elem[symCache] = distributed(elem);
+	      elem[symMap] = {};
 	      elem[symProps] = [];
 	    }
-	    elem[symProps].push([name, this.slot]);
-	    return getSlottedNodes(elem, this.slot);
+	    elem[symMap][name] = this.slot;
+	    elem[symProps].push(name);
+	    return elem[symCache][slotMap(elem, name)];
+	  },
+	  set: function set(elem, _ref4) {
+	    var name = _ref4.name;
+	    var newValue = _ref4.newValue;
+	
+	    elem[symCache][slotMap(elem, name)] = newValue || [];
 	  }
 	});
 	
@@ -11348,11 +11367,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return h(
 	      'div',
 	      null,
-	      h(
-	        'div',
-	        { style: { display: 'none' } },
-	        h('slot', null)
-	      ),
 	      h(
 	        'h3',
 	        null,
