@@ -3510,7 +3510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render(elem) {
 	    var Page = elem.page;
 	    (0, _title2.default)('SkateJS - functional web components');
-	    return [(0, _skatejs.h)('script', { src: 'https://sidecar.gitter.im/dist/sidecar.v1.js', async: true, defer: true }), (0, _skatejs.h)(
+	    return [(0, _skatejs.h)('script', { src: 'http://sidecar.gitter.im/dist/sidecar.v1.js', async: true, defer: true }), (0, _skatejs.h)(
 	      'div',
 	      null,
 	      (0, _skatejs.h)(

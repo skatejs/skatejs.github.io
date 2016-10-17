@@ -27,7 +27,7 @@ export default define('sk-app', {
     const Page = elem.page;
     title('SkateJS - functional web components');
     return [
-      <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
+      <script src="http://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
       <div>
         <Router on-route-change={e => (elem.page = e.detail)}>
           <Route component={Index} path="/" />
