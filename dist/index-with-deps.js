@@ -3493,6 +3493,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    page: {},
 	    scrolled: _skatejs.prop.boolean()
 	  },
+	  created: function created() {
+	    // Setup the Gitter script before it's rendered.
+	    ((window.gitter = {}).chat = {}).options = {
+	      room: 'skatejs/skatejs'
+	    };
+	  },
 	  attached: function attached(elem) {
 	    window.addEventListener('scroll', elem._scrollHandler = function () {
 	      return elem.scrolled = !!window.scrollY;
@@ -3504,7 +3510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render(elem) {
 	    var Page = elem.page;
 	    (0, _title2.default)('SkateJS - functional web components');
-	    return (0, _skatejs.h)(
+	    return [(0, _skatejs.h)('script', { src: 'https://sidecar.gitter.im/dist/sidecar.v1.js', async: true, defer: true }), (0, _skatejs.h)(
 	      'div',
 	      null,
 	      (0, _skatejs.h)(
@@ -3521,7 +3527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        null,
 	        Page ? (0, _skatejs.h)(Page, null) : ''
 	      )
-	    );
+	    )];
 	  }
 	});
 	// import Footer from '../footer';

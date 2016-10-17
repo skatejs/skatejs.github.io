@@ -1,5 +1,5 @@
 import { define, prop, h } from 'skatejs';
-import { Docs, Index } from '../pages';
+import { Community, Docs, Index } from '../pages';
 import Body from '../body';
 // import Footer from '../footer';
 import Header from '../header';
@@ -11,6 +11,12 @@ export default define('sk-app', {
     page: {},
     scrolled: prop.boolean(),
   },
+  created() {
+    // Setup the Gitter script before it's rendered.
+    ((window.gitter = {}).chat = {}).options = {
+      room: 'skatejs/skatejs'
+    };
+  },
   attached(elem) {
     window.addEventListener('scroll', elem._scrollHandler = () => (elem.scrolled = !!window.scrollY));
   },
@@ -20,7 +26,8 @@ export default define('sk-app', {
   render(elem) {
     const Page = elem.page;
     title('SkateJS - functional web components');
-    return (
+    return [
+      <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
       <div>
         <Router on-route-change={e => (elem.page = e.detail)}>
           <Route component={Index} path="/" />
@@ -30,6 +37,6 @@ export default define('sk-app', {
         <Body>{Page ? <Page /> : ''}</Body>
         {/* <Footer /> */}
       </div>
-    );
+    ];
   },
 });
