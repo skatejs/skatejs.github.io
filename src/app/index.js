@@ -1,4 +1,4 @@
-import { define, prop, h } from 'skatejs';
+import { Component, define, prop, h } from 'skatejs';
 import { Item } from '../helpers';
 import Body from '../body';
 import Footer from '../footer';
@@ -7,31 +7,38 @@ import Module from '../module';
 import Route from '../route';
 import title from '../_/title';
 
-export default define('sk-app', {
-  props: {
-    page: {},
-    scrolled: prop.boolean()
-  },
-  created() {
+export default define('sk-app', class extends Component {
+  static get props () {
+    return {
+      page: {},
+      scrolled: prop.boolean()
+    };
+  }
+  constructor() {
+    super();
     // Setup the Gitter script before it's rendered.
     ((window.gitter = {}).chat = {}).options = {
       room: 'skatejs/skatejs'
     };
-  },
-  attached(elem) {
-    window.addEventListener('scroll', elem._scrollHandler = () => (elem.scrolled = !!window.scrollY));
-  },
-  detached(elem) {
-    window.removeEventListener('scroll', elem._scrollHandler);
-  },
-  render(elem) {
+  }
+  connectedCallback(elem) {
+    super.connectedCallback();
+    window.addEventListener('scroll', this._scrollHandler = () => (this.scrolled = !!window.scrollY));
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('scroll', this._scrollHandler);
+  }
+  renderCallback() {
+    
+  }
+  static render(elem) {
     const Page = elem.page;
     const render = page => {
       elem.page = page.default;
     };
     title('SkateJS - functional web components');
     return [
-      <script src="http://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
       <div>
         <Route path="/" match={() =>
           <Module load={require('bundle!../pages/index/')} done={render} />
@@ -61,7 +68,8 @@ export default define('sk-app', {
         </Header>
         <Body>{Page ? <Page /> : ''}</Body>
         <Footer />
-      </div>
+      </div>,
+      <script src="http://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
     ];
-  },
+  }
 });
