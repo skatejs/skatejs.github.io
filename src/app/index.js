@@ -1,15 +1,16 @@
 import { define, prop, h } from 'skatejs';
-import { Community, Docs, Index } from '../pages';
 import Body from '../body';
-// import Footer from '../footer';
+import Footer from '../footer';
 import Header from '../header';
-import Router, { Route } from '../router';
+import Module from '../module';
+import Route from '../route';
 import title from '../_/title';
 
+// TODO do we even need ?lazy??
 export default define('sk-app', {
   props: {
     page: {},
-    scrolled: prop.boolean(),
+    scrolled: prop.boolean()
   },
   created() {
     // Setup the Gitter script before it's rendered.
@@ -25,17 +26,25 @@ export default define('sk-app', {
   },
   render(elem) {
     const Page = elem.page;
+    const render = page => {
+      elem.page = page.default;
+    };
     title('SkateJS - functional web components');
     return [
       <script src="http://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
       <div>
-        <Router on-route-change={e => (elem.page = e.detail)}>
-          <Route component={Index} path="/" />
-          <Route component={Docs} path="/docs" />
-        </Router>
+        <Route path="/" match={() =>
+          <Module load={require('bundle?lazy!../pages/index/')} done={render} />
+        } />
+        <Route path="/docs" match={() =>
+          <Module load={require('bundle?lazy!../pages/docs')} done={render} />
+        } />
+        <Route path="/docs/installing" match={() =>
+          <Module load={require('bundle?lazy!../pages/docs/installing')} done={render} />
+        } />
         <Header scrolled={elem.scrolled} title="SkateJS" />
         <Body>{Page ? <Page /> : ''}</Body>
-        {/* <Footer /> */}
+        <Footer />
       </div>
     ];
   },

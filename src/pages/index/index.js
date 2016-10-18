@@ -1,37 +1,9 @@
 import * as skate from 'skatejs';
+import { CodeExample } from '../../helpers';
 import css from './index.css';
-import cssPrism from '!css!prismjs/themes/prism.css';
-import Prism from 'prismjs';
 import Tabs, { Tab } from '../../tabs';
 
 const { define, h } = skate;
-
-function format (code, lang = 'markup') {
-  const lines = code.split('\n');
-  const ident = (lines[1] || '').match(/^\s*/)[0].length;
-  const formatted = lines.map(line => line.substring(ident)).join('\n').trim();
-  const highlighted = Prism.highlight(formatted, Prism.languages[lang]);
-  return highlighted;
-}
-
-const CodeExample = (props, chren) => (
-  <div class={css.locals.code}>
-    <style>{cssPrism.toString()}</style>
-    {props.title ? <h3 class={css.locals.title}>{props.title}</h3> : ''}
-    {props.description ? <h3 class={css.locals.description}>{props.description}</h3> : ''}
-    <Tabs>
-      <Tab name="Result" selected>
-        <p>{chren}</p>
-      </Tab>
-      <Tab name="JS">
-        <pre><code ref={e => (e.innerHTML = format(props.js, 'javascript'))}></code></pre>
-      </Tab>
-      <Tab name="HTML">
-        <pre><code ref={e => (e.innerHTML = format(props.html, 'markup'))}></code></pre>
-      </Tab>
-    </Tabs>
-  </div>
-);
 
 const FeaturePane = (props, chren) => (
   <div class={css.locals.featurePane}>

@@ -1,0 +1,415 @@
+webpackJsonpskatejsGithubIo([2],{
+
+/***/ 31:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _props;
+
+	var _skatejs = __webpack_require__(3);
+
+	var skate = _interopRequireWildcard(_skatejs);
+
+	var _helpers = __webpack_require__(7);
+
+	var _index = __webpack_require__(32);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	var _tabs = __webpack_require__(22);
+
+	var _tabs2 = _interopRequireDefault(_tabs);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var define = skate.define;
+	var h = skate.h;
+
+
+	var FeaturePane = function FeaturePane(props, chren) {
+	  return h(
+	    'div',
+	    { 'class': _index2.default.locals.featurePane },
+	    h(
+	      'h3',
+	      null,
+	      props.title
+	    ),
+	    h(
+	      'p',
+	      null,
+	      chren
+	    )
+	  );
+	};
+
+	// Hello World
+
+	skate.define('x-hello', {
+	  render: function render() {
+	    return h(
+	      'span',
+	      null,
+	      'Hello, ',
+	      h('slot', null),
+	      '!'
+	    );
+	  }
+	});
+
+	// Simple Counter
+
+	skate.define('x-counter', {
+	  props: {
+	    count: skate.prop.number()
+	  },
+	  attached: function attached(elem) {
+	    elem.__ival = setInterval(function () {
+	      return ++elem.count;
+	    }, 1000);
+	  },
+	  detached: function detached(elem) {
+	    clearInterval(elem.__ival);
+	  },
+	  render: function render(elem) {
+	    return h(
+	      'span',
+	      null,
+	      'Count: ',
+	      elem.count
+	    );
+	  }
+	});
+
+	// Todo List
+
+	// Dumb component that just emits events when something happens.
+
+	function remove(elem, indx) {
+	  return function () {
+	    skate.emit(elem, 'x-todo-remove', { detail: {
+	        todo: elem,
+	        item: elem.children[indx]
+	      } });
+	  };
+	}
+
+	function submit(elem) {
+	  return function (e) {
+	    skate.emit(elem, 'x-todo-add', { detail: {
+	        todo: elem,
+	        item: elem.value
+	      } });
+	    e.preventDefault();
+	  };
+	}
+
+	// This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
+	var _window = window;
+	var MutationObserver = _window.MutationObserver;
+
+	var symCache = Symbol();
+	var symDefault = Symbol();
+	var symMap = Symbol();
+	var symMo = Symbol();
+	var symProps = Symbol();
+
+	function distribute(cache, child) {
+	  var slot = child.getAttribute('slot') || symDefault;
+	  cache[slot] = cache[slot] || [];
+	  cache[slot].push(child);
+	  return cache;
+	}
+
+	function distributed(_ref) {
+	  var children = _ref.children;
+
+	  return [].concat(_toConsumableArray(children)).reduce(distribute, {});
+	}
+
+	function slotMap(elem, name) {
+	  return elem[symMap][name] || symDefault;
+	}
+
+	function updateProp(elem, name, distributed) {
+	  elem[name] = distributed[slotMap(elem, name)];
+	}
+
+	function updateProps(_ref2) {
+	  var elem = _ref2.target;
+
+	  var dist = distributed(elem);
+	  elem[symProps].forEach(function (name) {
+	    return updateProp(elem, name, dist);
+	  });
+	}
+
+	var slot = skate.prop.create({
+	  slot: null,
+	  get: function get(elem, _ref3) {
+	    var name = _ref3.name;
+
+	    if (!elem[symMo]) {
+	      var mo = new MutationObserver(function (muts) {
+	        return muts.forEach(updateProps);
+	      });
+	      mo.observe(elem, { childList: true });
+	      elem[symMo] = mo;
+	      elem[symCache] = distributed(elem);
+	      elem[symMap] = {};
+	      elem[symProps] = [];
+	    }
+	    elem[symMap][name] = this.slot;
+	    elem[symProps].push(name);
+	    return elem[symCache][slotMap(elem, name)];
+	  },
+	  set: function set(elem, _ref4) {
+	    var name = _ref4.name;
+	    var newValue = _ref4.newValue;
+
+	    elem[symCache][slotMap(elem, name)] = newValue || [];
+	  }
+	});
+
+	var symItems = Symbol();
+	var Xtodo = skate.define('x-todo', {
+	  props: (_props = {}, _defineProperty(_props, symItems, slot()), _defineProperty(_props, 'title', skate.prop.string({ attribute: true })), _defineProperty(_props, 'value', skate.prop.string({ attribute: true })), _props),
+	  render: function render(elem) {
+	    var numItems = elem[symItems].length;
+	    return h(
+	      'div',
+	      null,
+	      h(
+	        'h3',
+	        null,
+	        elem.title,
+	        ' (',
+	        numItems,
+	        ')'
+	      ),
+	      h(
+	        'form',
+	        { 'on-submit': submit(elem) },
+	        h('input', { 'on-keyup': skate.link(elem), type: 'text', value: elem.value }),
+	        h(
+	          'button',
+	          { type: 'submit' },
+	          'Add ',
+	          elem.value
+	        )
+	      ),
+	      numItems ? h(
+	        'ol',
+	        null,
+	        elem[symItems].map(function (item, indx) {
+	          return h(
+	            'li',
+	            null,
+	            item.textContent,
+	            h(
+	              'button',
+	              { 'on-click': remove(elem, indx) },
+	              'x'
+	            )
+	          );
+	        })
+	      ) : h(
+	        'p',
+	        null,
+	        'There is nothing to do.'
+	      )
+	    );
+	  }
+	});
+
+	// Smart component so <x-todo> doesn't mutate itself.
+
+	function addTodo(e) {
+	  var _e$detail = e.detail;
+	  var item = _e$detail.item;
+	  var todo = _e$detail.todo;
+
+	  var xitem = document.createElement('x-item');
+	  xitem.textContent = item;
+	  todo.appendChild(xitem);
+	  todo.value = '';
+	}
+
+	function removeTodo(e) {
+	  var _e$detail2 = e.detail;
+	  var item = _e$detail2.item;
+	  var todo = _e$detail2.todo;
+
+	  todo.removeChild(item);
+	}
+
+	skate.define('x-todo-smart', function (_Xtodo) {
+	  _inherits(_class, _Xtodo);
+
+	  function _class() {
+	    _classCallCheck(this, _class);
+
+	    return _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).apply(this, arguments));
+	  }
+
+	  _createClass(_class, null, [{
+	    key: 'created',
+	    value: function created(elem) {
+	      elem.addEventListener('x-todo-add', addTodo);
+	      elem.addEventListener('x-todo-remove', removeTodo);
+	    }
+	  }]);
+
+	  return _class;
+	}(Xtodo));
+
+	exports.default = define('sk-page-index', {
+	  render: function render() {
+	    return h(
+	      'div',
+	      null,
+	      h(
+	        'style',
+	        null,
+	        _index2.default.toString()
+	      ),
+	      h(
+	        'div',
+	        { 'class': _index2.default.locals.hero },
+	        h(
+	          'h1',
+	          null,
+	          'SkateJS'
+	        ),
+	        h(
+	          'p',
+	          null,
+	          'Skate is a functional, featherweight and cross-framework compatible web component library built on W3C specs.'
+	        )
+	      ),
+	      h(
+	        'div',
+	        { 'class': _index2.default.locals.featurePanes },
+	        h(
+	          FeaturePane,
+	          { title: 'Forward-thinking' },
+	          'Skate leverages the web platform and is built on top of the ',
+	          h(
+	            'a',
+	            { href: 'https://github.com/w3c/webcomponents' },
+	            'W3C Web Component specs'
+	          ),
+	          '. From this it gets native performance, longevity and cross-framework compatibility.'
+	        ),
+	        h(
+	          FeaturePane,
+	          { title: 'Functional' },
+	          h(
+	            'a',
+	            { href: 'https://github.com/google/incremental-dom' },
+	            'Incremental DOM'
+	          ),
+	          ' backs Skate\'s functional rendering pipeline, offering performance, memory-efficiency and simplicity.'
+	        ),
+	        h(
+	          FeaturePane,
+	          { title: 'Featherweight' },
+	          'Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet.'
+	        )
+	      ),
+	      h(
+	        'div',
+	        { 'class': _index2.default.locals.grid + ' ' + _index2.default.locals.grid2 },
+	        h(
+	          _helpers.CodeExample,
+	          {
+	            title: 'Hello World',
+	            description: 'A simple hello world example.',
+	            html: '\n              <x-hello>Bob</x-hello>\n            ',
+	            js: '\n              skate.define(\'x-hello\', {\n                render() {\n                  return <span>Hello, <slot />!</span>;\n                },\n              });\n            '
+	          },
+	          h(
+	            'x-hello',
+	            null,
+	            'Bob'
+	          )
+	        ),
+	        h(
+	          _helpers.CodeExample,
+	          {
+	            title: 'Simple Counter',
+	            description: 'A simple counter that shows how to use Shadow DOM name slots and re-rendering.',
+	            html: '\n              <x-counter count="1"></x-counter>\n            ',
+	            js: '\n              skate.define(\'x-counter\', {\n                props: {\n                  count: skate.prop.number(),\n                },\n                attached(elem) {\n                  elem.__ival = setInterval(() => ++elem.count, 1000);\n                },\n                detached(elem) {\n                  clearInterval(elem.__ival);\n                },\n                render(elem) {\n                  return <span>Count: {elem.count}</span>;\n                },\n              });\n            '
+	          },
+	          h('x-counter', { count: '1' })
+	        )
+	      )
+	    );
+	  }
+	});
+
+/***/ },
+
+/***/ 32:
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(20)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".iYB-ylcS-0bRr059nTAvY {\n  background-color: #111;\n  color: #eee;\n  flex-basis: 0;\n  flex-grow: 1;\n  font-size: 14px;\n  margin: 10px;\n}\n\n.iYB-ylcS-0bRr059nTAvY a {\n  color: #fff;\n}\n\n.iYB-ylcS-0bRr059nTAvY h3 {\n  background-color: #222;\n  font-weight: 200;\n}\n\n.iYB-ylcS-0bRr059nTAvY p {\n  font-weight: 100;\n}\n\n.iYB-ylcS-0bRr059nTAvY h3,\n.iYB-ylcS-0bRr059nTAvY p {\n  margin: 0;\n  padding: 20px;\n}\n\n._2eA-gGgtu95U0T2LIjbefD {\n  background-color: #333;\n  display: flex;\n  flex-wrap: wrap;\n  overflow: auto;\n  padding: 10px;\n}\n\n\n\n._3D_dMEHrZnxFd8qnEFinfp { \n  display: flex;\n  flex-wrap: wrap;\n}\n._3D_dMEHrZnxFd8qnEFinfp > * { \n  flex: 1 0 0;\n  box-sizing: border-box;\n  min-width: 100%;\n}\n@media (min-width: 500px) {\n  ._3IO_h7OgF7qT3tVrtEBvGh > * { min-width: 50%; }\n}\n@media (min-width: 750px) {\n  ._1xp5oHR2jCWbCKOEmGVTBz > * { min-width: 33.33%; }\n}\n@media (min-width: 1000px) {\n  ._3lTlDqKv0pwHrtQOqWB4kr > * { min-width: 25%; }\n}\n@media (min-width: 1250px) {\n  .GvcmiLQPFcHqLjWtZbCOe > * { min-width: 20%; }\n}\n@media (min-width: 1500px) {\n  ._1RWEsALJT9qMFZdnZnZDdt > * { min-width: 16.66%; }\n  ._2nWdTB7MlNAJgSglZ9R34- > * { min-width: 14.28%; }\n  ._1MeqOMty_QAoNuiNm9teCy > * { min-width: 12.5%; }\n  .rr8oEvwtBEBkJ7EvY8ZYq > * { min-width: 11.11%; }\n  ._7VGTUeyUzCWRVv1cDP6ql > * { min-width: 10%; }\n}\n\n\n\n._34LLXGQWwpFC-AGNgRE-Zi {\n  background-color: #F4547B;\n  color: #fff;\n  padding: 40px;\n}\n\n._34LLXGQWwpFC-AGNgRE-Zi h1 {\n  font-size: 48px;\n  font-weight: 200;\n  margin-top: 0;\n}\n\n._34LLXGQWwpFC-AGNgRE-Zi p {\n  font-size: 24px;\n  font-weight: 100;\n  margin-bottom: 0;\n}\n", ""]);
+
+	// exports
+	exports.locals = {
+		"feature-pane": "iYB-ylcS-0bRr059nTAvY",
+		"featurePane": "iYB-ylcS-0bRr059nTAvY",
+		"feature-panes": "_2eA-gGgtu95U0T2LIjbefD",
+		"featurePanes": "_2eA-gGgtu95U0T2LIjbefD",
+		"grid": "_3D_dMEHrZnxFd8qnEFinfp",
+		"grid": "_3D_dMEHrZnxFd8qnEFinfp",
+		"grid-2": "_3IO_h7OgF7qT3tVrtEBvGh",
+		"grid2": "_3IO_h7OgF7qT3tVrtEBvGh",
+		"grid-3": "_1xp5oHR2jCWbCKOEmGVTBz",
+		"grid3": "_1xp5oHR2jCWbCKOEmGVTBz",
+		"grid-4": "_3lTlDqKv0pwHrtQOqWB4kr",
+		"grid4": "_3lTlDqKv0pwHrtQOqWB4kr",
+		"grid-5": "GvcmiLQPFcHqLjWtZbCOe",
+		"grid5": "GvcmiLQPFcHqLjWtZbCOe",
+		"grid-6": "_1RWEsALJT9qMFZdnZnZDdt",
+		"grid6": "_1RWEsALJT9qMFZdnZnZDdt",
+		"grid-7": "_2nWdTB7MlNAJgSglZ9R34-",
+		"grid7": "_2nWdTB7MlNAJgSglZ9R34-",
+		"grid-8": "_1MeqOMty_QAoNuiNm9teCy",
+		"grid8": "_1MeqOMty_QAoNuiNm9teCy",
+		"grid-9": "rr8oEvwtBEBkJ7EvY8ZYq",
+		"grid9": "rr8oEvwtBEBkJ7EvY8ZYq",
+		"grid-10": "_7VGTUeyUzCWRVv1cDP6ql",
+		"grid10": "_7VGTUeyUzCWRVv1cDP6ql",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi",
+		"hero": "_34LLXGQWwpFC-AGNgRE-Zi"
+	};
+
+/***/ }
+
+});

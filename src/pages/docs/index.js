@@ -1,11 +1,13 @@
 import { define, h } from 'skatejs';
-import { Layout } from '../../helpers';
+import { Layout, Link } from '../../helpers';
+import Module from '../../module';
+import Route from '../../route';
 
 export default define('sk-page-docs', {
   render() {
     return (
       <Layout>
-        <p>The docs are currently being ported over from the <a href="https://github.com/skatejs/skatejs/blob/master/README.md">README</a>.</p>
+        <p>Coming soon. For now, check out the <a href="https://github.com/skatejs/skatejs">README</a>.</p>
       </Layout>
     );
   },
