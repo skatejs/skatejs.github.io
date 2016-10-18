@@ -6,8 +6,8 @@ const registered = [];
 export default define('sk-router-route', {
   props: {
     match: {},
-    matched: prop.boolean(),
-    path: prop.string(),
+    matched: prop.boolean({ attribute: true }),
+    path: prop.string({ attribute: true }),
   },
   updated (elem, prev) {
     const { path } = elem;
