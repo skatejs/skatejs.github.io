@@ -1,4 +1,5 @@
 import { define, prop, h } from 'skatejs';
+import { Item } from '../helpers';
 import Body from '../body';
 import Footer from '../footer';
 import Header from '../header';
@@ -6,7 +7,6 @@ import Module from '../module';
 import Route from '../route';
 import title from '../_/title';
 
-// TODO do we even need ?lazy??
 export default define('sk-app', {
   props: {
     page: {},
@@ -34,15 +34,31 @@ export default define('sk-app', {
       <script src="http://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>,
       <div>
         <Route path="/" match={() =>
-          <Module load={require('bundle?lazy!../pages/index/')} done={render} />
+          <Module load={require('bundle!../pages/index/')} done={render} />
+        } />
+        <Route path="/getting-started" match={() =>
+          <Module load={require('bundle!../pages/getting-started')} done={render} />
         } />
         <Route path="/docs" match={() =>
-          <Module load={require('bundle?lazy!../pages/docs')} done={render} />
+          <Module load={require('bundle!../pages/docs')} done={render} />
         } />
-        <Route path="/docs/installing" match={() =>
-          <Module load={require('bundle?lazy!../pages/docs/installing')} done={render} />
+        <Route path="/examples" match={() =>
+          <Module load={require('bundle!../pages/examples')} done={render} />
         } />
-        <Header scrolled={elem.scrolled} title="SkateJS" />
+        <Route path="/guides" match={() =>
+          <Module load={require('bundle!../pages/guides')} done={render} />
+        } />
+        <Route path="/support" match={() =>
+          <Module load={require('bundle!../pages/support')} done={render} />
+        } />
+        <Header scrolled={elem.scrolled} title="SkateJS">
+          <Item href="/getting-started">Getting Started</Item>
+          <Item href="/docs">Docs</Item>
+          <Item href="/examples">Examples</Item>
+          <Item href="/guides">Guides</Item>
+          <Item href="/support">Support</Item>
+          <Item href="https://github.com/skatejs/skatejs" external>Github</Item>
+        </Header>
         <Body>{Page ? <Page /> : ''}</Body>
         <Footer />
       </div>

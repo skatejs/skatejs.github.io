@@ -46,26 +46,15 @@ const css = {
   }),
 };
 
-const Item = (props, chren) => (
-  <li {...css.item}>
-    {props.external ?
-      <a {...props} {...css.link}>{chren}</a> :
-      <Link {...props} {...css.link}>{chren}</Link>
-    }
-  </li>
-);
 const allCss = Object.keys(css).map((k) => css[k]);
-export default props => (
+export default (props, chren) => (
   <div>
     <Css for={allCss} />
     <div {...css.header} {...(props.scrolled ? css.scrolled : {})}>
       <h1 {...css.title}>
         <Link href="/"><img alt={props.title} src={logo} width="30" /></Link>
       </h1>
-      <ul {...css.list}>
-        <Item href="/docs">Docs</Item>
-        <Item href="https://github.com/skatejs/skatejs" external>Github</Item>
-      </ul>
+      <ul {...css.list}>{chren}</ul>
     </div>
   </div>
 );

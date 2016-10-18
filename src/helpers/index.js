@@ -1,5 +1,5 @@
 import { h } from 'skatejs';
-import { cssFor, style } from 'glamor';
+import { cssFor, hover, style } from 'glamor';
 import page from 'page';
 import PrismCss from '!css!prismjs/themes/prism.css';
 import Prism from 'prismjs';
@@ -65,4 +65,35 @@ export const CodeExample = (props, chren) => (
       </Tab>
     </Tabs>
   </div>
+);
+
+
+
+const itemCss = style({
+  display: 'inline-block',
+  margin: 0,
+  padding: 0
+});
+
+const itemLinkCss = style({
+  color: '#333',
+  display: 'inline-block',
+  fontSize: 18,
+  margin: 0,
+  padding: 20,
+  textDecoration: 'none',
+  transition: 'background-color .3s ease'
+});
+
+const itemLinkHover = hover({
+  backgroundColor: '#eee'
+});
+
+export const Item = (props, chren) => (
+  <li {...itemCss}>
+    <Css for={[itemCss, itemLinkCss, itemLinkHover]} />
+    {props.external
+      ? <a {...props} {...itemLinkCss} {...itemLinkHover}>{chren}</a>
+      : <Link {...props} {...itemLinkCss} {...itemLinkHover}>{chren}</Link>}
+  </li>
 );
