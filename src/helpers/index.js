@@ -6,7 +6,7 @@ import Prism from 'prismjs';
 import Tabs, { Tab } from '../tabs';
 
 function followHref(e) {
-  if (e.target.rel !== 'external') {
+  if (e.currentTarget.rel !== 'external') {
     page(e.target.pathname || '/');
     e.preventDefault();
   }

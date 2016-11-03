@@ -18,7 +18,7 @@ const githubLogoStyle = style({
 export default () => (
   <div {...footerCss}>
     <Css for={[footerCss, githubLogoStyle]} />
-    <Link href="https://github.com/skatejs/skatejs"><img src={logoGithub} height="26" {...githubLogoStyle} /></Link>
-    <Link href="https://twitter.com/skate_js"><img src={logoTwitter} height="48" /></Link>
+    <Link rel="external" href="https://github.com/skatejs/skatejs"><img src={logoGithub} height="26" {...githubLogoStyle} /></Link>
+    <Link rel="external" href="https://twitter.com/skate_js"><img src={logoTwitter} height="48" /></Link>
   </div>
 );
