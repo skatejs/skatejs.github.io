@@ -5,7 +5,7 @@ export default define('sk-page-docs', {
   render() {
     return (
       <Layout>
-        <p>Coming soon. For now, check out the <Link href="https://github.com/skatejs/skatejs">README</Link>.</p>
+        <p>Coming soon. For now, check out the <Link rel="external" href="https://github.com/skatejs/skatejs">README</Link>.</p>
       </Layout>
     );
   },

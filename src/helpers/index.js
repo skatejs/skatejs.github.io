@@ -6,8 +6,10 @@ import Prism from 'prismjs';
 import Tabs, { Tab } from '../tabs';
 
 function followHref(e) {
-  page(e.target.pathname || '/');
-  e.preventDefault();
+  if (e.target.rel !== 'external') {
+    page(e.target.pathname || '/');
+    e.preventDefault();
+  }
 }
 
 export const Css = props => <style>
