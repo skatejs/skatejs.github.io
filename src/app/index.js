@@ -59,12 +59,12 @@ export default define('sk-app', class extends Component {
           <Module load={require('bundle!../pages/support')} done={render} />
         } />
         <Header scrolled={elem.scrolled} title="SkateJS">
-          <Item href="/getting-started">Getting Started</Item>
+          {/*<Item href="/getting-started">Getting Started</Item>*/}
           <Item href="/docs">Docs</Item>
-          <Item href="/examples">Examples</Item>
+          {/*<Item href="/examples">Examples</Item>
           <Item href="/guides">Guides</Item>
           <Item href="/support">Support</Item>
-          <Item href="https://github.com/skatejs/skatejs" external>Github</Item>
+          <Item href="https://github.com/skatejs/skatejs" external>Github</Item>*/}
         </Header>
         <Body>{Page ? <Page /> : ''}</Body>
         <Footer />
