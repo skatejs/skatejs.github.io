@@ -9,13 +9,11 @@ webpackJsonpskatejsGithubIo([1],{
 	  value: true
 	});
 
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _props;
-
 	var _skatejs = __webpack_require__(3);
-
-	var skate = _interopRequireWildcard(_skatejs);
 
 	var _helpers = __webpack_require__(6);
 
@@ -23,13 +21,11 @@ webpackJsonpskatejsGithubIo([1],{
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _tabs = __webpack_require__(21);
-
-	var _tabs2 = _interopRequireDefault(_tabs);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -37,24 +33,20 @@ webpackJsonpskatejsGithubIo([1],{
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	var define = skate.define;
-	var h = skate.h;
+	var _window = window;
+	var customElements = _window.customElements;
 
 
 	var FeaturePane = function FeaturePane(props, chren) {
-	  return h(
+	  return (0, _skatejs.h)(
 	    'div',
 	    { 'class': _index2.default.locals.featurePane },
-	    h(
+	    (0, _skatejs.h)(
 	      'h3',
 	      null,
 	      props.title
 	    ),
-	    h(
+	    (0, _skatejs.h)(
 	      'p',
 	      null,
 	      chren
@@ -64,49 +56,99 @@ webpackJsonpskatejsGithubIo([1],{
 
 	// Hello World
 
-	skate.define('x-hello', {
-	  render: function render() {
-	    return h(
-	      'span',
-	      null,
-	      'Hello, ',
-	      h('slot', null),
-	      '!'
-	    );
+	/** @jsx h */
+	// import { Component, h } from 'skatejs';
+
+	var Hello = function (_Component) {
+	  _inherits(Hello, _Component);
+
+	  function Hello() {
+	    _classCallCheck(this, Hello);
+
+	    return _possibleConstructorReturn(this, (Hello.__proto__ || Object.getPrototypeOf(Hello)).apply(this, arguments));
 	  }
-	});
+
+	  _createClass(Hello, [{
+	    key: 'renderCallback',
+	    value: function renderCallback() {
+	      return (0, _skatejs.h)(
+	        'span',
+	        null,
+	        'Hello, ',
+	        (0, _skatejs.h)('slot', null),
+	        '!'
+	      );
+	    }
+	  }]);
+
+	  return Hello;
+	}(_skatejs.Component);
+
+	customElements.define('x-hello', Hello);
 
 	// Simple Counter
 
-	skate.define('x-counter', {
-	  props: {
-	    count: skate.prop.number()
-	  },
-	  attached: function attached(elem) {
-	    elem.__ival = setInterval(function () {
-	      return ++elem.count;
-	    }, 1000);
-	  },
-	  detached: function detached(elem) {
-	    clearInterval(elem.__ival);
-	  },
-	  render: function render(elem) {
-	    return h(
-	      'span',
-	      null,
-	      'Count: ',
-	      elem.count
-	    );
+	/** @jsx h */
+	// import { Component, h, prop } from 'skatejs';
+
+	var _interval = Symbol();
+
+	var Counter = function (_Component2) {
+	  _inherits(Counter, _Component2);
+
+	  function Counter() {
+	    _classCallCheck(this, Counter);
+
+	    return _possibleConstructorReturn(this, (Counter.__proto__ || Object.getPrototypeOf(Counter)).apply(this, arguments));
 	  }
-	});
+
+	  _createClass(Counter, [{
+	    key: 'connectedCallback',
+	    value: function connectedCallback() {
+	      var _this3 = this;
+
+	      _get(Counter.prototype.__proto__ || Object.getPrototypeOf(Counter.prototype), 'connectedCallback', this).call(this);
+	      this[_interval] = setInterval(function () {
+	        return ++_this3.count;
+	      }, 1000);
+	    }
+	  }, {
+	    key: 'disconnectedCallback',
+	    value: function disconnectedCallback() {
+	      _get(Counter.prototype.__proto__ || Object.getPrototypeOf(Counter.prototype), 'disconnectedCallback', this).call(this);
+	      clearInterval(this[_interval]);
+	    }
+	  }, {
+	    key: 'renderCallback',
+	    value: function renderCallback() {
+	      return (0, _skatejs.h)(
+	        'span',
+	        null,
+	        'Count: ',
+	        this.count
+	      );
+	    }
+	  }], [{
+	    key: 'props',
+	    get: function get() {
+	      return { count: _skatejs.prop.number() };
+	    }
+	  }]);
+
+	  return Counter;
+	}(_skatejs.Component);
+
+	customElements.define('x-counter', Counter);
 
 	// Todo List
 
 	// Dumb component that just emits events when something happens.
 
+	// import { Component, emit, h, link, prop } from 'skatejs';
+
 	function remove(elem, indx) {
 	  return function () {
-	    skate.emit(elem, 'x-todo-remove', { detail: {
+	    (0, _skatejs.emit)(elem, 'x-todo-remove', { detail: {
 	        todo: elem,
 	        item: elem.children[indx]
 	      } });
@@ -115,7 +157,7 @@ webpackJsonpskatejsGithubIo([1],{
 
 	function submit(elem) {
 	  return function (e) {
-	    skate.emit(elem, 'x-todo-add', { detail: {
+	    (0, _skatejs.emit)(elem, 'x-todo-add', { detail: {
 	        todo: elem,
 	        item: elem.value
 	      } });
@@ -124,8 +166,8 @@ webpackJsonpskatejsGithubIo([1],{
 	}
 
 	// This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
-	var _window = window;
-	var MutationObserver = _window.MutationObserver;
+	var _window2 = window;
+	var MutationObserver = _window2.MutationObserver;
 
 	var symCache = Symbol();
 	var symDefault = Symbol();
@@ -163,7 +205,7 @@ webpackJsonpskatejsGithubIo([1],{
 	  });
 	}
 
-	var slot = skate.prop.create({
+	var slot = _skatejs.prop.create({
 	  slot: null,
 	  get: function get(elem, _ref3) {
 	    var name = _ref3.name;
@@ -190,58 +232,80 @@ webpackJsonpskatejsGithubIo([1],{
 	  }
 	});
 
-	var symItems = Symbol();
-	var Xtodo = skate.define('x-todo', {
-	  props: (_props = {}, _defineProperty(_props, symItems, slot()), _defineProperty(_props, 'title', skate.prop.string({ attribute: true })), _defineProperty(_props, 'value', skate.prop.string({ attribute: true })), _props),
-	  render: function render(elem) {
-	    var numItems = elem[symItems].length;
-	    return h(
-	      'div',
-	      null,
-	      h(
-	        'h3',
-	        null,
-	        elem.title,
-	        ' (',
-	        numItems,
-	        ')'
-	      ),
-	      h(
-	        'form',
-	        { 'on-submit': submit(elem) },
-	        h('input', { 'on-keyup': skate.link(elem), type: 'text', value: elem.value }),
-	        h(
-	          'button',
-	          { type: 'submit' },
-	          'Add ',
-	          elem.value
-	        )
-	      ),
-	      numItems ? h(
-	        'ol',
-	        null,
-	        elem[symItems].map(function (item, indx) {
-	          return h(
-	            'li',
-	            null,
-	            item.textContent,
-	            h(
-	              'button',
-	              { 'on-click': remove(elem, indx) },
-	              'x'
-	            )
-	          );
-	        })
-	      ) : h(
-	        'p',
-	        null,
-	        'There is nothing to do.'
-	      )
-	    );
-	  }
-	});
+	var _items = Symbol();
 
-	// Smart component so <x-todo> doesn't mutate itself.
+	var Todo = function (_Component3) {
+	  _inherits(Todo, _Component3);
+
+	  function Todo() {
+	    _classCallCheck(this, Todo);
+
+	    return _possibleConstructorReturn(this, (Todo.__proto__ || Object.getPrototypeOf(Todo)).apply(this, arguments));
+	  }
+
+	  _createClass(Todo, [{
+	    key: 'renderCallback',
+	    value: function renderCallback() {
+	      var _this5 = this;
+
+	      var numItems = this[_items].length;
+	      return (0, _skatejs.h)(
+	        'div',
+	        null,
+	        (0, _skatejs.h)(
+	          'h3',
+	          null,
+	          this.title,
+	          ' (',
+	          numItems,
+	          ')'
+	        ),
+	        (0, _skatejs.h)(
+	          'form',
+	          { 'on-submit': submit(this) },
+	          (0, _skatejs.h)('input', { 'on-keyup': (0, _skatejs.link)(this), type: 'text', value: this.value }),
+	          (0, _skatejs.h)(
+	            'button',
+	            { type: 'submit' },
+	            'Add ',
+	            this.value
+	          )
+	        ),
+	        numItems ? (0, _skatejs.h)(
+	          'ol',
+	          null,
+	          this[_items].map(function (item, indx) {
+	            return (0, _skatejs.h)(
+	              'li',
+	              null,
+	              item.textContent,
+	              (0, _skatejs.h)(
+	                'button',
+	                { 'on-click': remove(_this5, indx) },
+	                'x'
+	              )
+	            );
+	          })
+	        ) : (0, _skatejs.h)(
+	          'p',
+	          null,
+	          'There is nothing to do.'
+	        )
+	      );
+	    }
+	  }], [{
+	    key: 'props',
+	    get: function get() {
+	      var _ref5;
+
+	      return _ref5 = {}, _defineProperty(_ref5, _items, slot()), _defineProperty(_ref5, 'title', _skatejs.prop.string({ attribute: true })), _defineProperty(_ref5, 'value', _skatejs.prop.string({ attribute: true })), _ref5;
+	    }
+	  }]);
+
+	  return Todo;
+	}(_skatejs.Component);
+
+	// Smart component so <Todo /> doesn't mutate itself.
 
 	function addTodo(e) {
 	  var _e$detail = e.detail;
@@ -262,16 +326,16 @@ webpackJsonpskatejsGithubIo([1],{
 	  todo.removeChild(item);
 	}
 
-	skate.define('x-todo-smart', function (_Xtodo) {
-	  _inherits(_class, _Xtodo);
+	var TodoSmart = function (_Todo) {
+	  _inherits(TodoSmart, _Todo);
 
-	  function _class() {
-	    _classCallCheck(this, _class);
+	  function TodoSmart() {
+	    _classCallCheck(this, TodoSmart);
 
-	    return _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).apply(this, arguments));
+	    return _possibleConstructorReturn(this, (TodoSmart.__proto__ || Object.getPrototypeOf(TodoSmart)).apply(this, arguments));
 	  }
 
-	  _createClass(_class, null, [{
+	  _createClass(TodoSmart, null, [{
 	    key: 'created',
 	    value: function created(elem) {
 	      elem.addEventListener('x-todo-add', addTodo);
@@ -279,94 +343,110 @@ webpackJsonpskatejsGithubIo([1],{
 	    }
 	  }]);
 
-	  return _class;
-	}(Xtodo));
+	  return TodoSmart;
+	}(Todo);
 
-	exports.default = define('sk-page-index', {
-	  render: function render() {
-	    return h(
-	      'div',
-	      null,
-	      h(
-	        'style',
+	customElements.define('x-todo', Todo);
+	customElements.define('x-todo-smart', TodoSmart);
+
+	exports.default = (0, _skatejs.define)(function (_Component4) {
+	  _inherits(_class, _Component4);
+
+	  function _class() {
+	    _classCallCheck(this, _class);
+
+	    return _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).apply(this, arguments));
+	  }
+
+	  _createClass(_class, [{
+	    key: 'renderCallback',
+	    value: function renderCallback() {
+	      return (0, _skatejs.h)(
+	        'div',
 	        null,
-	        _index2.default.toString()
-	      ),
-	      h(
-	        'div',
-	        { 'class': _index2.default.locals.hero },
-	        h(
-	          'h1',
+	        (0, _skatejs.h)(
+	          'style',
 	          null,
-	          'SkateJS'
+	          _index2.default.toString()
 	        ),
-	        h(
-	          'p',
-	          null,
-	          'Skate is a functional, featherweight and cross-framework compatible web component library built on W3C specs.'
-	        )
-	      ),
-	      h(
-	        'div',
-	        { 'class': _index2.default.locals.featurePanes },
-	        h(
-	          FeaturePane,
-	          { title: 'Forward-thinking' },
-	          'Skate leverages the web platform and is built on top of the ',
-	          h(
-	            'a',
-	            { href: 'https://github.com/w3c/webcomponents' },
-	            'W3C Web Component specs'
-	          ),
-	          '. From this it gets native performance, longevity and cross-framework compatibility.'
-	        ),
-	        h(
-	          FeaturePane,
-	          { title: 'Functional' },
-	          h(
-	            'a',
-	            { href: 'https://github.com/google/incremental-dom' },
-	            'Incremental DOM'
-	          ),
-	          ' backs Skate\'s functional rendering pipeline, offering performance, memory-efficiency and simplicity.'
-	        ),
-	        h(
-	          FeaturePane,
-	          { title: 'Featherweight' },
-	          'Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet.'
-	        )
-	      ),
-	      h(
-	        'div',
-	        { 'class': _index2.default.locals.grid + ' ' + _index2.default.locals.grid2 },
-	        h(
-	          _helpers.CodeExample,
-	          {
-	            title: 'Hello World',
-	            description: 'A simple hello world example.',
-	            html: '\n              <x-hello>Bob</x-hello>\n            ',
-	            js: '\n              skate.define(\'x-hello\', {\n                render() {\n                  return <span>Hello, <slot />!</span>;\n                },\n              });\n            '
-	          },
-	          h(
-	            'x-hello',
+	        (0, _skatejs.h)(
+	          'div',
+	          { 'class': _index2.default.locals.hero },
+	          (0, _skatejs.h)(
+	            'h1',
 	            null,
-	            'Bob'
+	            'SkateJS'
+	          ),
+	          (0, _skatejs.h)(
+	            'p',
+	            null,
+	            'Skate is a functional, featherweight and cross-framework compatible web component library built on W3C specs.'
 	          )
 	        ),
-	        h(
-	          _helpers.CodeExample,
-	          {
-	            title: 'Simple Counter',
-	            description: 'A simple counter that shows how to use Shadow DOM name slots and re-rendering.',
-	            html: '\n              <x-counter count="1"></x-counter>\n            ',
-	            js: '\n              skate.define(\'x-counter\', {\n                props: {\n                  count: skate.prop.number(),\n                },\n                attached(elem) {\n                  elem.__ival = setInterval(() => ++elem.count, 1000);\n                },\n                detached(elem) {\n                  clearInterval(elem.__ival);\n                },\n                render(elem) {\n                  return <span>Count: {elem.count}</span>;\n                },\n              });\n            '
-	          },
-	          h('x-counter', { count: '1' })
+	        (0, _skatejs.h)(
+	          'div',
+	          { 'class': _index2.default.locals.featurePanes },
+	          (0, _skatejs.h)(
+	            FeaturePane,
+	            { title: 'Forward-thinking' },
+	            'Skate leverages the web platform and is built on top of the ',
+	            (0, _skatejs.h)(
+	              'a',
+	              { href: 'https://github.com/w3c/webcomponents' },
+	              'W3C Web Component specs'
+	            ),
+	            '. From this it gets native performance, longevity and cross-framework compatibility.'
+	          ),
+	          (0, _skatejs.h)(
+	            FeaturePane,
+	            { title: 'Functional' },
+	            (0, _skatejs.h)(
+	              'a',
+	              { href: 'https://github.com/google/incremental-dom' },
+	              'Incremental DOM'
+	            ),
+	            ' backs Skate\'s functional rendering pipeline, offering performance, memory-efficiency and simplicity.'
+	          ),
+	          (0, _skatejs.h)(
+	            FeaturePane,
+	            { title: 'Featherweight' },
+	            'Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet.'
+	          )
+	        ),
+	        (0, _skatejs.h)(
+	          'div',
+	          { 'class': _index2.default.locals.grid + ' ' + _index2.default.locals.grid2 },
+	          (0, _skatejs.h)(
+	            _helpers.CodeExample,
+	            {
+	              title: 'Hello World',
+	              description: 'A simple hello world example.',
+	              html: '\n              <x-hello>Bob</x-hello>\n            ',
+	              js: '\n              /** @jsx h */\n              import { Component, h } from \'skatejs\';\n\n              class Hello extends Component {\n                renderCallback () {\n                  return <span>Hello, <slot />!</span>;\n                }\n              }\n\n              customElements.define(\'x-hello\', Hello);\n            '
+	            },
+	            (0, _skatejs.h)(
+	              'x-hello',
+	              null,
+	              'Bob'
+	            )
+	          ),
+	          (0, _skatejs.h)(
+	            _helpers.CodeExample,
+	            {
+	              title: 'Simple Counter',
+	              description: 'A simple counter that shows how to use Shadow DOM name slots and re-rendering.',
+	              html: '\n              <x-counter count="1"></x-counter>\n            ',
+	              js: '\n              /** @jsx h */\n              import { Component, h, prop } from \'skatejs\';\n\n              const _interval = Symbol();\n\n              class Counter extends Component {\n                static get props () {\n                  return { count: prop.number() };\n                }\n                connectedCallback () {\n                  super.connectedCallback();\n                  this[_interval] = setInterval(() => ++this.count, 1000);\n                }\n                disconnectedCallback () {\n                  super.disconnectedCallback();\n                  clearInterval(this[_interval]);\n                }\n                renderCallback () {\n                  return <span>Count: {this.count}</span>;\n                }\n              }\n\n              customElements.define(\'x-counter\', Counter);\n            '
+	            },
+	            (0, _skatejs.h)(Counter, { count: '1' })
+	          )
 	        )
-	      )
-	    );
-	  }
-	});
+	      );
+	    }
+	  }]);
+
+	  return _class;
+	}(_skatejs.Component));
 
 /***/ },
 

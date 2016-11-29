@@ -1,9 +1,8 @@
-import * as skate from 'skatejs';
+import { Component, define, emit, h, link, prop } from 'skatejs';
 import { CodeExample } from '../../helpers';
 import css from './index.css';
-import Tabs, { Tab } from '../../tabs';
 
-const { define, h } = skate;
+const { customElements } = window;
 
 const FeaturePane = (props, chren) => (
   <div class={css.locals.featurePane}>
@@ -12,61 +11,69 @@ const FeaturePane = (props, chren) => (
   </div>
 );
 
-
-
 // Hello World
 
-skate.define('x-hello', {
-  render () {
+/** @jsx h */
+// import { Component, h } from 'skatejs';
+
+class Hello extends Component {
+  renderCallback () {
     return <span>Hello, <slot />!</span>;
   }
-});
+}
 
-
+customElements.define('x-hello', Hello);
 
 // Simple Counter
 
-skate.define('x-counter', {
-  props: {
-    count: skate.prop.number(),
-  },
-  attached (elem) {
-    elem.__ival = setInterval(() => ++elem.count, 1000);
-  },
-  detached (elem) {
-    clearInterval(elem.__ival);
-  },
-  render (elem) {
-    return <span>Count: {elem.count}</span>;
+/** @jsx h */
+// import { Component, h, prop } from 'skatejs';
+
+const _interval = Symbol();
+
+class Counter extends Component {
+  static get props () {
+    return { count: prop.number() };
   }
-});
+  connectedCallback () {
+    super.connectedCallback();
+    this[_interval] = setInterval(() => ++this.count, 1000);
+  }
+  disconnectedCallback () {
+    super.disconnectedCallback();
+    clearInterval(this[_interval]);
+  }
+  renderCallback () {
+    return <span>Count: {this.count}</span>;
+  }
+}
 
-
+customElements.define('x-counter', Counter);
 
 // Todo List
 
 // Dumb component that just emits events when something happens.
 
+// import { Component, emit, h, link, prop } from 'skatejs';
+
 function remove (elem, indx) {
   return () => {
-    skate.emit(elem, 'x-todo-remove', { detail: {
+    emit(elem, 'x-todo-remove', { detail: {
       todo: elem,
-      item: elem.children[indx],
+      item: elem.children[indx]
     } });
   };
 }
 
 function submit (elem) {
   return e => {
-    skate.emit(elem, 'x-todo-add', { detail: {
+    emit(elem, 'x-todo-add', { detail: {
       todo: elem,
-      item: elem.value,
+      item: elem.value
     } });
     e.preventDefault();
   };
 }
-
-
 
 // This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
 const { MutationObserver } = window;
@@ -100,7 +107,7 @@ function updateProps ({ target: elem }) {
   elem[symProps].forEach(name => updateProp(elem, name, dist));
 }
 
-const slot = skate.prop.create({
+const slot = prop.create({
   slot: null,
   get (elem, { name }) {
     if (!elem[symMo]) {
@@ -120,30 +127,31 @@ const slot = skate.prop.create({
   }
 });
 
+const _items = Symbol();
 
-
-const symItems = Symbol();
-const Xtodo = skate.define('x-todo', {
-  props: {
-    [symItems]: slot(),
-    title: skate.prop.string({ attribute: true }),
-    value: skate.prop.string({ attribute: true })
-  },
-  render (elem) {
-    const numItems = elem[symItems].length;
+class Todo extends Component {
+  static get props () {
+    return {
+      [_items]: slot(),
+      title: prop.string({ attribute: true }),
+      value: prop.string({ attribute: true })
+    };
+  }
+  renderCallback () {
+    const numItems = this[_items].length;
     return (
       <div>
-        <h3>{elem.title} ({numItems})</h3>
-        <form on-submit={submit(elem)}>
-          <input on-keyup={skate.link(elem)} type="text" value={elem.value} />
-          <button type="submit">Add {elem.value}</button>
+        <h3>{this.title} ({numItems})</h3>
+        <form on-submit={submit(this)}>
+          <input on-keyup={link(this)} type='text' value={this.value} />
+          <button type='submit'>Add {this.value}</button>
         </form>
         {numItems ? (
           <ol>
-            {elem[symItems].map((item, indx) => (
+            {this[_items].map((item, indx) => (
               <li>
                 {item.textContent}
-                <button on-click={remove(elem, indx)}>x</button>
+                <button on-click={remove(this, indx)}>x</button>
               </li>
             ))}
           </ol>
@@ -153,10 +161,9 @@ const Xtodo = skate.define('x-todo', {
       </div>
     );
   }
-});
+}
 
-
-// Smart component so <x-todo> doesn't mutate itself.
+// Smart component so <Todo /> doesn't mutate itself.
 
 function addTodo (e) {
   const { item, todo } = e.detail;
@@ -171,17 +178,18 @@ function removeTodo (e) {
   todo.removeChild(item);
 }
 
-skate.define('x-todo-smart', class extends Xtodo {
+class TodoSmart extends Todo {
   static created (elem) {
     elem.addEventListener('x-todo-add', addTodo);
     elem.addEventListener('x-todo-remove', removeTodo);
   }
-});
+}
 
+customElements.define('x-todo', Todo);
+customElements.define('x-todo-smart', TodoSmart);
 
-
-export default define('sk-page-index', {
-  render () {
+export default define(class extends Component {
+  renderCallback () {
     return (
       <div>
         <style>{css.toString()}</style>
@@ -190,60 +198,74 @@ export default define('sk-page-index', {
           <p>Skate is a functional, featherweight and cross-framework compatible web component library built on W3C specs.</p>
         </div>
         <div class={css.locals.featurePanes}>
-          <FeaturePane title="Forward-thinking">
-            Skate leverages the web platform and is built on top of the <a href="https://github.com/w3c/webcomponents">W3C Web Component specs</a>. From this it gets native performance, longevity and cross-framework compatibility.
+          <FeaturePane title='Forward-thinking'>
+            Skate leverages the web platform and is built on top of the <a href='https://github.com/w3c/webcomponents'>W3C Web Component specs</a>. From this it gets native performance, longevity and cross-framework compatibility.
           </FeaturePane>
-          <FeaturePane title="Functional">
-            <a href="https://github.com/google/incremental-dom">Incremental DOM</a> backs Skate's functional rendering pipeline, offering performance, memory-efficiency and simplicity.
+          <FeaturePane title='Functional'>
+            <a href='https://github.com/google/incremental-dom'>Incremental DOM</a> backs Skate's functional rendering pipeline, offering performance, memory-efficiency and simplicity.
           </FeaturePane>
-          <FeaturePane title="Featherweight">
+          <FeaturePane title='Featherweight'>
             Weighing in at only 5k min+gz, it gives you a solid foundation for building complex UI components without downloading the entire internet.
           </FeaturePane>
         </div>
         <div class={`${css.locals.grid} ${css.locals.grid2}`}>
           <CodeExample
-            title="Hello World"
-            description="A simple hello world example."
+            title='Hello World'
+            description='A simple hello world example.'
             html={`
               <x-hello>Bob</x-hello>
             `}
             js={`
-              skate.define('x-hello', {
-                render() {
+              /** @jsx h */
+              import { Component, h } from 'skatejs';
+
+              class Hello extends Component {
+                renderCallback () {
                   return <span>Hello, <slot />!</span>;
-                },
-              });
+                }
+              }
+
+              customElements.define('x-hello', Hello);
             `}
           >
             <x-hello>Bob</x-hello>
           </CodeExample>
           <CodeExample
-            title="Simple Counter"
-            description="A simple counter that shows how to use Shadow DOM name slots and re-rendering."
+            title='Simple Counter'
+            description='A simple counter that shows how to use Shadow DOM name slots and re-rendering.'
             html={`
               <x-counter count="1"></x-counter>
             `}
             js={`
-              skate.define('x-counter', {
-                props: {
-                  count: skate.prop.number(),
-                },
-                attached(elem) {
-                  elem.__ival = setInterval(() => ++elem.count, 1000);
-                },
-                detached(elem) {
-                  clearInterval(elem.__ival);
-                },
-                render(elem) {
-                  return <span>Count: {elem.count}</span>;
-                },
-              });
+              /** @jsx h */
+              import { Component, h, prop } from 'skatejs';
+
+              const _interval = Symbol();
+
+              class Counter extends Component {
+                static get props () {
+                  return { count: prop.number() };
+                }
+                connectedCallback () {
+                  super.connectedCallback();
+                  this[_interval] = setInterval(() => ++this.count, 1000);
+                }
+                disconnectedCallback () {
+                  super.disconnectedCallback();
+                  clearInterval(this[_interval]);
+                }
+                renderCallback () {
+                  return <span>Count: {this.count}</span>;
+                }
+              }
+
+              customElements.define('x-counter', Counter);
             `}
           >
-            <x-counter count="1"></x-counter>
+            <Counter count='1' />
           </CodeExample>
         </div>
       </div>
     );
-  },
+  }
 });
