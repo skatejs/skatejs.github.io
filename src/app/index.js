@@ -29,9 +29,6 @@ export default define('sk-app', class extends Component {
     super.disconnectedCallback();
     window.removeEventListener('scroll', this._scrollHandler);
   }
-  renderCallback() {
-    
-  }
   static render(elem) {
     const Page = elem.page;
     const render = page => {

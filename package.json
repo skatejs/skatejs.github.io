@@ -37,7 +37,7 @@
     "glamor": "2.x",
     "page": "1.x",
     "prismjs": "1.x",
-    "skatejs": "^3.1.0",
+    "skatejs": "^4.1.1",
     "skatejs-build": "^9.2.1",
     "skatejs-web-components": "1.2.4"
   }
