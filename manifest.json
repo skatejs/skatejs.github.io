@@ -1,5 +1,6 @@
 {
   "name": "SkateJS",
+  "description": "SkateJS is a web component library designed to give you an augmentation of the web component specs focusing on a functional rendering pipeline, clean property / attribute semantics and a small footprint.",
   "short_name": "SkateJS",
   "icons": [{
     "src": "dist/cdcf8f64994df2f0ca865f88e17aaa59.png",
@@ -8,6 +9,6 @@
   }],
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#F4547B",
-  "theme_color": "#FFF"
+  "background_color": "#f4547b",
+  "theme_color": "#ffffff"
 }
