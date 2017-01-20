@@ -1,4 +1,4 @@
-import 'core-js/es6/symbol';
+import 'core-js/shim';
 import 'skatejs-web-components';
 import App from './app/index';
 import css from 'style!./index.css';
