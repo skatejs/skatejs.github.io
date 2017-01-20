@@ -14,30 +14,33 @@ function selectTab(tabs, tab) {
   };
 }
 
-export default define('sk-tabs', {
-  props: {
-    tabs: prop.array(),
-  },
-  updated(elem, prev) {
-    if (Component.updated(elem, prev)) {
-      return emit(elem, 'tab-changed', { detail: elem.selected });
+export default define(class extends Component {
+  static get is(){ return 'sk-tabs' }
+  static get props() {
+    return {
+      tabs: prop.array(),
+    };
+  }
+  updatedCallback(prev) {
+    if (Component.updated(this, prev)) {
+      return emit(this, 'tab-changed', { detail: this.selected });
     }
-  },
-  render(elem) {
+  }
+  renderCallback() {
     return (
       <div>
         <style>{css.toString()}</style>
         <div class={css.locals.tabs}>
-          {elem.tabs.map(tab => (
+          {this.tabs.map(tab => (
             <div class={cx({ [css.locals.tab]: true, [css.locals.selected]: tab.selected })}>
-              <a href={`#${tab.name}`} on-click={selectTab(elem.tabs, tab)}>{tab.name}</a>
+              <a href={`#${tab.name}`} on-click={selectTab(this.tabs, tab)}>{tab.name}</a>
             </div>
           ))}
         </div>
-        <slot on-slotchange={onTabsChanged(elem)} />
+        <slot on-slotchange={onTabsChanged(this)} />
       </div>
     );
-  },
+  }
 });
 
 export { Tab };
