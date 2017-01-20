@@ -189,6 +189,7 @@ customElements.define('x-todo', Todo);
 customElements.define('x-todo-smart', TodoSmart);
 
 export default define(class extends Component {
+  static get is(){ return 'sk-page-index' }
   renderCallback () {
     return (
       <div>
