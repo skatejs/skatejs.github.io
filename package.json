@@ -33,12 +33,13 @@
   },
   "dependencies": {
     "classnames": "2.x",
+    "core-js": "^2.4.1",
     "debounce": "1.x",
     "glamor": "2.x",
     "page": "1.x",
     "prismjs": "1.x",
-    "skatejs": "^4.1.1",
-    "skatejs-build": "^9.2.1",
-    "skatejs-web-components": "^5.0.0"
+    "skatejs": "^4.6.2",
+    "skatejs-build": "^12.1.0",
+    "skatejs-web-components": "^5.0.1"
   }
 }
