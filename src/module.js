@@ -1,20 +1,23 @@
-import { define } from 'skatejs';
+import { define, Component } from 'skatejs';
 
-export default define('sk-module', {
-  props: {
-    args: {},
-    load: {},
-    done: {}
-  },
-  updated (elem, prev) {
-    if (typeof elem.load === 'function') {
-      elem.load(args => (elem.args = args));
+export default define(class extends Component {
+  static get is(){ return 'sk-module' }
+  static get props() {
+    return {
+      args: {},
+      load: {},
+      done: {},
+    };
+  }
+  updatedCallback (prev) {
+    if (typeof this.load === 'function') {
+      this.load(args => (this.args = args));
     }
-    return elem.args;
-  },
-  render (elem) {
-    if (typeof elem.done === 'function') {
-      return elem.done(elem.args);
+    return this.args;
+  }
+  renderCallback () {
+    if (typeof this.done === 'function') {
+      return this.done(this.args);
     }
   }
 });

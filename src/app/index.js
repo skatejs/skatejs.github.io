@@ -9,7 +9,8 @@ import Module from '../module';
 import Route from '../route';
 import title from '../_/title';
 
-export default define('sk-app', class extends Component {
+export default define(class extends Component {
+  static get is(){ return 'sk-app' }
   static get props () {
     return {
       page: {},

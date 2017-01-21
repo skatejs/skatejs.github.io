@@ -10,27 +10,32 @@ function emitSlotChange(elem) {
   return elem.__debouncedSlotChangeEvent();
 }
 
-export default define('sk-tabs-tab', {
-  props: {
-    name: prop.string({ attribute: true }),
-    selected: prop.boolean({ attribute: true }),
-  },
-  attached(elem) {
-    emitSlotChange(elem);
-  },
-  detached(elem) {
-    emitSlotChange(elem);
-  },
-  updated(elem, prev) {
-    emitSlotChange(elem);
-    return Component.updated(elem, prev);
-  },
-  render(elem) {
+export default define(class extends Component {
+  static get is(){ return 'sk-tabs-tab' }
+  static get props(){ 
+    return {
+      name: prop.string({ attribute: true }),
+      selected: prop.boolean({ attribute: true }),
+    }
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    emitSlotChange(this);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    emitSlotChange(this);
+  }
+  updatedCallback(prev) {
+    emitSlotChange(this);
+    return super.updatedCallback(prev);
+  }
+  renderCallback() {
     return (
-      <div class={cx({ [css.locals.pane]: true, [css.locals.selected]: elem.selected })}>
+      <div class={cx({ [css.locals.pane]: true, [css.locals.selected]: this.selected })}>
         <style>{css.toString()}</style>
         <slot />
       </div>
     );
-  },
+  }
 });

@@ -1,24 +1,27 @@
-import { define, emit, prop } from 'skatejs';
+import { define, prop, Component } from 'skatejs';
 import page from 'page';
 
 const registered = [];
 
-export default define('sk-router-route', {
-  props: {
-    match: {},
-    matched: prop.boolean({ attribute: true }),
-    path: prop.string({ attribute: true }),
-  },
-  updated (elem, prev) {
-    const { path } = elem;
+export default define(class extends Component {
+  static get is(){ return 'sk-router-route' }
+  static get props() {
+    return {
+      match: {},
+      matched: prop.boolean({ attribute: true }),
+      path: prop.string({ attribute: true }),
+    }
+  }
+  updatedCallback (prev) {
+    const { path } = this;
 
     if (registered.indexOf(path) === -1) {
       registered.push(path);
       page(path, () => {
-        elem.matched = true;
+        this.matched = true;
       });
       page.exit(path, (args, next) => {
-        elem.matched = false;
+        this.matched = false;
         next();
       });
 
@@ -28,8 +31,8 @@ export default define('sk-router-route', {
     }
     
     return true;
-  },
-  render(elem) {
-    return elem.matched && elem.match();
+  }
+  renderCallback() {
+    return this.matched && this.match();
   }
 });
