@@ -19,6 +19,9 @@
   "homepage": "https://github.com/skatejs/skatejs.github.io#readme",
   "devDependencies": {
     "babel-plugin-incremental-dom": "^3.4.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
     "bundle-loader": "^0.5.4",
     "cz-conventional-changelog": "^1.1.6",
     "file-loader": "^0.9.0",
@@ -38,8 +41,8 @@
     "glamor": "2.x",
     "page": "1.x",
     "prismjs": "1.x",
-    "skatejs": "^4.6.2",
+    "skatejs": "latest",
     "skatejs-build": "^12.1.0",
-    "skatejs-web-components": "^5.0.1"
+    "skatejs-web-components": "latest"
   }
 }

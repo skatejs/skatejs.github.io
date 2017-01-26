@@ -10,7 +10,9 @@ import Route from '../route';
 import title from '../_/title';
 
 export default define(class extends Component {
-  static get is(){ return 'sk-app' }
+  static get is () {
+    return 'sk-app';
+  }
   static get props () {
     return {
       page: {},

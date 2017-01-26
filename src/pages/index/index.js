@@ -1,3 +1,5 @@
+/** @jsx h */
+
 import { Component, define, emit, h, link, prop } from 'skatejs';
 import { CodeExample } from '../../helpers';
 import css from './index.css';

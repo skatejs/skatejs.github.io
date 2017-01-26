@@ -1,4 +1,6 @@
-import { merge, style } from 'glamor';
+/** @jsx h */
+
+import { style } from 'glamor';
 import { h } from 'skatejs';
 import { Css, Link } from './helpers';
 import logoGithub from './assets/logo-github.png';

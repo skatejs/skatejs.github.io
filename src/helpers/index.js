@@ -1,3 +1,5 @@
+/** @jsx h */
+
 import { h } from 'skatejs';
 import { cssFor, hover, style } from 'glamor';
 import page from 'page';
@@ -5,7 +7,7 @@ import PrismCss from '!css!prismjs/themes/prism.css';
 import Prism from 'prismjs';
 import Tabs, { Tab } from '../tabs';
 
-function followHref(e) {
+function followHref (e) {
   if (e.currentTarget.rel !== 'external') {
     page(e.target.pathname || '/');
     e.preventDefault();

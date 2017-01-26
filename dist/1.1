@@ -1,6 +1,6 @@
 webpackJsonpskatejsGithubIo([1],{
 
-/***/ 225:
+/***/ 338:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13,11 +13,11 @@ webpackJsonpskatejsGithubIo([1],{
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _skatejs = __webpack_require__(190);
+	var _skatejs = __webpack_require__(294);
 
-	var _helpers = __webpack_require__(193);
+	var _helpers = __webpack_require__(296);
 
-	var _index = __webpack_require__(226);
+	var _index = __webpack_require__(339);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31,10 +31,10 @@ webpackJsonpskatejsGithubIo([1],{
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /** @jsx h */
 
-	var _window = window;
-	var customElements = _window.customElements;
+	var _window = window,
+	    customElements = _window.customElements;
 
 
 	var FeaturePane = function FeaturePane(props, chren) {
@@ -166,8 +166,8 @@ webpackJsonpskatejsGithubIo([1],{
 	}
 
 	// This is currently in RFC: https://github.com/skatejs/skatejs/issues/863
-	var _window2 = window;
-	var MutationObserver = _window2.MutationObserver;
+	var _window2 = window,
+	    MutationObserver = _window2.MutationObserver;
 
 	var symCache = Symbol();
 	var symDefault = Symbol();
@@ -225,8 +225,8 @@ webpackJsonpskatejsGithubIo([1],{
 	    return elem[symCache][slotMap(elem, name)];
 	  },
 	  set: function set(elem, _ref4) {
-	    var name = _ref4.name;
-	    var newValue = _ref4.newValue;
+	    var name = _ref4.name,
+	        newValue = _ref4.newValue;
 
 	    elem[symCache][slotMap(elem, name)] = newValue || [];
 	  }
@@ -308,9 +308,9 @@ webpackJsonpskatejsGithubIo([1],{
 	// Smart component so <Todo /> doesn't mutate itself.
 
 	function addTodo(e) {
-	  var _e$detail = e.detail;
-	  var item = _e$detail.item;
-	  var todo = _e$detail.todo;
+	  var _e$detail = e.detail,
+	      item = _e$detail.item,
+	      todo = _e$detail.todo;
 
 	  var xitem = document.createElement('x-item');
 	  xitem.textContent = item;
@@ -319,9 +319,9 @@ webpackJsonpskatejsGithubIo([1],{
 	}
 
 	function removeTodo(e) {
-	  var _e$detail2 = e.detail;
-	  var item = _e$detail2.item;
-	  var todo = _e$detail2.todo;
+	  var _e$detail2 = e.detail,
+	      item = _e$detail2.item,
+	      todo = _e$detail2.todo;
 
 	  todo.removeChild(item);
 	}
@@ -455,10 +455,10 @@ webpackJsonpskatejsGithubIo([1],{
 
 /***/ },
 
-/***/ 226:
+/***/ 339:
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(206)();
+	exports = module.exports = __webpack_require__(319)();
 	// imports
 
 

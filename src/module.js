@@ -1,12 +1,14 @@
 import { define, Component } from 'skatejs';
 
 export default define(class extends Component {
-  static get is(){ return 'sk-module' }
-  static get props() {
+  static get is () {
+    return 'sk-module';
+  }
+  static get props () {
     return {
       args: {},
       load: {},
-      done: {},
+      done: {}
     };
   }
   updatedCallback (prev) {

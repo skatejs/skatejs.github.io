@@ -1,3 +1,5 @@
+/** @jsx h */
+
 import { h } from 'skatejs';
 import { Css, Link } from '../helpers';
 import { hover, merge, style } from 'glamor';

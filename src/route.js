@@ -4,13 +4,15 @@ import page from 'page';
 const registered = [];
 
 export default define(class extends Component {
-  static get is(){ return 'sk-router-route' }
-  static get props() {
+  static get is () {
+    return 'sk-router-route';
+  }
+  static get props () {
     return {
       match: {},
       matched: prop.boolean({ attribute: true }),
       path: prop.string({ attribute: true }),
-    }
+    };
   }
   updatedCallback (prev) {
     const { path } = this;
@@ -29,10 +31,10 @@ export default define(class extends Component {
         page(path);
       }
     }
-    
+
     return true;
   }
-  renderCallback() {
+  renderCallback () {
     return this.matched && this.match();
   }
 });
